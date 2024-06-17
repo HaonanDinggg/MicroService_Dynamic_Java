@@ -4,32 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="731f939b-15dd-4006-aaf8-2515b5a369d8" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/jarRepositories.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__com_fasterxml_jackson_core_jackson_annotations_2_14_0.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__com_fasterxml_jackson_core_jackson_core_2_14_0.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__com_fasterxml_jackson_core_jackson_databind_2_14_0.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/uiDesigner.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Dynamic_Java.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/utils/AppPathInfo.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/utils/App_Creator.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/utils/App_Params.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/utils/Connection.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/utils/NetWorkInfo.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/utils/NodeInfo.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/utils/PathProbability.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/utils/PhysicalNodeInfo.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/utils/PhysicalPathNodeInfo.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/utils/PhysicalRoutingInfo.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/utils/ServiceTypeInfo.java" afterDir="false" />
+    <list default="true" id="731f939b-15dd-4006-aaf8-2515b5a369d8" name="Changes" comment="初版Environment">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -65,7 +41,7 @@
     "project.structure.last.edited": "Modules",
     "project.structure.proportion": "0.15",
     "project.structure.side.proportion": "0.2",
-    "settings.editor.selected.configurable": "configurable.group.build"
+    "settings.editor.selected.configurable": "org.jetbrains.plugins.github.ui.GithubSettingsConfigurable"
   }
 }]]></component>
   <component name="RunManager" selected="Application.NetWorkInfo">
@@ -139,6 +115,29 @@
       <option name="presentableId" value="Default" />
       <updated>1718260321211</updated>
     </task>
+    <task id="LOCAL-00001" summary="初版Environment">
+      <created>1718626610889</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1718626610889</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="初版Environment" />
+    <option name="LAST_COMMIT_MESSAGE" value="初版Environment" />
   </component>
 </project>
