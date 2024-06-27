@@ -23,7 +23,7 @@ public class App_Params {
     private int MAX1; // 最大值
 
     // 基于微服务的应用的各个参数范围
-    private int App_Num; // 该时段下app的数量
+    private int[] App_Num; // 该时段下app的数量
     private int[] TTL_Max_Tolerance_Latency_Range; // 应用的生命周期/最大容忍时延范围
     private double[] Unit_Rate_Bandwidth_Range; // 单位到达率下对应的带宽占用范围
     private int[] Average_Arrival_Rate_Range; // 平均请求到达率的范围
@@ -43,11 +43,15 @@ public class App_Params {
 
     private int Lowest_Microservice_Type_Unit_Process_Ability; // 微服务一个实例的最低处理能力1
     private int Highest_Microservice_Type_Unit_Process_Ability; // 微服务一个实例的最高处理能力1
+    private double[][] PhysicalConnectionDelay;
+    private double[][] PhysicalConnectionBandwidth;
+    private double[][] MicroServiceConnectionDelay;
+
 
     public App_Params() {
     }
 
-    public App_Params(int Num_Server, int Num_Microservice, List<ServiceTypeInfo> serviceTypeInfos, int Num_Application, int Num_Time_Slot, int Num_CPU_Core, int MAX1, int App_Num, int[] TTL_Max_Tolerance_Latency_Range, double[] Unit_Rate_Bandwidth_Range, int[] Average_Arrival_Rate_Range, int[] Num_Node_Range, int[] Num_Edge_Range, int[] DAG_Category_Range, int[] Num_Apps_Timeslot_Range, int[] Microservice_Type_CPU, int[] Microservice_Type_Memory, double Lowest_Communication_Latency, double Highest_Communication_Latency, int Lowest_Bandwidth_Capacity, int Highest_Bandwidth_Capacity, int Lowest_Microservice_Bandwidth_Requirement, int Highest_Microservice_Bandwidth_Requirement, int Lowest_Microservice_Type_Unit_Process_Ability, int Highest_Microservice_Type_Unit_Process_Ability) {
+    public App_Params(int Num_Server, int Num_Microservice, List<ServiceTypeInfo> serviceTypeInfos, int Num_Application, int Num_Time_Slot, int Num_CPU_Core, int MAX1, int[] App_Num, int[] TTL_Max_Tolerance_Latency_Range, double[] Unit_Rate_Bandwidth_Range, int[] Average_Arrival_Rate_Range, int[] Num_Node_Range, int[] Num_Edge_Range, int[] DAG_Category_Range, int[] Num_Apps_Timeslot_Range, int[] Microservice_Type_CPU, int[] Microservice_Type_Memory, double Lowest_Communication_Latency, double Highest_Communication_Latency, int Lowest_Bandwidth_Capacity, int Highest_Bandwidth_Capacity, int Lowest_Microservice_Bandwidth_Requirement, int Highest_Microservice_Bandwidth_Requirement, int Lowest_Microservice_Type_Unit_Process_Ability, int Highest_Microservice_Type_Unit_Process_Ability) {
         this.Num_Server = Num_Server;
         this.Num_Microservice = Num_Microservice;
         this.serviceTypeInfos = serviceTypeInfos;
@@ -87,22 +91,15 @@ public class App_Params {
         }
     }
 
-
-    /**
-     * 获取
-     * @return App_Num
-     */
-    public int getApp_Num() {
-        return App_Num;
+    public void InitNodeList(App_Params appParams){
+        for(int i = 0;i < appParams.getNum_Server();i++){
+            PhysicalNodeInfo physicalNodeInfo = new PhysicalNodeInfo();
+            physicalNodeInfo.setNodeID(i);
+        }
     }
 
-    /**
-     * 设置
-     * @param App_Num
-     */
-    public void setApp_Num(int App_Num) {
-        this.App_Num = App_Num;
-    }
+
+
 
     /**
      * 获取
@@ -488,7 +485,23 @@ public class App_Params {
         this.Highest_Microservice_Type_Unit_Process_Ability = Highest_Microservice_Type_Unit_Process_Ability;
     }
 
+    /**
+     * 获取
+     * @return App_Num
+     */
+    public int[] getApp_Num() {
+        return App_Num;
+    }
+
+    /**
+     * 设置
+     * @param App_Num
+     */
+    public void setApp_Num(int[] App_Num) {
+        this.App_Num = App_Num;
+    }
+
     public String toString() {
-        return "App_Params{App_Num = " + App_Num + ", Num_Server = " + Num_Server + ", Num_Microservice = " + Num_Microservice + ", serviceTypeInfos = " + serviceTypeInfos + ", Num_Application = " + Num_Application + ", Num_Time_Slot = " + Num_Time_Slot + ", Num_CPU_Core = " + Num_CPU_Core + ", MAX1 = " + MAX1 + ", TTL_Max_Tolerance_Latency_Range = " + TTL_Max_Tolerance_Latency_Range + ", Unit_Rate_Bandwidth_Range = " + Unit_Rate_Bandwidth_Range + ", Average_Arrival_Rate_Range = " + Average_Arrival_Rate_Range + ", Num_Node_Range = " + Num_Node_Range + ", Num_Edge_Range = " + Num_Edge_Range + ", DAG_Category_Range = " + DAG_Category_Range + ", Num_Apps_Timeslot_Range = " + Num_Apps_Timeslot_Range + ", Microservice_Type_CPU = " + Microservice_Type_CPU + ", Microservice_Type_Memory = " + Microservice_Type_Memory + ", Lowest_Communication_Latency = " + Lowest_Communication_Latency + ", Highest_Communication_Latency = " + Highest_Communication_Latency + ", Lowest_Bandwidth_Capacity = " + Lowest_Bandwidth_Capacity + ", Highest_Bandwidth_Capacity = " + Highest_Bandwidth_Capacity + ", Lowest_Microservice_Bandwidth_Requirement = " + Lowest_Microservice_Bandwidth_Requirement + ", Highest_Microservice_Bandwidth_Requirement = " + Highest_Microservice_Bandwidth_Requirement + ", Lowest_Microservice_Type_Unit_Process_Ability = " + Lowest_Microservice_Type_Unit_Process_Ability + ", Highest_Microservice_Type_Unit_Process_Ability = " + Highest_Microservice_Type_Unit_Process_Ability + "}";
+        return "App_Params{Num_Server = " + Num_Server + ", Num_Microservice = " + Num_Microservice + ", serviceTypeInfos = " + serviceTypeInfos + ", Num_Application = " + Num_Application + ", Num_Time_Slot = " + Num_Time_Slot + ", Num_CPU_Core = " + Num_CPU_Core + ", MAX1 = " + MAX1 + ", App_Num = " + App_Num + ", TTL_Max_Tolerance_Latency_Range = " + TTL_Max_Tolerance_Latency_Range + ", Unit_Rate_Bandwidth_Range = " + Unit_Rate_Bandwidth_Range + ", Average_Arrival_Rate_Range = " + Average_Arrival_Rate_Range + ", Num_Node_Range = " + Num_Node_Range + ", Num_Edge_Range = " + Num_Edge_Range + ", DAG_Category_Range = " + DAG_Category_Range + ", Num_Apps_Timeslot_Range = " + Num_Apps_Timeslot_Range + ", Microservice_Type_CPU = " + Microservice_Type_CPU + ", Microservice_Type_Memory = " + Microservice_Type_Memory + ", Lowest_Communication_Latency = " + Lowest_Communication_Latency + ", Highest_Communication_Latency = " + Highest_Communication_Latency + ", Lowest_Bandwidth_Capacity = " + Lowest_Bandwidth_Capacity + ", Highest_Bandwidth_Capacity = " + Highest_Bandwidth_Capacity + ", Lowest_Microservice_Bandwidth_Requirement = " + Lowest_Microservice_Bandwidth_Requirement + ", Highest_Microservice_Bandwidth_Requirement = " + Highest_Microservice_Bandwidth_Requirement + ", Lowest_Microservice_Type_Unit_Process_Ability = " + Lowest_Microservice_Type_Unit_Process_Ability + ", Highest_Microservice_Type_Unit_Process_Ability = " + Highest_Microservice_Type_Unit_Process_Ability + "}";
     }
 }

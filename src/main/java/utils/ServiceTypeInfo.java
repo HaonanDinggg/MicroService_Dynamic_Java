@@ -14,7 +14,6 @@ public class ServiceTypeInfo {
     private int ServiceState; //判断微服务种类，是否为有状态的
     private int ServiceCPU; //单位实例cpu资源占用
     private int ServiceMemory; //单位实例存储资源占用
-    private Map<ServiceTypeInfo, Double> MicroserviceBandwidthRequirement;//微服务间带宽需求
     private int ServiceProcessingRate;
 
     public ServiceTypeInfo() {
@@ -27,12 +26,11 @@ public class ServiceTypeInfo {
         this.ServiceProcessingRate = ServiceProcessingRate;
     }
 
-    public ServiceTypeInfo(int ServiceID, int ServiceState, int ServiceCPU, int ServiceMemory, Map<ServiceTypeInfo, Double> MicroserviceBandwidthRequirement, int ServiceProcessingRate) {
+    public ServiceTypeInfo(int ServiceID, int ServiceState, int ServiceCPU, int ServiceMemory, int ServiceProcessingRate) {
         this.ServiceID = ServiceID;
         this.ServiceState = ServiceState;
         this.ServiceCPU = ServiceCPU;
         this.ServiceMemory = ServiceMemory;
-        this.MicroserviceBandwidthRequirement = MicroserviceBandwidthRequirement;
         this.ServiceProcessingRate = ServiceProcessingRate;
     }
 
@@ -118,23 +116,8 @@ public class ServiceTypeInfo {
         this.ServiceMemory = ServiceMemory;
     }
 
-    /**
-     * 获取
-     * @return MicroserviceBandwidthRequirement
-     */
-    public Map<ServiceTypeInfo, Double> getMicroserviceBandwidthRequirement() {
-        return MicroserviceBandwidthRequirement;
-    }
-
-    /**
-     * 设置
-     * @param MicroserviceBandwidthRequirement
-     */
-    public void setMicroserviceBandwidthRequirement(Map<ServiceTypeInfo, Double> MicroserviceBandwidthRequirement) {
-        this.MicroserviceBandwidthRequirement = MicroserviceBandwidthRequirement;
-    }
 
     public String toString() {
-        return "ServiceTypeInfo{ServiceID = " + ServiceID + ", ServiceState = " + ServiceState + ", ServiceCPU = " + ServiceCPU + ", ServiceMemory = " + ServiceMemory + ", MicroserviceBandwidthRequirement = " + MicroserviceBandwidthRequirement + ", ServiceProcessingRate = " + ServiceProcessingRate + "}";
+        return "ServiceTypeInfo{ServiceID = " + ServiceID + ", ServiceState = " + ServiceState + ", ServiceCPU = " + ServiceCPU + ", ServiceMemory = " + ServiceMemory + ", ServiceProcessingRate = " + ServiceProcessingRate + "}";
     }
 }
