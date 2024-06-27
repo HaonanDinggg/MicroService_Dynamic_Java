@@ -1,5 +1,9 @@
 package utils;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * @author: Dior
  * @Desc:
@@ -8,21 +12,30 @@ package utils;
 public class ServiceTypeInfo {
     private int ServiceID; //微服务ID
     private int ServiceState; //判断微服务种类，是否为有状态的
+    private int ServiceCPU; //单位实例cpu资源占用
+    private int ServiceMemory; //单位实例存储资源占用
+    private Map<ServiceTypeInfo, Double> MicroserviceBandwidthRequirement;//微服务间带宽需求
     private int ServiceProcessingRate;
 
     public ServiceTypeInfo() {
     }
 
-    public ServiceTypeInfo(int ServiceID, int ServiceState) {
-        this.ServiceID = ServiceID;
-        this.ServiceState = ServiceState;
-    }
 
     public ServiceTypeInfo(int ServiceID, int ServiceState, int ServiceProcessingRate) {
         this.ServiceID = ServiceID;
         this.ServiceState = ServiceState;
         this.ServiceProcessingRate = ServiceProcessingRate;
     }
+
+    public ServiceTypeInfo(int ServiceID, int ServiceState, int ServiceCPU, int ServiceMemory, Map<ServiceTypeInfo, Double> MicroserviceBandwidthRequirement, int ServiceProcessingRate) {
+        this.ServiceID = ServiceID;
+        this.ServiceState = ServiceState;
+        this.ServiceCPU = ServiceCPU;
+        this.ServiceMemory = ServiceMemory;
+        this.MicroserviceBandwidthRequirement = MicroserviceBandwidthRequirement;
+        this.ServiceProcessingRate = ServiceProcessingRate;
+    }
+
 
     /**
      * 获取
@@ -56,9 +69,6 @@ public class ServiceTypeInfo {
         this.ServiceState = ServiceState;
     }
 
-    public String toString() {
-        return "ServiceTypeInfo{ServiceID = " + ServiceID + ", ServiceState = " + ServiceState + "}";
-    }
 
     /**
      * 获取
@@ -74,5 +84,57 @@ public class ServiceTypeInfo {
      */
     public void setServiceProcessingRate(int ServiceProcessingRate) {
         this.ServiceProcessingRate = ServiceProcessingRate;
+    }
+
+    /**
+     * 获取
+     * @return ServiceCPU
+     */
+    public int getServiceCPU() {
+        return ServiceCPU;
+    }
+
+    /**
+     * 设置
+     * @param ServiceCPU
+     */
+    public void setServiceCPU(int ServiceCPU) {
+        this.ServiceCPU = ServiceCPU;
+    }
+
+    /**
+     * 获取
+     * @return ServiceMemory
+     */
+    public int getServiceMemory() {
+        return ServiceMemory;
+    }
+
+    /**
+     * 设置
+     * @param ServiceMemory
+     */
+    public void setServiceMemory(int ServiceMemory) {
+        this.ServiceMemory = ServiceMemory;
+    }
+
+    /**
+     * 获取
+     * @return MicroserviceBandwidthRequirement
+     */
+    public Map<ServiceTypeInfo, Double> getMicroserviceBandwidthRequirement() {
+        return MicroserviceBandwidthRequirement;
+    }
+
+    /**
+     * 设置
+     * @param MicroserviceBandwidthRequirement
+     */
+    public void setMicroserviceBandwidthRequirement(Map<ServiceTypeInfo, Double> MicroserviceBandwidthRequirement) {
+        this.MicroserviceBandwidthRequirement = MicroserviceBandwidthRequirement;
+    }
+
+    public String toString() {
+        return "ServiceTypeInfo{ServiceID = " + ServiceID + ", ServiceState = " + ServiceState + ", ServiceCPU = " + ServiceCPU + ", ServiceMemory = " + ServiceMemory + ", MicroserviceBandwidthRequirement = " + MicroserviceBandwidthRequirement + ", ServiceProcessingRate = " + ServiceProcessingRate + "}";
     }
 }

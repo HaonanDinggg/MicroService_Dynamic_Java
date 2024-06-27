@@ -19,6 +19,7 @@ public class AppPathInfo {
     private int Num_MicroService; // AppDAG图微服务种类数
     private int[][] adjMatrix ; // AppDAG图邻接矩阵
     private double ArrivalRate; // App到达率
+    private double AppMaxToleranceLatency; // App最大容忍时延
     private int AppType; // DAG图类型 0 1区分概率转发和并行转发
 
 

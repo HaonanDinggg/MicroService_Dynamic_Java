@@ -1,6 +1,7 @@
 package utils;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author: Dior
@@ -11,16 +12,17 @@ import java.util.List;
 public class PhysicalNodeInfo {
     private int NodeID;//这边还可以将该数组拆分成微服务实例种类和数量两个属性，太复杂 感觉没必要
     private List<Integer> DeployServiceType;//这边还可以将该数组拆分成微服务实例种类和数量两个属性，太复杂 感觉没必要
+    private Map<ServiceTypeInfo, Double[] > PhysicalConnection;//微服务间带宽需求
 
-    public PhysicalNodeInfo() {
-    }
-
-    public PhysicalNodeInfo(int NodeID, List<Integer> DeployServiceType) {
-        this.NodeID = NodeID;
-        this.DeployServiceType = DeployServiceType;
-    }
 
     public PhysicalNodeInfo(int i) {
+    }
+
+
+    public PhysicalNodeInfo(int NodeID, List<Integer> DeployServiceType, Map<ServiceTypeInfo, Double[]> PhysicalConnection) {
+        this.NodeID = NodeID;
+        this.DeployServiceType = DeployServiceType;
+        this.PhysicalConnection = PhysicalConnection;
     }
 
 
@@ -56,7 +58,24 @@ public class PhysicalNodeInfo {
         this.NodeID = NodeID;
     }
 
+
+    /**
+     * 获取
+     * @return PhysicalConnection
+     */
+    public Map<ServiceTypeInfo, Double[]> getPhysicalConnection() {
+        return PhysicalConnection;
+    }
+
+    /**
+     * 设置
+     * @param PhysicalConnection
+     */
+    public void setPhysicalConnection(Map<ServiceTypeInfo, Double[]> PhysicalConnection) {
+        this.PhysicalConnection = PhysicalConnection;
+    }
+
     public String toString() {
-        return "PhysicalNodeInfo{NodeID = " + NodeID + ", DeployServiceType = " + DeployServiceType + "}";
+        return "PhysicalNodeInfo{NodeID = " + NodeID + ", DeployServiceType = " + DeployServiceType + ", PhysicalConnection = " + PhysicalConnection + "}";
     }
 }

@@ -2,6 +2,7 @@ package utils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.sun.xml.internal.bind.v2.TODO;
 
 import java.io.File;
 import java.io.IOException;
@@ -21,24 +22,30 @@ public class App_Creator {
 //    private static List<Integer> result;
     static Random random = new Random(214);
     public static void main(String[] args) {
+        int timeplot = 5;
         App_Params appParams = new App_Params();
-        int t = 1;//表示某个时隙
         appParams.setNum_Microservice(10);
         appParams.CreateServiceList();
         List<ServiceTypeInfo> serviceTypeInfos = appParams.getServiceTypeInfos();
-        AppPathInfo dagPathInfo1 = new AppPathInfo();
-        dagPathInfo1.setNum_Dag_Edge(4);
-        dagPathInfo1.setNum_Dag_Node(5);
-        dagPathInfo1.setAppType(1);
-        dagPathInfo1.setNum_MicroService(appParams.getNum_Microservice());
+        //需要初始化所有的ServiceTypeInfo 共用一套微服务信息
+        for(int t = 0; t < timeplot ;t++) {
+            int AppNum = 10;
+            for(int Num = 0; Num < AppNum ; Num++) {
+                AppPathInfo dagPathInfo1 = new AppPathInfo();
+                dagPathInfo1.setNum_Dag_Edge(4);
+                dagPathInfo1.setNum_Dag_Node(5);
+                dagPathInfo1.setAppType(1);
+                dagPathInfo1.setNum_MicroService(appParams.getNum_Microservice());
 
-        dagPathInfo1 = generateDAGPathInfo(dagPathInfo1,serviceTypeInfos);
-        try {
-            saveToJsonFile(dagPathInfo1, "D:\\华科工作\\实验室工作\\胡毅学长动态\\Dynamic_Java\\daginfos\\dagPathInfo.json");
-        } catch (IOException e) {
-            e.printStackTrace();
+                dagPathInfo1 = generateDAGPathInfo(dagPathInfo1, serviceTypeInfos);
+                try {
+                    saveToJsonFile(dagPathInfo1, "D:\\华科工作\\实验室工作\\胡毅学长动态\\Dynamic_Java\\daginfos\\dagPathInfo.json");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                System.out.println(dagPathInfo1);
+            }
         }
-        System.out.println(dagPathInfo1);
     }
 
 //    /*
