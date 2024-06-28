@@ -23,7 +23,7 @@ public class App_Params {
     private int MAX1; // 最大值
 
     // 基于微服务的应用的各个参数范围
-    private int[] App_Num; // 该时段下app的数量
+    private int[] App_Num; // 该时段下app的数量范围
     private int[] TTL_Max_Tolerance_Latency_Range; // 应用的生命周期/最大容忍时延范围
     private double[] Unit_Rate_Bandwidth_Range; // 单位到达率下对应的带宽占用范围
     private int[] Average_Arrival_Rate_Range; // 平均请求到达率的范围

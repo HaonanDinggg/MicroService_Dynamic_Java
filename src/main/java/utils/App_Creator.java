@@ -24,6 +24,8 @@ public class App_Creator {
     public static void main(String[] args) {
         int timeplot = 5;
         App_Params appParams = new App_Params();
+        //初始化Constant的信息
+        appParams = init();
         appParams.setNum_Microservice(10);
         appParams.CreateServiceList();
         List<ServiceTypeInfo> serviceTypeInfos = appParams.getServiceTypeInfos();
@@ -46,6 +48,35 @@ public class App_Creator {
                 System.out.println(dagPathInfo1);
             }
         }
+    }
+    public static App_Params init() {
+        App_Params appParams = new App_Params();
+        appParams.setNum_Server(1);
+        appParams.setNum_Microservice(1);
+        appParams.setNum_Application(1);
+        appParams.setNum_Time_Slot(1);
+        appParams.setNum_CPU_Core(1);
+        appParams.setMAX1(1);
+        appParams.setApp_Num(new int[]{1,2});
+        appParams.setTTL_Max_Tolerance_Latency_Range(new int[]{1,2});
+        appParams.setUnit_Rate_Bandwidth_Range(new double[]{1,2});
+        appParams.setAverage_Arrival_Rate_Range(new int[]{1,2});
+        appParams.setNum_Node_Range(new int[]{1,2});
+        appParams.setNum_Edge_Range(new int[]{1,2});
+        appParams.setDAG_Category_Range(new int[]{0,1});
+        appParams.setNum_Apps_Timeslot_Range(new int[]{0,1});
+        appParams.setMicroservice_Type_CPU(new int[]{0,1});
+        appParams.setMicroservice_Type_Memory(new int[]{0,1});
+        appParams.setLowest_Communication_Latency(1);
+        appParams.setHighest_Communication_Latency(1);
+        appParams.setLowest_Bandwidth_Capacity(1);
+        appParams.setHighest_Bandwidth_Capacity(1);
+        appParams.setLowest_Microservice_Bandwidth_Requirement(1);
+        appParams.setHighest_Microservice_Bandwidth_Requirement(1);
+        appParams.setLowest_Microservice_Type_Unit_Process_Ability(1);
+        appParams.setHighest_Microservice_Type_Unit_Process_Ability(1);
+
+        return appParams;
     }
 
 //    /*
