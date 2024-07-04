@@ -11,6 +11,10 @@ import java.util.Map;
  **/
 public class PhysicalNodeInfo {
     private int NodeID;//物理节点id
+    private int UsedCPUResourcce;//节点已经占用的cpu资源
+    private int FreeCPUResourcce;//节点空余的cpu资源
+    private int UsedMemoryResourcce;//节点已经占用的memory资源
+    private int FreeMemoryResourcce;//节点空余的memory资源
     private List<Integer> DeployServiceType;//这边还可以将该数组拆分成微服务实例种类和数量两个属性，太复杂 感觉没必要
 
 
@@ -21,19 +25,15 @@ public class PhysicalNodeInfo {
     public PhysicalNodeInfo() {
     }
 
-    public PhysicalNodeInfo(int NodeID, List<Integer> DeployServiceType) {
+    public PhysicalNodeInfo(int NodeID, int UsedCPUResourcce, int FreeCPUResourcce, int UsedMemoryResourcce, int FreeMemoryResourcce, List<Integer> DeployServiceType) {
         this.NodeID = NodeID;
+        this.UsedCPUResourcce = UsedCPUResourcce;
+        this.FreeCPUResourcce = FreeCPUResourcce;
+        this.UsedMemoryResourcce = UsedMemoryResourcce;
+        this.FreeMemoryResourcce = FreeMemoryResourcce;
         this.DeployServiceType = DeployServiceType;
     }
 
-
-    /**
-     * 获取
-     * @return DeployServiceType
-     */
-    public List<Integer> getDeployServiceType() {
-        return DeployServiceType;
-    }
 
     /**
      * 设置
@@ -59,8 +59,79 @@ public class PhysicalNodeInfo {
         this.NodeID = NodeID;
     }
 
+    /**
+     * 获取
+     * @return UsedCPUResourcce
+     */
+    public int getUsedCPUResourcce() {
+        return UsedCPUResourcce;
+    }
+
+    /**
+     * 设置
+     * @param UsedCPUResourcce
+     */
+    public void setUsedCPUResourcce(int UsedCPUResourcce) {
+        this.UsedCPUResourcce = UsedCPUResourcce;
+    }
+
+    /**
+     * 获取
+     * @return FreeCPUResourcce
+     */
+    public int getFreeCPUResourcce() {
+        return FreeCPUResourcce;
+    }
+
+    /**
+     * 设置
+     * @param FreeCPUResourcce
+     */
+    public void setFreeCPUResourcce(int FreeCPUResourcce) {
+        this.FreeCPUResourcce = FreeCPUResourcce;
+    }
+
+    /**
+     * 获取
+     * @return UsedMemoryResourcce
+     */
+    public int getUsedMemoryResourcce() {
+        return UsedMemoryResourcce;
+    }
+
+    /**
+     * 设置
+     * @param UsedMemoryResourcce
+     */
+    public void setUsedMemoryResourcce(int UsedMemoryResourcce) {
+        this.UsedMemoryResourcce = UsedMemoryResourcce;
+    }
+
+    /**
+     * 获取
+     * @return FreeMemoryResourcce
+     */
+    public int getFreeMemoryResourcce() {
+        return FreeMemoryResourcce;
+    }
+
+    /**
+     * 设置
+     * @param FreeMemoryResourcce
+     */
+    public void setFreeMemoryResourcce(int FreeMemoryResourcce) {
+        this.FreeMemoryResourcce = FreeMemoryResourcce;
+    }
+
+    /**
+     * 获取
+     * @return DeployServiceType
+     */
+    public List<Integer> getDeployServiceType() {
+        return DeployServiceType;
+    }
 
     public String toString() {
-        return "PhysicalNodeInfo{NodeID = " + NodeID + ", DeployServiceType = " + DeployServiceType + "}";
+        return "PhysicalNodeInfo{NodeID = " + NodeID + ", UsedCPUResourcce = " + UsedCPUResourcce + ", FreeCPUResourcce = " + FreeCPUResourcce + ", UsedMemoryResourcce = " + UsedMemoryResourcce + ", FreeMemoryResourcce = " + FreeMemoryResourcce + ", DeployServiceType = " + DeployServiceType + "}";
     }
 }

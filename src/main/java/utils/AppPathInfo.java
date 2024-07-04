@@ -26,15 +26,7 @@ public class AppPathInfo {
 
     public AppPathInfo() {
     }
-
-    public AppPathInfo(int num_Dag_Node, int num_Dag_Edge,int num_MicroService) {
-        this.Num_Dag_Node = num_Dag_Node;
-        this.Num_Dag_Edge = num_Dag_Edge;
-        this.Num_MicroService = num_MicroService;
-    }
-
-
-    public AppPathInfo(Map<Integer, NodeInfo> nodeInfos, List<PathProbability> pathProbabilities, int Num_Dag_Node, int Num_Dag_Edge, int Num_MicroService, int[][] adjMatrix, double ArrivalRate, int AppType) {
+    public AppPathInfo(Map<Integer, NodeInfo> nodeInfos, List<PathProbability> pathProbabilities, int Num_Dag_Node, int Num_Dag_Edge, int Num_MicroService, int[][] adjMatrix, double ArrivalRate, double AppMaxToleranceLatency, int AppType) {
         this.nodeInfos = nodeInfos;
         this.pathProbabilities = pathProbabilities;
         this.Num_Dag_Node = Num_Dag_Node;
@@ -42,8 +34,10 @@ public class AppPathInfo {
         this.Num_MicroService = Num_MicroService;
         this.adjMatrix = adjMatrix;
         this.ArrivalRate = ArrivalRate;
+        this.AppMaxToleranceLatency = AppMaxToleranceLatency;
         this.AppType = AppType;
     }
+
 
     /**
      * 获取
@@ -173,7 +167,23 @@ public class AppPathInfo {
         this.AppType = AppType;
     }
 
+    /**
+     * 获取
+     * @return AppMaxToleranceLatency
+     */
+    public double getAppMaxToleranceLatency() {
+        return AppMaxToleranceLatency;
+    }
+
+    /**
+     * 设置
+     * @param AppMaxToleranceLatency
+     */
+    public void setAppMaxToleranceLatency(double AppMaxToleranceLatency) {
+        this.AppMaxToleranceLatency = AppMaxToleranceLatency;
+    }
+
     public String toString() {
-        return "AppPathInfo{nodeInfos = " + nodeInfos + ", pathProbabilities = " + pathProbabilities + ", Num_Dag_Node = " + Num_Dag_Node + ", Num_Dag_Edge = " + Num_Dag_Edge + ", Num_MicroService = " + Num_MicroService + ", adjMatrix = " + adjMatrix + ", ArrivalRate = " + ArrivalRate + ", AppType = " + AppType + "}";
+        return "AppPathInfo{nodeInfos = " + nodeInfos + ", pathProbabilities = " + pathProbabilities + ", Num_Dag_Node = " + Num_Dag_Node + ", Num_Dag_Edge = " + Num_Dag_Edge + ", Num_MicroService = " + Num_MicroService + ", adjMatrix = " + adjMatrix + ", ArrivalRate = " + ArrivalRate + ", AppMaxToleranceLatency = " + AppMaxToleranceLatency + ", AppType = " + AppType + "}";
     }
 }

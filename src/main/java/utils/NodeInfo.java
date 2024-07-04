@@ -19,16 +19,11 @@ public class NodeInfo {
     public NodeInfo() {
     }
 
-    public NodeInfo(int serviceType, Map<NodeInfo, Double> transitionProbabilities) {
-        this.ServiceType = serviceType;
-        this.transitionProbabilities = transitionProbabilities;
-    }
-
-
     public NodeInfo(int serviceType, ServiceTypeInfo serviceTypeInfo, Map<NodeInfo, Double> transitions) {
-
+        this.ServiceType = serviceType;
+        this.serviceType = serviceTypeInfo;
+        this.transitionProbabilities = transitions;
     }
-
     public NodeInfo(int ServiceType, ServiceTypeInfo serviceType, Map<NodeInfo, Double> transitionProbabilities, double ArrivalRate_On_Node, int Instance_To_Deploy, int[] DeployedNode) {
         this.ServiceType = ServiceType;
         this.serviceType = serviceType;
@@ -37,6 +32,8 @@ public class NodeInfo {
         this.Instance_To_Deploy = Instance_To_Deploy;
         this.DeployedNode = DeployedNode;
     }
+
+
 
 
     public boolean equals(Object o) {

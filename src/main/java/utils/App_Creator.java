@@ -2,10 +2,14 @@ package utils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.sun.xml.internal.bind.v2.TODO;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InterruptedIOException;
+import java.lang.reflect.Field;
 import java.util.*;
 
 /**
@@ -22,64 +26,133 @@ public class App_Creator {
 //    private static List<Integer> result;
     static Random random = new Random(214);
     public static void main(String[] args) {
-        int timeplot = 5;
-        App_Params appParams = new App_Params();
-        //初始化Constant的信息
-        appParams = init();
-        appParams.setNum_Microservice(10);
-        appParams.CreateServiceList();
-        List<ServiceTypeInfo> serviceTypeInfos = appParams.getServiceTypeInfos();
+        int timeslot = 5;
+        Random r = new Random();
+        App_Params appParams = init();
+        String filePathParams = String.format("D:\\华科工作\\实验室工作\\胡毅学长动态\\Dynamic_Java\\appParams\\app_params.json");
+        File fileParams = new File(filePathParams);
+        fileParams.getParentFile().mkdirs();
+        // 确保目录存在
+        try {
+            saveToJsonFile(appParams, filePathParams);
+            //System.out.println("对象已成功保存到 app_params.json 文件中。");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        //System.out.println(appParams);
+        ArrayList<ArrayList<AppPathInfo>> alltimeApp = new ArrayList<>();
         //需要初始化所有的ServiceTypeInfo 共用一套微服务信息
-        for(int t = 0; t < timeplot ;t++) {
-            int AppNum = 10;
+        for(int t = 0; t < timeslot ;t++) {
+            int AppNum = r.nextInt(appParams.getApp_Num()[1] - appParams.getApp_Num()[0] + 1) + appParams.getApp_Num()[0];//当前时段的请求流数量
+            ArrayList<AppPathInfo> currentApps = new ArrayList<>();
             for(int Num = 0; Num < AppNum ; Num++) {
-                AppPathInfo dagPathInfo1 = new AppPathInfo();
-                dagPathInfo1.setNum_Dag_Edge(4);
-                dagPathInfo1.setNum_Dag_Node(5);
-                dagPathInfo1.setAppType(1);
-                dagPathInfo1.setNum_MicroService(appParams.getNum_Microservice());
-
-                dagPathInfo1 = generateDAGPathInfo(dagPathInfo1, serviceTypeInfos);
+                AppPathInfo dagPathInfo = new AppPathInfo();
+                int num_node = r.nextInt(appParams.getNum_Node_Range()[1] - appParams.getNum_Node_Range()[0] + 1) + appParams.getNum_Node_Range()[0];
+                int min = num_node - 1;
+                int max = num_node * (num_node - 1) / 2;
+                int num_edge = random.nextInt((max - min) + 1) + min;
+                dagPathInfo.setNum_Dag_Node(num_node);
+                dagPathInfo.setNum_Dag_Edge(num_edge);
+                dagPathInfo.setAppType(r.nextInt(appParams.getDAG_Category_Range()[1] - appParams.getDAG_Category_Range()[0] + 1) + appParams.getDAG_Category_Range()[0]);
+                dagPathInfo.setNum_MicroService(appParams.getNum_Microservice());
+                dagPathInfo = generateDAGPathInfo(dagPathInfo, appParams);
+                // 生成文件路径
+                String filePathApp = String.format("D:\\华科工作\\实验室工作\\胡毅学长动态\\Dynamic_Java\\daginfos\\timeslot%d\\dagPathInfo%d.json", t, Num);
+                File fileApp = new File(filePathApp);
+                // 确保目录存在
+                fileApp.getParentFile().mkdirs();
+                // 将结果转换为 JSON 并存储到文件中
                 try {
-                    saveToJsonFile(dagPathInfo1, "D:\\华科工作\\实验室工作\\胡毅学长动态\\Dynamic_Java\\daginfos\\dagPathInfo.json");
+                    saveToJsonFile(dagPathInfo, filePathApp);
+                    //System.out.println("时隙" + (t+1) + "下到达服务中心的第" + (Num+1) + "个App请求流已经被成功保存到" + filePathApp);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                System.out.println(dagPathInfo1);
+                //System.out.println(dagPathInfo);
+                currentApps.add(dagPathInfo);
             }
+            alltimeApp.add(currentApps);
         }
+
+        //后面开始准备计算实例需求
+        for(int time = 0; time < alltimeApp.size(); time++){
+            ArrayList<AppPathInfo> currentAppList = alltimeApp.get(time);
+            System.out.println("开始处理时隙"+time+"的所有APP");
+            System.out.println("对该时隙APP按照请求到达率大小进行排序");
+            // 使用Collections.sort()和自定义Comparator进行排序
+            Collections.sort(currentAppList, new Comparator<AppPathInfo>() {
+                @Override
+                public int compare(AppPathInfo o1, AppPathInfo o2) {
+                    // 从高到低排序
+                    return Double.compare(o2.getArrivalRate(), o1.getArrivalRate());
+                }
+            });
+            System.out.println("排序结果如下");
+            for (AppPathInfo app : currentAppList) {
+                System.out.println(app.getArrivalRate());
+            }
+
+            for (AppPathInfo app : currentAppList) {
+                System.out.println("当前APP的类型是" + app.getAppType());
+                List<PathProbability> pathProbabilities = app.getPathProbabilities();
+                System.out.println("计算该app下每个路径的到达率");
+                for (PathProbability pathProbability : pathProbabilities) {
+                    pathProbability.setArrivalRate(app.getArrivalRate()*pathProbability.getProbability());
+                }
+                System.out.println("对该app的每条路径的到达率进行排序");
+                Collections.sort(pathProbabilities, new Comparator<PathProbability>() {
+                    @Override
+                    public int compare(PathProbability o1, PathProbability o2) {
+                        // 从高到低排序
+                        return Double.compare(o2.getArrivalRate(), o1.getArrivalRate());
+                    }
+                });
+
+                System.out.println("排序结果如下");
+                for (PathProbability pathProbability : pathProbabilities) {
+                    System.out.println(pathProbability.getArrivalRate());
+                }
+
+            }
+
+        }
+
+
+
     }
     public static App_Params init() {
         App_Params appParams = new App_Params();
-        appParams.setNum_Server(1);
-        appParams.setNum_Microservice(1);
-        appParams.setNum_Application(1);
-        appParams.setNum_Time_Slot(1);
-        appParams.setNum_CPU_Core(1);
-        appParams.setMAX1(1);
-        appParams.setApp_Num(new int[]{1,2});
-        appParams.setTTL_Max_Tolerance_Latency_Range(new int[]{1,2});
-        appParams.setUnit_Rate_Bandwidth_Range(new double[]{1,2});
-        appParams.setAverage_Arrival_Rate_Range(new int[]{1,2});
-        appParams.setNum_Node_Range(new int[]{1,2});
-        appParams.setNum_Edge_Range(new int[]{1,2});
+        appParams.setNum_Server(10);
+        appParams.setNum_Microservice(50);
+        appParams.setNum_Application(30);
+        appParams.setNum_Time_Slot(20);
+        appParams.setNum_CPU_Core(30);
+        appParams.setMAX1(100);
+        appParams.setApp_Num(new int[]{1,5});
+        appParams.setTTL_Max_Tolerance_Latency_Range(new int[]{3,10});
+        appParams.setUnit_Rate_Bandwidth_Range(new double[]{0.11,2});
+        appParams.setAverage_Arrival_Rate_Range(new int[]{1,10});
+        appParams.setNum_Node_Range(new int[]{2,6});
+        appParams.setNum_Edge_Range(new int[]{1,6});
         appParams.setDAG_Category_Range(new int[]{0,1});
-        appParams.setNum_Apps_Timeslot_Range(new int[]{0,1});
-        appParams.setMicroservice_Type_CPU(new int[]{0,1});
-        appParams.setMicroservice_Type_Memory(new int[]{0,1});
-        appParams.setLowest_Communication_Latency(1);
+        appParams.setNum_Apps_Timeslot_Range(new int[]{1,100});
+        appParams.setMicroservice_Type_CPU(new int[]{1,5});
+        appParams.setMicroservice_Type_Memory(new int[]{1,5});
+        appParams.setLowest_Communication_Latency(0.5);
         appParams.setHighest_Communication_Latency(1);
-        appParams.setLowest_Bandwidth_Capacity(1);
-        appParams.setHighest_Bandwidth_Capacity(1);
+        appParams.setLowest_Bandwidth_Capacity(50);
+        appParams.setHighest_Bandwidth_Capacity(100);
         appParams.setLowest_Microservice_Bandwidth_Requirement(1);
-        appParams.setHighest_Microservice_Bandwidth_Requirement(1);
-        appParams.setLowest_Microservice_Type_Unit_Process_Ability(1);
-        appParams.setHighest_Microservice_Type_Unit_Process_Ability(1);
-
+        appParams.setHighest_Microservice_Bandwidth_Requirement(2);
+        appParams.setLowest_Microservice_Type_Unit_Process_Ability(3);
+        appParams.setHighest_Microservice_Type_Unit_Process_Ability(8);
+        //写方法构建几个其他的constant属性
+        appParams.InitConstant();
+        appParams.CreateServiceList();
         return appParams;
     }
 
-//    /*
+//    /**
 //      * @Description : 生成对应拓扑排序
 //      * @Author : THINK
 //      *  * @param node
@@ -115,7 +188,7 @@ public class App_Creator {
 //        return single_req_flow_topology;
 //    }
 
-    /*
+    /**
      * @Description : 随机生成DAG图
      * @Author : Dior
      *  * @param node
@@ -189,7 +262,7 @@ public class App_Creator {
 
         return matrix;
     }
-    /*
+    /**
      * @Description : 判断边是否已经生成过
      * @Author : Dior
      *  * @param edges
@@ -208,7 +281,7 @@ public class App_Creator {
         }
         return false;
     }
-    /*
+    /**
      * @Description : 生成DAG图 保证一个入度为0的节点只有一个
      * @Author : Dior
      *  * @param node
@@ -285,49 +358,58 @@ public class App_Creator {
 //        }
 //    }
 
-    /*
+    /**
      * @Description : 生成特定APP的DAG图的信息 包含了此图的各个节点信息包含了节点的部署的微服务以及后继节点的概率
      * @Author : Dior
      *  * @param adjMatrix
-     * @param Num_Microservice
+     * @param dagPathInfo,serviceTypeInfos
      * @return : utils.DAGPathInfo
      * @Date : 2024/6/13
      * @Version : 1.0
      * @Copyright : © 2024 All Rights Reserved.
      **/
-    public static AppPathInfo generateDAGPathInfo(AppPathInfo dagPathInfo,List<ServiceTypeInfo> serviceTypeInfos) {
+    public static AppPathInfo generateDAGPathInfo(AppPathInfo dagPathInfo,App_Params appParams) {
+        //目前卡住的原因是生成的dag图 边和节点比值不对
         int[][] adjMatrix = CorrectGraph(dagPathInfo.getNum_Dag_Node(),dagPathInfo.getNum_Dag_Edge());
         dagPathInfo.setAdjMatrix(adjMatrix);
         for (int i = 0; i < dagPathInfo.getAdjMatrix().length; i++) {
             System.out.println(Arrays.toString(dagPathInfo.getAdjMatrix()[i]));
         }
-
         Map<Integer, Integer> serviceTypes = assignServiceTypes(dagPathInfo.getAdjMatrix().length, dagPathInfo.getNum_MicroService());
         Map<Integer, Map<Integer, Double>> transitionProbabilities = generateTransitionProbabilities(dagPathInfo.getAdjMatrix(),dagPathInfo.getAppType());
-        Map<Integer, NodeInfo> nodeInfos = createNodeInfos(serviceTypes,serviceTypeInfos, transitionProbabilities);
+        Map<Integer, NodeInfo> nodeInfos = createNodeInfos(serviceTypes,appParams.getServiceTypeInfos(), transitionProbabilities);
         List<PathProbability> pathProbabilities = generateAllPaths(dagPathInfo.getAdjMatrix(), nodeInfos);
         dagPathInfo.setNodeInfos(nodeInfos);
         dagPathInfo.setPathProbabilities(pathProbabilities);
+        Random r = new Random();//处理率的随机种子固定
+        double maxMaxToleranceLatencydagPathInfo = appParams.getTTL_Max_Tolerance_Latency_Range()[1];
+        double minMaxToleranceLatencydagPathInfo = appParams.getTTL_Max_Tolerance_Latency_Range()[0];
+        double appMaxToleranceLatency = (r.nextDouble() * (maxMaxToleranceLatencydagPathInfo - minMaxToleranceLatencydagPathInfo)) + minMaxToleranceLatencydagPathInfo;
+        double maxArrivalRate = appParams.getAverage_Arrival_Rate_Range()[1];
+        double minArrivalRate = appParams.getAverage_Arrival_Rate_Range()[0];
+        double appArrivalRate = (r.nextDouble() * (maxArrivalRate - minArrivalRate)) + minArrivalRate;
+        dagPathInfo.setAppMaxToleranceLatency(appMaxToleranceLatency);
+        dagPathInfo.setArrivalRate(appArrivalRate);
         return dagPathInfo;
     }
 
-    /*
+    /**
       * @Description : 匹配DAG图节点上微服务种类
       * @Author : Dior
       *  * @param numNodes
- * @param Num_Microservice
+      * @param num_Microservice
       * @return : java.util.Map<java.lang.Integer,java.lang.Integer>
       * @Date : 2024/6/14 
       * @Version : 1.0
       * @Copyright : © 2024 All Rights Reserved.       
       **/
-    private static Map<Integer, Integer> assignServiceTypes(int numNodes,int Num_Microservice) {
+    private static Map<Integer, Integer> assignServiceTypes(int numNodes,int num_Microservice) {
         Map<Integer, Integer> serviceTypes = new HashMap<>();
         Set<Integer> usedServices = new HashSet<>();
         for (int i = 0; i < numNodes; i++) {
             int service;
             do {
-                service = random.nextInt(Num_Microservice);
+                service = random.nextInt(num_Microservice);
             } while (usedServices.contains(service));
             usedServices.add(service);
             serviceTypes.put(i, service);
@@ -335,11 +417,11 @@ public class App_Creator {
         return serviceTypes;
     }
 
-    /*
+    /**
       * @Description : 生成DAG图每个节点微服务转发到后续微服务的转发概率，为每个节点生成随机转移概率。，如果是概率转发类型的App就是dag图节点微服务到后续节点微服务概率和为1，如果是并行转发，则dag图节点微服务到后续节点微服务概率均为1
       * @Author : Dior
       *  * @param adjMatrix
- * @param dagType
+      * @param dagType
       * @return : java.util.Map<java.lang.Integer,java.util.Map<java.lang.Integer,java.lang.Double>>
       * @Date : 2024/6/14 
       * @Version : 1.0
@@ -390,11 +472,11 @@ public class App_Creator {
         return transitionProbabilities;
     }
 
-    /*
+    /**
       * @Description : 创建 NodeInfo 对象，并填充转移概率。
       * @Author : Dior
       *  * @param serviceTypes
- * @param transitionProbabilities
+      * @param transitionProbabilities
       * @return : java.util.Map<java.lang.Integer,utils.NodeInfo>
       * @Date : 2024/6/14 
       * @Version : 1.0
@@ -402,29 +484,32 @@ public class App_Creator {
       **/
     private static Map<Integer, NodeInfo> createNodeInfos(Map<Integer, Integer> serviceTypes,List<ServiceTypeInfo> serviceTypeInfos, Map<Integer, Map<Integer, Double>> transitionProbabilities) {
         Map<Integer, NodeInfo> nodeInfos = new HashMap<>();
+
         for (Map.Entry<Integer, Integer> entry : serviceTypes.entrySet()) {
             int node = entry.getKey();
             int serviceType = entry.getValue();
             ServiceTypeInfo serviceTypeInfo = serviceTypeInfos.get(serviceType);
             Map<NodeInfo, Double> transitions = new HashMap<>();
-            nodeInfos.put(node, new NodeInfo(serviceType,serviceTypeInfo, transitions));
+            NodeInfo nodeInfo = new NodeInfo(serviceType,serviceTypeInfo, transitions);
+            nodeInfos.put(node, nodeInfo);
         }
         for (Map.Entry<Integer, Map<Integer, Double>> entry : transitionProbabilities.entrySet()) {
             int node = entry.getKey();
             NodeInfo nodeInfo = nodeInfos.get(node);
-            Map<NodeInfo, Double> transitions = nodeInfo.getTransitionProbabilities();
+            Map<NodeInfo, Double> transitions = new HashMap<>();
             for (Map.Entry<Integer, Double> transition : entry.getValue().entrySet()) {
                 transitions.put(nodeInfos.get(transition.getKey()), transition.getValue());
             }
+            nodeInfo.setTransitionProbabilities(transitions);
         }
         return nodeInfos;
     }
 
-    /*
+    /**
       * @Description : 生成从所有入口节点到所有出口节点的所有路径及其概率。
       * @Author : Dior
       *  * @param adjMatrix
- * @param nodeInfos
+      * @param nodeInfos
       * @return : java.util.List<utils.PathProbability>
       * @Date : 2024/6/14 
       * @Version : 1.0
@@ -490,11 +575,11 @@ public class App_Creator {
         }
     }
 
-    /*
+    /**
       * @Description : 根据 NodeInfo 对象找到相应的节点键。
       * @Author : Dior
       *  * @param nodeInfos
- * @param nodeInfo
+      * @param nodeInfo
       * @return : java.lang.Integer
       * @Date : 2024/6/17
       * @Version : 1.0
@@ -509,19 +594,19 @@ public class App_Creator {
         return null;
     }
 
-    /*
+    /**
       * @Description : 将 DAGPathInfo 对象序列化为 JSON 文件并保存。
       * @Author : Dior
-      *  * @param dagPathInfo
+      *  * @param obj
  * @param fileName
       * @return : void
-      * @Date : 2024/6/14 
+      * @Date : 2024/7/2
       * @Version : 1.0
-      * @Copyright : © 2024 All Rights Reserved.       
+      * @Copyright : © 2024 All Rights Reserved.
       **/
-    private static void saveToJsonFile(AppPathInfo dagPathInfo, String fileName) throws IOException {
+    private static void saveToJsonFile(Object obj, String fileName) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
         mapper.enable(SerializationFeature.INDENT_OUTPUT);
-        mapper.writeValue(new File(fileName), dagPathInfo);
+        mapper.writeValue(new File(fileName), obj);
     }
 }
