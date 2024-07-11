@@ -11,19 +11,12 @@ public class Constant {
     public static final int RESOURCE_OF_HOST = 10;//每个服务器节点的核心数量
     public static final int NO_OF_MICROSERVICE = 10;//微服务种类数量|M| 2-40
     public static final int STREAM_NUM = 50; //请求流的数量 10-1000
-    public static final double  THRESHOLD_OMEGA = 25;//w(部署算法中选择可用服务器)
     public static final double[] PROCESSING_RATE = new double[NO_OF_MICROSERVICE];//每种微服务的单位核心处理速率Λ_m
-    public static final double[] MS_TOLERABLE_TIME = new double[NO_OF_MICROSERVICE];//每种微服务的最大可容忍时延
     public static final double[] STREAM_TOLERABLE_TIME = new double[STREAM_NUM];//每条流的最大可容忍时延
-    public static final double[][] Trans_MS_USE = new double[NO_OF_MICROSERVICE][NO_OF_MICROSERVICE];  //在单位请求到达率下，从微服务h_i到微服务h_j传输数据消耗的带宽资源
-    public static final double[][] Trans_HOST_Delay = new double[NO_OF_HOST][NO_OF_HOST]; //服务器之间的通信时延  即·节点间距离
-    public static final double[][] HOST_Bandwith_Delay = new double[NO_OF_HOST][NO_OF_HOST]; //服务器之间的带宽
-    public static final double[][] STREAM_DIST = new double[STREAM_NUM][STREAM_NUM]; //请求流之间的相似度矩阵
     public static  final ArrayList<ArrayList> All_Req_Stream = new ArrayList<>();//此数组存储拓扑排序的微服务以及进入节点以及最大容忍时延
     //因此我们需要用All_Req_Stream_Map来生产对应的All_Req_Stream
     public static  final ArrayList<ArrayList> K8s_Req_Stream = new ArrayList<>();//此数组存储拓扑排序的微服务以及进入节点以及最大容忍时延
     public static final ArrayList<Map<Integer, Integer>> All_Req_Stream_Map = new ArrayList<>();
-    public static final  ArrayList<int[][]> All_Req_Stream_Matrix = Generate_All_Req_Stream_randomly();//此数组存储会被其他函数引用
     // 记录节点的入度
     public static int[] indegree;
     // 记录已经遍历的节点

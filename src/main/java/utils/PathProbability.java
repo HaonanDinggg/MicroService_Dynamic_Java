@@ -12,7 +12,7 @@ public class PathProbability {
     private double probability; //记载当前微服务路径的概率
     private double ArrivalRate; //记载当前微服务路径的到达率 总DAG到达率*probability
     private List<PhysicalRoutingInfo> physicalRoutingInfos;
-
+    private double TighterToleranceLatency; //记载当前微服务路径的收紧容忍时延
 
     public PathProbability() {
     }
@@ -27,6 +27,14 @@ public class PathProbability {
         this.nodeInfos = nodeInfos;
         this.probability = probability;
         this.ArrivalRate = ArrivalRate;
+    }
+
+    public PathProbability(List<NodeInfo> nodeInfos, double probability, double ArrivalRate, List<PhysicalRoutingInfo> physicalRoutingInfos, double TighterToleranceLatency) {
+        this.nodeInfos = nodeInfos;
+        this.probability = probability;
+        this.ArrivalRate = ArrivalRate;
+        this.physicalRoutingInfos = physicalRoutingInfos;
+        this.TighterToleranceLatency = TighterToleranceLatency;
     }
 
     /**
@@ -79,5 +87,37 @@ public class PathProbability {
 
     public String toString() {
         return "PathProbability{nodeInfos = " + nodeInfos + ", probability = " + probability + ", ArrivalRate = " + ArrivalRate + "}";
+    }
+
+    /**
+     * 获取
+     * @return physicalRoutingInfos
+     */
+    public List<PhysicalRoutingInfo> getPhysicalRoutingInfos() {
+        return physicalRoutingInfos;
+    }
+
+    /**
+     * 设置
+     * @param physicalRoutingInfos
+     */
+    public void setPhysicalRoutingInfos(List<PhysicalRoutingInfo> physicalRoutingInfos) {
+        this.physicalRoutingInfos = physicalRoutingInfos;
+    }
+
+    /**
+     * 获取
+     * @return TighterToleranceLatency
+     */
+    public double getTighterToleranceLatency() {
+        return TighterToleranceLatency;
+    }
+
+    /**
+     * 设置
+     * @param TighterToleranceLatency
+     */
+    public void setTighterToleranceLatency(double TighterToleranceLatency) {
+        this.TighterToleranceLatency = TighterToleranceLatency;
     }
 }

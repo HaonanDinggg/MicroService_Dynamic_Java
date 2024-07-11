@@ -24,7 +24,9 @@ public class App_Params {
     private int Num_Time_Slot; // 时隙的长度
     private int Num_CPU_Core; // 每个服务器的核心
     private int MAX1; // 最大值
-
+    private int AvgArrivalRateDataSize;//单位请求到达率下的平均数据大小
+    private double DataBaseCommunicationDelay;//数据库交互时延
+    private int RoundRobinParam;//轮询放置的的数量
     // 基于微服务的应用的各个参数范围
     private int[] App_Num; // 该时段下app的数量范围
     private int[] TTL_Max_Tolerance_Latency_Range; // 应用的生命周期/最大容忍时延范围
@@ -54,7 +56,8 @@ public class App_Params {
     public App_Params() {
     }
 
-    public App_Params(int Num_Server, int Num_Microservice, List<ServiceTypeInfo> serviceTypeInfos, List<PhysicalNodeInfo> physicalNodeInfos, int Num_Application, int Num_Time_Slot, int Num_CPU_Core, int MAX1, int[] App_Num, int[] TTL_Max_Tolerance_Latency_Range, double[] Unit_Rate_Bandwidth_Range, int[] Average_Arrival_Rate_Range, int[] Num_Node_Range, int[] Num_Edge_Range, int[] DAG_Category_Range, int[] Num_Apps_Timeslot_Range, int[] Microservice_Type_CPU, int[] Microservice_Type_Memory, double Lowest_Communication_Latency, double Highest_Communication_Latency, int Lowest_Bandwidth_Capacity, int Highest_Bandwidth_Capacity, int Lowest_Microservice_Bandwidth_Requirement, int Highest_Microservice_Bandwidth_Requirement, int Lowest_Microservice_Type_Unit_Process_Ability, int Highest_Microservice_Type_Unit_Process_Ability, double[][] PhysicalConnectionDelay, int[][] PhysicalConnectionBandwidth, int[][] MicroServiceConnectionDelay) {
+
+    public App_Params(int Num_Server, int Num_Microservice, List<ServiceTypeInfo> serviceTypeInfos, List<PhysicalNodeInfo> physicalNodeInfos, int Num_Application, int Num_Time_Slot, int Num_CPU_Core, int MAX1, int AvgArrivalRateDataSize, double DataBaseCommunicationDelay, int RoundRobinParam, int[] App_Num, int[] TTL_Max_Tolerance_Latency_Range, double[] Unit_Rate_Bandwidth_Range, int[] Average_Arrival_Rate_Range, int[] Num_Node_Range, int[] Num_Edge_Range, int[] DAG_Category_Range, int[] Num_Apps_Timeslot_Range, int[] Microservice_Type_CPU, int[] Microservice_Type_Memory, double Lowest_Communication_Latency, double Highest_Communication_Latency, int Lowest_Bandwidth_Capacity, int Highest_Bandwidth_Capacity, int Lowest_Microservice_Bandwidth_Requirement, int Highest_Microservice_Bandwidth_Requirement, int Lowest_Microservice_Type_Unit_Process_Ability, int Highest_Microservice_Type_Unit_Process_Ability, double[][] PhysicalConnectionDelay, int[][] PhysicalConnectionBandwidth, int[][] MicroServiceConnectionDelay) {
         this.Num_Server = Num_Server;
         this.Num_Microservice = Num_Microservice;
         this.serviceTypeInfos = serviceTypeInfos;
@@ -63,6 +66,9 @@ public class App_Params {
         this.Num_Time_Slot = Num_Time_Slot;
         this.Num_CPU_Core = Num_CPU_Core;
         this.MAX1 = MAX1;
+        this.AvgArrivalRateDataSize = AvgArrivalRateDataSize;
+        this.DataBaseCommunicationDelay = DataBaseCommunicationDelay;
+        this.RoundRobinParam = RoundRobinParam;
         this.App_Num = App_Num;
         this.TTL_Max_Tolerance_Latency_Range = TTL_Max_Tolerance_Latency_Range;
         this.Unit_Rate_Bandwidth_Range = Unit_Rate_Bandwidth_Range;
@@ -686,5 +692,53 @@ public class App_Params {
 
     public String toString() {
         return "App_Params{Num_Server = " + Num_Server + ", Num_Microservice = " + Num_Microservice + ", serviceTypeInfos = " + serviceTypeInfos + ", physicalNodeInfos = " + physicalNodeInfos + ", Num_Application = " + Num_Application + ", Num_Time_Slot = " + Num_Time_Slot + ", Num_CPU_Core = " + Num_CPU_Core + ", MAX1 = " + MAX1 + ", App_Num = " + App_Num + ", TTL_Max_Tolerance_Latency_Range = " + TTL_Max_Tolerance_Latency_Range + ", Unit_Rate_Bandwidth_Range = " + Unit_Rate_Bandwidth_Range + ", Average_Arrival_Rate_Range = " + Average_Arrival_Rate_Range + ", Num_Node_Range = " + Num_Node_Range + ", Num_Edge_Range = " + Num_Edge_Range + ", DAG_Category_Range = " + DAG_Category_Range + ", Num_Apps_Timeslot_Range = " + Num_Apps_Timeslot_Range + ", Microservice_Type_CPU = " + Microservice_Type_CPU + ", Microservice_Type_Memory = " + Microservice_Type_Memory + ", Lowest_Communication_Latency = " + Lowest_Communication_Latency + ", Highest_Communication_Latency = " + Highest_Communication_Latency + ", Lowest_Bandwidth_Capacity = " + Lowest_Bandwidth_Capacity + ", Highest_Bandwidth_Capacity = " + Highest_Bandwidth_Capacity + ", Lowest_Microservice_Bandwidth_Requirement = " + Lowest_Microservice_Bandwidth_Requirement + ", Highest_Microservice_Bandwidth_Requirement = " + Highest_Microservice_Bandwidth_Requirement + ", Lowest_Microservice_Type_Unit_Process_Ability = " + Lowest_Microservice_Type_Unit_Process_Ability + ", Highest_Microservice_Type_Unit_Process_Ability = " + Highest_Microservice_Type_Unit_Process_Ability + ", PhysicalConnectionDelay = " + PhysicalConnectionDelay + ", PhysicalConnectionBandwidth = " + PhysicalConnectionBandwidth + ", MicroServiceConnectionDelay = " + MicroServiceConnectionDelay + "}";
+    }
+
+    /**
+     * 获取
+     * @return AvgArrivalRateDataSize
+     */
+    public int getAvgArrivalRateDataSize() {
+        return AvgArrivalRateDataSize;
+    }
+
+    /**
+     * 设置
+     * @param AvgArrivalRateDataSize
+     */
+    public void setAvgArrivalRateDataSize(int AvgArrivalRateDataSize) {
+        this.AvgArrivalRateDataSize = AvgArrivalRateDataSize;
+    }
+
+    /**
+     * 获取
+     * @return DataBaseCommunicationDelay
+     */
+    public double getDataBaseCommunicationDelay() {
+        return DataBaseCommunicationDelay;
+    }
+
+    /**
+     * 设置
+     * @param DataBaseCommunicationDelay
+     */
+    public void setDataBaseCommunicationDelay(double DataBaseCommunicationDelay) {
+        this.DataBaseCommunicationDelay = DataBaseCommunicationDelay;
+    }
+
+    /**
+     * 获取
+     * @return RoundRobinParam
+     */
+    public int getRoundRobinParam() {
+        return RoundRobinParam;
+    }
+
+    /**
+     * 设置
+     * @param RoundRobinParam
+     */
+    public void setRoundRobinParam(int RoundRobinParam) {
+        this.RoundRobinParam = RoundRobinParam;
     }
 }

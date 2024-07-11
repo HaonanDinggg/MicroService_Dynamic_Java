@@ -124,6 +124,57 @@ public class WaitingTime {
     public static int Final_Activated_MS_Num = 0;
     public static double Final_Resource_Utilization_Rate = 0;
     public static int Final_Full_Use_Host = 0;
+
+
+    /**
+      * @Description : 给定实例数量和到达率，计算这个微服务节点的平均服务时间（平均处理时延+平均排队时延）
+      * @Author : Dior
+      *  * @param microserviceType
+ * @param averageArrivalRate
+ * @param correspondingMicroserviceInstanceNum
+ * @param microserviceTypeUnitProcessAbility
+      * @return : java.lang.Double
+      * @Date : 2024/7/5
+      * @Version : 1.0
+      * @Copyright : © 2024 All Rights Reserved.
+      **/
+    public static Double calculateMicroserviceNodeAverageServiceTime(double averageArrivalRate, int correspondingMicroserviceInstanceNum, int microserviceTypeUnitProcessAbility) {
+        Double resultMicroserviceNodeAverageServiceTime = null;
+        double serviceIntensity1 = averageArrivalRate / microserviceTypeUnitProcessAbility;
+
+        double serviceIntensity2 = averageArrivalRate / microserviceTypeUnitProcessAbility / correspondingMicroserviceInstanceNum;
+
+        if (0 < serviceIntensity2 && serviceIntensity2 < 1) {
+            double v1 = 0;
+            for (int k = 0; k < correspondingMicroserviceInstanceNum; k++) {
+                double v2 = factorial(k);
+                double v3 = Math.pow(serviceIntensity1, k) / v2;
+                v1 += v3;
+            }
+            double v4 = factorial(correspondingMicroserviceInstanceNum);
+            double p0 = Math.pow((v1 + Math.pow(serviceIntensity1, correspondingMicroserviceInstanceNum) / (v4 * (1 - serviceIntensity2))), -1);
+
+            resultMicroserviceNodeAverageServiceTime = serviceIntensity2 * Math.pow(serviceIntensity1, correspondingMicroserviceInstanceNum) * p0 /
+                    (averageArrivalRate * Math.pow((1 - serviceIntensity2), 2) * v4) +
+                    1.0 / microserviceTypeUnitProcessAbility;
+
+            return resultMicroserviceNodeAverageServiceTime;
+        } else {
+            return (double) 100; // 100表示时延无穷大，为后续请求成功率作铺垫
+        }
+    }
+
+    private static double factorial(int number) {
+        double result = 1;
+        for (int i = 1; i <= number; i++) {
+            result *= i;
+        }
+        return result;
+    }
+
+
+
+
     /**
      *
      * @param stream_allocated_resource
@@ -462,11 +513,9 @@ public class WaitingTime {
         }else{
             return Double.MAX_VALUE;
         }
-
     }
 
 
-    
     /**
     *
      * @param Arrival_Rate
@@ -474,9 +523,7 @@ public class WaitingTime {
      * @param Processing_Rate
     * @return 计算对应到达率 占用的资源数量 处理率的微服务的处理时延
     */
-    
-    
-    
+
 public static double Calculate_Stay_Time(double Arrival_Rate,int Req_Resource,double Processing_Rate) {
     	
 	//        System.out.println(Arrival_Rate);

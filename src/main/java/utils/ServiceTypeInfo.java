@@ -14,7 +14,7 @@ public class ServiceTypeInfo {
     private int ServiceState; //判断微服务种类，是否为有状态的
     private int ServiceCPU; //单位实例cpu资源占用
     private int ServiceMemory; //单位实例存储资源占用
-    private int ServiceProcessingRate;
+    private int ServiceProcessingRate;//单位实例微服务处理能力
 
     public ServiceTypeInfo() {
     }
