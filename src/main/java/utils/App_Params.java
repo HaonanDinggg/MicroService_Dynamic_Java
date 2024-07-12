@@ -27,6 +27,8 @@ public class App_Params {
     private int AvgArrivalRateDataSize;//单位请求到达率下的平均数据大小
     private double DataBaseCommunicationDelay;//数据库交互时延
     private int RoundRobinParam;//轮询放置的的数量
+    private double AvgPhysicalConnectionDelay;//平均通信时延
+    private int AvgPhysicalConnectionBandwidth;//平均带宽
     // 基于微服务的应用的各个参数范围
     private int[] App_Num; // 该时段下app的数量范围
     private int[] TTL_Max_Tolerance_Latency_Range; // 应用的生命周期/最大容忍时延范围
@@ -92,6 +94,43 @@ public class App_Params {
         this.MicroServiceConnectionDelay = MicroServiceConnectionDelay;
     }
 
+    public App_Params(int Num_Server, int Num_Microservice, List<ServiceTypeInfo> serviceTypeInfos, List<PhysicalNodeInfo> physicalNodeInfos, int Num_Application, int Num_Time_Slot, int Num_CPU_Core, int MAX1, int AvgArrivalRateDataSize, double DataBaseCommunicationDelay, int RoundRobinParam, double AvgPhysicalConnectionDelay, int AvgPhysicalConnectionBandwidth, int[] App_Num, int[] TTL_Max_Tolerance_Latency_Range, double[] Unit_Rate_Bandwidth_Range, int[] Average_Arrival_Rate_Range, int[] Num_Node_Range, int[] Num_Edge_Range, int[] DAG_Category_Range, int[] Num_Apps_Timeslot_Range, int[] Microservice_Type_CPU, int[] Microservice_Type_Memory, double Lowest_Communication_Latency, double Highest_Communication_Latency, int Lowest_Bandwidth_Capacity, int Highest_Bandwidth_Capacity, int Lowest_Microservice_Bandwidth_Requirement, int Highest_Microservice_Bandwidth_Requirement, int Lowest_Microservice_Type_Unit_Process_Ability, int Highest_Microservice_Type_Unit_Process_Ability, double[][] PhysicalConnectionDelay, int[][] PhysicalConnectionBandwidth, int[][] MicroServiceConnectionDelay) {
+        this.Num_Server = Num_Server;
+        this.Num_Microservice = Num_Microservice;
+        this.serviceTypeInfos = serviceTypeInfos;
+        this.physicalNodeInfos = physicalNodeInfos;
+        this.Num_Application = Num_Application;
+        this.Num_Time_Slot = Num_Time_Slot;
+        this.Num_CPU_Core = Num_CPU_Core;
+        this.MAX1 = MAX1;
+        this.AvgArrivalRateDataSize = AvgArrivalRateDataSize;
+        this.DataBaseCommunicationDelay = DataBaseCommunicationDelay;
+        this.RoundRobinParam = RoundRobinParam;
+        this.AvgPhysicalConnectionDelay = AvgPhysicalConnectionDelay;
+        this.AvgPhysicalConnectionBandwidth = AvgPhysicalConnectionBandwidth;
+        this.App_Num = App_Num;
+        this.TTL_Max_Tolerance_Latency_Range = TTL_Max_Tolerance_Latency_Range;
+        this.Unit_Rate_Bandwidth_Range = Unit_Rate_Bandwidth_Range;
+        this.Average_Arrival_Rate_Range = Average_Arrival_Rate_Range;
+        this.Num_Node_Range = Num_Node_Range;
+        this.Num_Edge_Range = Num_Edge_Range;
+        this.DAG_Category_Range = DAG_Category_Range;
+        this.Num_Apps_Timeslot_Range = Num_Apps_Timeslot_Range;
+        this.Microservice_Type_CPU = Microservice_Type_CPU;
+        this.Microservice_Type_Memory = Microservice_Type_Memory;
+        this.Lowest_Communication_Latency = Lowest_Communication_Latency;
+        this.Highest_Communication_Latency = Highest_Communication_Latency;
+        this.Lowest_Bandwidth_Capacity = Lowest_Bandwidth_Capacity;
+        this.Highest_Bandwidth_Capacity = Highest_Bandwidth_Capacity;
+        this.Lowest_Microservice_Bandwidth_Requirement = Lowest_Microservice_Bandwidth_Requirement;
+        this.Highest_Microservice_Bandwidth_Requirement = Highest_Microservice_Bandwidth_Requirement;
+        this.Lowest_Microservice_Type_Unit_Process_Ability = Lowest_Microservice_Type_Unit_Process_Ability;
+        this.Highest_Microservice_Type_Unit_Process_Ability = Highest_Microservice_Type_Unit_Process_Ability;
+        this.PhysicalConnectionDelay = PhysicalConnectionDelay;
+        this.PhysicalConnectionBandwidth = PhysicalConnectionBandwidth;
+        this.MicroServiceConnectionDelay = MicroServiceConnectionDelay;
+    }
+
 
     public void CreateServiceList() {
         List<ServiceTypeInfo> serviceTypeInfoList = new ArrayList<>();
@@ -127,7 +166,7 @@ public class App_Params {
         int[][] MicroServiceConnectionDelay  = new int[this.getNum_Microservice()][this.getNum_Microservice()];
         int max = 10000;
         List<PhysicalNodeInfo> physicalNodeInfosList = new ArrayList<>();
-        Random r = new Random();//处理率的随机种子固定
+        Random r = new Random(214);//处理率的随机种子固定
         for (int i = 0; i < this.getNum_Server(); i++) {
             PhysicalNodeInfo physicalNodeInfo = new PhysicalNodeInfo();
             physicalNodeInfo.setNodeID(i);
@@ -740,5 +779,37 @@ public class App_Params {
      */
     public void setRoundRobinParam(int RoundRobinParam) {
         this.RoundRobinParam = RoundRobinParam;
+    }
+
+    /**
+     * 获取
+     * @return AvgPhysicalConnectionDelay
+     */
+    public double getAvgPhysicalConnectionDelay() {
+        return AvgPhysicalConnectionDelay;
+    }
+
+    /**
+     * 设置
+     * @param AvgPhysicalConnectionDelay
+     */
+    public void setAvgPhysicalConnectionDelay(double AvgPhysicalConnectionDelay) {
+        this.AvgPhysicalConnectionDelay = AvgPhysicalConnectionDelay;
+    }
+
+    /**
+     * 获取
+     * @return AvgPhysicalConnectionBandwidth
+     */
+    public int getAvgPhysicalConnectionBandwidth() {
+        return AvgPhysicalConnectionBandwidth;
+    }
+
+    /**
+     * 设置
+     * @param AvgPhysicalConnectionBandwidth
+     */
+    public void setAvgPhysicalConnectionBandwidth(int AvgPhysicalConnectionBandwidth) {
+        this.AvgPhysicalConnectionBandwidth = AvgPhysicalConnectionBandwidth;
     }
 }
