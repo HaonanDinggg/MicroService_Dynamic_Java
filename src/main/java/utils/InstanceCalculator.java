@@ -12,7 +12,7 @@ import static utils.WaitingTime.calculateMicroserviceNodeAverageServiceTime;
  * @create: 2024-07-12 20:34
  **/
 public class InstanceCalculator {
-    public static ArrayList<CurrentTimeApps> CreatealltimeApp(App_Params appParams,ArrayList<CurrentTimeApps> alltimeApp) {
+    public static ArrayList<CurrentTimeApps> CalculateInstance(App_Params appParams,ArrayList<CurrentTimeApps> alltimeApp) {
         //后面开始准备计算实例需求
         for(int time = 0; time < alltimeApp.size(); time++){
             ArrayList<AppPathInfo> currentAppList = alltimeApp.get(time).getAppPathInfos();
@@ -69,6 +69,11 @@ public class InstanceCalculator {
                         pathProbability.getNodeInfos().get(currentNodeInfo).setArrivalRate_On_Node(currentArrivalRateOnNode);//该服务链当前节点的请求到达率即该请求链的到达率 他可以被拆分到不同的服务器节点
                         int temporaryInstance = (int)(currentArrivalRateOnNode/currentServiceProcessingRate) + 1;//粗略计算暂时的实例数量
                         pathProbability.getNodeInfos().get(currentNodeInfo).setInstance_To_Deploy(temporaryInstance);
+                        ArrayList<Integer> deployedNode = new ArrayList<>();
+                        for(int node = 0 ; node < appParams.getNum_Server() ; node++ ){
+                            deployedNode.add(0);
+                        }
+                        pathProbability.getNodeInfos().get(currentNodeInfo).setDeployedNode(deployedNode);//最初实例只是计算 并未部署在某一结点上因此，全为0
                         if(app.getAppType()==0){
                             //更新app的Map<Integer, NodeInfo> nodeInfos当前DAG图所有的节点信息，更新该app每个微服务需要部署的实例数
                             Map<Integer, NodeInfo> updateNodeInfos = app.getNodeInfos();
@@ -229,18 +234,16 @@ public class InstanceCalculator {
     public static Map<Integer, Double> sortByValueDescending(Map<Integer, Double> map) {
         // 将Map的Entry放入List
         List<Map.Entry<Integer, Double>> list = new ArrayList<>(map.entrySet());
-
         // 按值进行排序
         list.sort((entry1, entry2) -> entry2.getValue().compareTo(entry1.getValue()));
-
         // 创建一个有序的LinkedHashMap
         Map<Integer, Double> sortedMap = new LinkedHashMap<>();
         for (Map.Entry<Integer, Double> entry : list) {
             sortedMap.put(entry.getKey(), entry.getValue());
         }
-
         return sortedMap;
     }
+
 
     public static List<TempPathInfo> calculatePathInfos(Map<Integer, ArrayList<Integer>> splitInstances, App_Params appParams, double arrivalRatePath) {
         List<TempPathInfo> results = new ArrayList<>();

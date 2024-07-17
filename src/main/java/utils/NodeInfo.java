@@ -1,4 +1,5 @@
 package utils;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.Objects;
 
@@ -14,7 +15,7 @@ public class NodeInfo {
     private Map<NodeInfo, Double> transitionProbabilities; //当前DAG图该节点的后继节点的信息，包括后继节点的DAG图编号，可以查看后继NodeInfo的Servicetype,以及以键值对形式保存了路由到后继Node的转发概率
     private double ArrivalRate_On_Node; //路由到当前节点服务的请求流数量用以计算Instance_To_Deploy
     private int Instance_To_Deploy; //在该节点当前到达率下需要部署的微服务实例数
-    private int[] DeployedNode; //在不同编号物理节点的部署数量
+    private ArrayList<Integer> DeployedNode; //在不同编号物理节点的部署数量
 
     public NodeInfo() {
     }
@@ -25,9 +26,9 @@ public class NodeInfo {
         this.transitionProbabilities = transitions;
     }
 
-    public NodeInfo(int ServiceType, ServiceTypeInfo serviceType, Map<NodeInfo, Double> transitionProbabilities, double ArrivalRate_On_Node, int Instance_To_Deploy, int[] DeployedNode) {
+    public NodeInfo(int ServiceType, ServiceTypeInfo serviceTypeState, Map<NodeInfo, Double> transitionProbabilities, double ArrivalRate_On_Node, int Instance_To_Deploy, ArrayList<Integer> DeployedNode) {
         this.ServiceType = ServiceType;
-        this.serviceTypeState = serviceType;
+        this.serviceTypeState = serviceTypeState;
         this.transitionProbabilities = transitionProbabilities;
         this.ArrivalRate_On_Node = ArrivalRate_On_Node;
         this.Instance_To_Deploy = Instance_To_Deploy;
@@ -111,21 +112,6 @@ public class NodeInfo {
         this.Instance_To_Deploy = Instance_To_Deploy;
     }
 
-    /**
-     * 获取
-     * @return DeployedNode
-     */
-    public int[] getDeployedNode() {
-        return DeployedNode;
-    }
-
-    /**
-     * 设置
-     * @param DeployedNode
-     */
-    public void setDeployedNode(int[] DeployedNode) {
-        this.DeployedNode = DeployedNode;
-    }
 
     public String toString() {
         return "NodeInfo{ServiceType = " + ServiceType + ", serviceType = " + serviceTypeState + ", transitionProbabilities = " + transitionProbabilities + ", ArrivalRate_On_Node = " + ArrivalRate_On_Node + ", Instance_To_Deploy = " + Instance_To_Deploy + ", DeployedNode = " + DeployedNode + "}";
@@ -145,6 +131,22 @@ public class NodeInfo {
      */
     public void setServiceTypeState(ServiceTypeInfo serviceTypeState) {
         this.serviceTypeState = serviceTypeState;
+    }
+
+    /**
+     * 获取
+     * @return DeployedNode
+     */
+    public ArrayList<Integer> getDeployedNode() {
+        return DeployedNode;
+    }
+
+    /**
+     * 设置
+     * @param DeployedNode
+     */
+    public void setDeployedNode(ArrayList<Integer> DeployedNode) {
+        this.DeployedNode = DeployedNode;
     }
 }
 

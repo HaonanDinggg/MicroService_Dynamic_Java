@@ -11,7 +11,7 @@ import java.util.List;
 public class CurrentTimeApps {
     private ArrayList<AppPathInfo> appPathInfos;//保存当前微服务的所有app
     private ArrayList<Integer> ServiceInstanceNum; //当前时隙微服务实例的数量
-    private int[][] InstanceDeployOnNode; // 各个节点的部署结果
+    private int[][] InstanceDeployOnNode; // 各个节点的部署结果 第一维为节点数，第二维为微服务种类
 
 
     public CurrentTimeApps() {

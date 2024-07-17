@@ -13,7 +13,7 @@ import java.util.*;
  * @create: 2024-07-12 17:19
  **/
 public class GenerateApp {
-    public static ArrayList<CurrentTimeApps> CreatealltimeApp(int timeslot,App_Params appParams,Random r) {
+    public static ArrayList<CurrentTimeApps> CreateAlltimeApp(int timeslot,App_Params appParams,Random r) {
         ArrayList<CurrentTimeApps> alltimeApp = new ArrayList<>();
         //需要初始化所有的ServiceTypeInfo 共用一套微服务信息
         for(int t = 0; t < timeslot ;t++) {
