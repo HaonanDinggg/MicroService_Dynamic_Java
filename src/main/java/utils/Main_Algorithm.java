@@ -84,7 +84,7 @@ public class Main_Algorithm {
 
         //准备部署实例
         for(int time = 0; time < alltimeApp.size(); time++){
-            double equalizationCoefficient = 0.9;
+            double equalizationCoefficient = 0.9;//公平指数下限
             ArrayList<Integer> NowServiceInstanceNum = alltimeApp.get(time).getServiceInstanceNum();//获取当前时隙的app情况
             ArrayList<Integer> PastServiceInstanceNum = new ArrayList<>(appParams.getNum_Microservice());//获取前一个时隙后的app情况
             if(time == 0) {
@@ -132,6 +132,7 @@ public class Main_Algorithm {
                     }
                     if(nowServiceInstanceNum < pastServiceInstanceNum){
                         //因为为第一个时隙 不会进入该段
+
                     } else if (nowServiceInstanceNum == pastServiceInstanceNum) {
                         //因为为第一个时隙 进入该段也不会有任何操作
                     } else if (nowServiceInstanceNum > pastServiceInstanceNum) {
