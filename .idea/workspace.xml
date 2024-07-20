@@ -6,7 +6,11 @@
   <component name="ChangeListManager">
     <list default="true" id="731f939b-15dd-4006-aaf8-2515b5a369d8" name="Changes" comment="完成当前时隙部署服务数量大于前一时隙部署服务的数量">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/daginfos/timeslot1/dagPathInfo3.json" beforeDir="false" afterPath="$PROJECT_DIR$/daginfos/timeslot1/dagPathInfo3.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/utils/App_Params.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/utils/App_Params.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/utils/Main_Algorithm.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/utils/Main_Algorithm.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/utils/PhysicalPathNodeInfo.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/utils/PhysicalPathNodeInfo.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/utils/test1.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/utils/test1.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -53,7 +57,7 @@
     "settings.editor.selected.configurable": "editing.templates"
   }
 }]]></component>
-  <component name="RunManager" selected="Application.Main_Algorithm">
+  <component name="RunManager" selected="Application.test1">
     <configuration name="App_Creator (2)" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="utils.App_Creator" />
       <module name="Dynamic_Java" />
@@ -160,8 +164,8 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Application.Main_Algorithm" />
         <item itemvalue="Application.test1" />
+        <item itemvalue="Application.Main_Algorithm" />
         <item itemvalue="Application.Main_Algorithm" />
         <item itemvalue="Application.test (1)" />
         <item itemvalue="Application.test" />
@@ -240,7 +244,14 @@
       <option name="project" value="LOCAL" />
       <updated>1721222047536</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL-00010" summary="完成当前时隙部署服务数量大于前一时隙部署服务的数量">
+      <created>1721272733791</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1721272733791</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
     <servers />
   </component>
   <component name="Vcs.Log.History.Properties">
