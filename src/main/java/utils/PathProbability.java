@@ -210,4 +210,12 @@ public class PathProbability {
     public void setRouting_tables_eachPath(List<List> routing_tables_eachPath) {
         this.Routing_tables_eachPath = routing_tables_eachPath;
     }
+
+    /**
+     * 获取当前微服务路径路由表
+     * @return  Routing_tables_eachPath
+     */
+    public List<List> getRouting_tables_eachPath() {
+        return this.Routing_tables_eachPath;
+    }
 }
