@@ -12,6 +12,7 @@ public class CurrentTimeApps {
     private ArrayList<AppPathInfo> appPathInfos;//保存当前微服务的所有app
     private ArrayList<Integer> ServiceInstanceNum; //当前时隙微服务实例的数量
     private int[][] InstanceDeployOnNode; // 各个节点的部署结果 第一维为节点数，第二维为微服务种类
+    private int[][] Routing_decision_Y; //路由决策变量，论文中的Y(t)
 
 
     public CurrentTimeApps() {
@@ -24,8 +25,21 @@ public class CurrentTimeApps {
     }
 
 
+    public int[][] genRouting_decision_Y(){
+        int[][] Routing_decision_Y = new int[InstanceDeployOnNode.length][InstanceDeployOnNode[0].length];
+        for (int i = 0; i < InstanceDeployOnNode.length; i++) {
+            for (int j = 0; j < InstanceDeployOnNode[0].length; j++) {
+                if (InstanceDeployOnNode[i][j] > 0){
+                    Routing_decision_Y[i][j] = 1;
+                }
+            }
+        }
+        this.Routing_decision_Y = Routing_decision_Y;
+        return this.Routing_decision_Y;
+    }
+
     /**
-     * 获取
+     * 获取当前微服务的所有app ArrayList<AppPathInfo>
      * @return appPathInfos
      */
     public ArrayList<AppPathInfo> getAppPathInfos() {
@@ -33,7 +47,7 @@ public class CurrentTimeApps {
     }
 
     /**
-     * 设置
+     * 设置当前微服务的所有app
      * @param appPathInfos
      */
     public void setAppPathInfos(ArrayList<AppPathInfo> appPathInfos) {
@@ -41,7 +55,7 @@ public class CurrentTimeApps {
     }
 
     /**
-     * 获取
+     * 获取当前时隙微服务实例的数量
      * @return ServiceInstanceNum
      */
     public ArrayList<Integer> getServiceInstanceNum() {
@@ -49,7 +63,7 @@ public class CurrentTimeApps {
     }
 
     /**
-     * 设置
+     * 设置当前时隙微服务实例的数量
      * @param ServiceInstanceNum
      */
     public void setServiceInstanceNum(ArrayList<Integer> ServiceInstanceNum) {
@@ -61,7 +75,7 @@ public class CurrentTimeApps {
     }
 
     /**
-     * 获取
+     * 获取各个节点的部署结果 第一维为节点数，第二维为微服务种类
      * @return InstanceDeployOnNode
      */
     public int[][] getInstanceDeployOnNode() {
@@ -69,7 +83,7 @@ public class CurrentTimeApps {
     }
 
     /**
-     * 设置
+     * 设置各个节点的部署结果 第一维为节点数，第二维为微服务种类
      * @param InstanceDeployOnNode
      */
     public void setInstanceDeployOnNode(int[][] InstanceDeployOnNode) {

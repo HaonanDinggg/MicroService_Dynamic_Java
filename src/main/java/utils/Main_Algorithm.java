@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.*;
 
 
@@ -33,7 +34,7 @@ public class Main_Algorithm {
         appParams.setNum_CPU_Core(30);
         appParams.setMAX1(100);
         appParams.setAvgArrivalRateDataSize(1);
-        appParams.setDataBaseCommunicationDelay(0.1);//不知道要不要写到appParams中作为常量还是后续要详细计算 目前当常量考虑
+        appParams.setDataBaseCommunicationDelay(0);//不知道要不要写到appParams中作为常量还是后续要详细计算 目前当常量考虑 //0.1
         appParams.setRoundRobinParam(2);
         appParams.setApp_Num(new int[]{1,5});
         appParams.setTTL_Max_Tolerance_Latency_Range(new int[]{5,10});
@@ -81,6 +82,7 @@ public class Main_Algorithm {
 
         //后面开始准备计算实例需求
         alltimeApp = InstanceCalculator.CalculateInstance(appParams,alltimeApp);
+        System.out.println("====ar2====");
 
         //准备部署实例
         for(int time = 0; time < alltimeApp.size(); time++){
@@ -239,6 +241,41 @@ public class Main_Algorithm {
                 }
                 System.out.println();
             }
+            //计算当前时隙路由
+            //打印部署结果
+            System.out.println("当前部署情况X(t):");
+            for (int i = 0; i < alltimeApp.get(time).getInstanceDeployOnNode().length; i++) {
+                System.out.println(Arrays.toString(alltimeApp.get(time).getInstanceDeployOnNode()[i]));
+            }
+            //打印当前时隙所有请求流到达率
+            for (int i = 0; i < alltimeApp.get(time).getAppPathInfos().size(); i++) {
+                System.out.println("APP" + i + "的到达率为:" + alltimeApp.get(time).getAppPathInfos().get(i).getArrivalRate());
+            }
+            //遍历每条请求流
+            for (int i = 0; i < alltimeApp.get(time).getAppPathInfos().size(); i++) {
+                System.out.println("APP" + i + " =======");
+                int[][] InstanceDeployOnNode = alltimeApp.get(time).getInstanceDeployOnNode();
+                Iterator<PathProbability> it_mspath = alltimeApp.get(time).getAppPathInfos().get(i).getPathProbabilities().iterator();
+                while (it_mspath.hasNext()){
+                    PathProbability one_mspath = it_mspath.next();
+                    System.out.printf("链: ");
+                    for (int j = 0; j < one_mspath.getNodeInfos().size(); j++) {
+                        System.out.printf("微服务" + one_mspath.getNodeInfos().get(j).getServiceType() + " ");
+                    }
+                    System.out.println();
+                    System.out.println("ArrivateRate:" + one_mspath.getArrivalRate() + "微服务路径概率:" + one_mspath.getProbability());
+                    List<List> Routing_tables_eachPath = one_mspath.genPathRouting_tables(InstanceDeployOnNode);
+                    System.out.println(Routing_tables_eachPath);
+                }
+            }
+            int[][] Routing_decision_Y = alltimeApp.get(time).genRouting_decision_Y(); //决策变量，论文中的Y(t)，其实感觉没啥吊用
+            /*for (int i = 0; i < Routing_decision_Y.length; i++) {
+                for (int k = 0; k < Routing_decision_Y[0].length; k++) {
+                    System.out.print(Routing_decision_Y[i][k]);
+                }
+                System.out.println();
+            }*/
+
         }
     }
 

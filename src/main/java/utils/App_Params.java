@@ -206,7 +206,7 @@ public class App_Params {
 
 
     /**
-     * 获取
+     * 获取服务器节点的数量
      *
      * @return Num_Server
      */
@@ -215,7 +215,7 @@ public class App_Params {
     }
 
     /**
-     * 设置
+     * 设置服务器节点的数量
      *
      * @param Num_Server
      */
@@ -224,7 +224,7 @@ public class App_Params {
     }
 
     /**
-     * 获取
+     * 获取微服务的种类数
      *
      * @return Num_Microservice
      */
@@ -233,7 +233,7 @@ public class App_Params {
     }
 
     /**
-     * 设置
+     * 设置微服务的种类数
      *
      * @param Num_Microservice
      */
@@ -296,7 +296,7 @@ public class App_Params {
     }
 
     /**
-     * 获取
+     * 获取每个服务器的核心数
      *
      * @return Num_CPU_Core
      */
@@ -734,7 +734,7 @@ public class App_Params {
     }
 
     /**
-     * 获取
+     * 获取单位请求到达率下的平均数据大小
      * @return AvgArrivalRateDataSize
      */
     public int getAvgArrivalRateDataSize() {
@@ -742,7 +742,7 @@ public class App_Params {
     }
 
     /**
-     * 设置
+     * 设置单位请求到达率下的平均数据大小
      * @param AvgArrivalRateDataSize
      */
     public void setAvgArrivalRateDataSize(int AvgArrivalRateDataSize) {

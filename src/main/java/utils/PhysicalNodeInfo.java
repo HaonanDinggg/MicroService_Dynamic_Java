@@ -1,5 +1,6 @@
 package utils;
 
+import javax.xml.soap.Node;
 import java.util.List;
 import java.util.Map;
 
@@ -20,6 +21,8 @@ public class PhysicalNodeInfo {
 
 
     public PhysicalNodeInfo(int i) {
+        //虚拟首转发器,i = -1
+        this.NodeID = i;
     }
 
     public PhysicalNodeInfo() {

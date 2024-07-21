@@ -19,6 +19,11 @@ public class PhysicalPathNodeInfo {
     //在该节点部署的的该微服务类型的实例数量 ServiceNum/NodeInfo.Instance_To_Deploy=
 
 
+    public PhysicalPathNodeInfo(PhysicalNodeInfo virtual) {
+        //创建虚拟转发器专用
+        this.physicalNode = virtual;
+    }
+
     public PhysicalPathNodeInfo() {
     }
 
