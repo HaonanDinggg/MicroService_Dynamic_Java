@@ -17,10 +17,10 @@ public class PathProbability {
     private double TighterToleranceLatency; //记载当前微服务路径的收紧容忍时延
     // 路由表存储所有微服务节点的路由转移分布，最终形成三层列表，
     // 第一层：所有微服务
-    // 第二层：对应微服务的转移路径
+    // 第二层：对应微服务的转移路径 所有有mi节点的转移到所有有mj节点的
     // 第三层：转移路径中对应的具体的每个元素的值 [前继微服务序号，前继节点号，后继微服务序号，后继节点号，转发概率]
     // 链头假设有个虚拟转发器，前继微服务和节点名记为-1
-    private List<List> Routing_tables_eachPath;
+    private List<List<List<Object>>> Routing_tables_eachPath;
 
     public PathProbability() {
     }
@@ -49,13 +49,13 @@ public class PathProbability {
      * 更新当前微服务路径路由表,并返回当前微服务路径路由表信息
      * @return Routing_tables_eachPath
      */
-    public List<List> genPathRouting_tables(int[][] InstanceDeployOnNode){
+    public List<List<List<Object>>> genPathRouting_tables(int[][] InstanceDeployOnNode){
         System.out.println("======genPathRouting_tables======");
-        List<List> Routing_tables_eachPath = new ArrayList<>();
+        List<List<List<Object>>> Routing_tables_eachPath = new ArrayList<>();
         //遍历每个微服务
         for (int i = 0; i < nodeInfos.size(); i++) {
             int backward_ms_type = nodeInfos.get(i).getServiceType();
-            List<List> Routing_tables_eachPath_eachMs = new ArrayList<>();
+            List<List<Object>> Routing_tables_eachPath_eachMs = new ArrayList<>();
             //如果是入口微服务，则设前继微服务为-1，只需要确定入口节点的概率分布
             if (i == 0){
                 //获取该微服务部署节点集合
@@ -207,7 +207,7 @@ public class PathProbability {
      * 设置当前微服务路径路由表
      * @param routing_tables_eachPath
      */
-    public void setRouting_tables_eachPath(List<List> routing_tables_eachPath) {
+    public void setRouting_tables_eachPath(List<List<List<Object>>> routing_tables_eachPath) {
         this.Routing_tables_eachPath = routing_tables_eachPath;
     }
 
@@ -215,7 +215,7 @@ public class PathProbability {
      * 获取当前微服务路径路由表
      * @return  Routing_tables_eachPath
      */
-    public List<List> getRouting_tables_eachPath() {
+    public List<List<List<Object>>> getRouting_tables_eachPath() {
         return this.Routing_tables_eachPath;
     }
 }

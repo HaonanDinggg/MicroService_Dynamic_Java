@@ -2,145 +2,76 @@
   "nodeInfos" : {
     "0" : {
       "serviceTypeState" : {
-        "serviceProcessingRate" : 4,
-        "serviceMemory" : 5,
-        "serviceID" : 12,
         "serviceState" : 1,
-        "serviceCPU" : 4
+        "serviceCPU" : 4,
+        "serviceMemory" : 5,
+        "serviceID" : 9,
+        "serviceProcessingRate" : 4
       },
-      "transitionProbabilities" : {
-        "NodeInfo{ServiceType = 22, serviceType = ServiceTypeInfo{ServiceID = 22, ServiceState = 1, ServiceCPU = 4, ServiceMemory = 5, ServiceProcessingRate = 4}, transitionProbabilities = {}, ArrivalRate_On_Node = 0.0, Instance_To_Deploy = 0, DeployedNode = null}" : 1.0
-      },
-      "instance_To_Deploy" : 0,
-      "serviceType" : 12,
+      "transitionProbabilities" : { },
+      "serviceType" : 9,
       "deployedNode" : null,
+      "instance_To_Deploy" : 0,
       "arrivalRate_On_Node" : 0.0
     },
     "1" : {
       "serviceTypeState" : {
-        "serviceProcessingRate" : 4,
-        "serviceMemory" : 5,
-        "serviceID" : 22,
         "serviceState" : 1,
-        "serviceCPU" : 4
-      },
-      "transitionProbabilities" : { },
-      "instance_To_Deploy" : 0,
-      "serviceType" : 22,
-      "deployedNode" : null,
-      "arrivalRate_On_Node" : 0.0
-    },
-    "2" : {
-      "serviceTypeState" : {
-        "serviceProcessingRate" : 4,
+        "serviceCPU" : 4,
         "serviceMemory" : 5,
-        "serviceID" : 41,
-        "serviceState" : 1,
-        "serviceCPU" : 4
+        "serviceID" : 3,
+        "serviceProcessingRate" : 4
       },
       "transitionProbabilities" : {
-        "NodeInfo{ServiceType = 22, serviceType = ServiceTypeInfo{ServiceID = 22, ServiceState = 1, ServiceCPU = 4, ServiceMemory = 5, ServiceProcessingRate = 4}, transitionProbabilities = {}, ArrivalRate_On_Node = 0.0, Instance_To_Deploy = 0, DeployedNode = null}" : 0.5886540650759394,
-        "NodeInfo{ServiceType = 12, serviceType = ServiceTypeInfo{ServiceID = 12, ServiceState = 1, ServiceCPU = 4, ServiceMemory = 5, ServiceProcessingRate = 4}, transitionProbabilities = {NodeInfo{ServiceType = 22, serviceType = ServiceTypeInfo{ServiceID = 22, ServiceState = 1, ServiceCPU = 4, ServiceMemory = 5, ServiceProcessingRate = 4}, transitionProbabilities = {}, ArrivalRate_On_Node = 0.0, Instance_To_Deploy = 0, DeployedNode = null}=1.0}, ArrivalRate_On_Node = 0.0, Instance_To_Deploy = 0, DeployedNode = null}" : 0.4113459349240606
+        "NodeInfo{ServiceType = 9, serviceType = ServiceTypeInfo{ServiceID = 9, ServiceState = 1, ServiceCPU = 4, ServiceMemory = 5, ServiceProcessingRate = 4}, transitionProbabilities = {}, ArrivalRate_On_Node = 0.0, Instance_To_Deploy = 0, DeployedNode = null}" : 1.0
       },
-      "instance_To_Deploy" : 0,
-      "serviceType" : 41,
+      "serviceType" : 3,
       "deployedNode" : null,
+      "instance_To_Deploy" : 0,
       "arrivalRate_On_Node" : 0.0
     }
   },
   "pathProbabilities" : [ {
     "nodeInfos" : [ {
       "serviceTypeState" : {
-        "serviceProcessingRate" : 4,
-        "serviceMemory" : 5,
-        "serviceID" : 41,
         "serviceState" : 1,
-        "serviceCPU" : 4
+        "serviceCPU" : 4,
+        "serviceMemory" : 5,
+        "serviceID" : 3,
+        "serviceProcessingRate" : 4
       },
       "transitionProbabilities" : {
-        "NodeInfo{ServiceType = 22, serviceType = ServiceTypeInfo{ServiceID = 22, ServiceState = 1, ServiceCPU = 4, ServiceMemory = 5, ServiceProcessingRate = 4}, transitionProbabilities = {}, ArrivalRate_On_Node = 0.0, Instance_To_Deploy = 0, DeployedNode = null}" : 0.5886540650759394,
-        "NodeInfo{ServiceType = 12, serviceType = ServiceTypeInfo{ServiceID = 12, ServiceState = 1, ServiceCPU = 4, ServiceMemory = 5, ServiceProcessingRate = 4}, transitionProbabilities = {NodeInfo{ServiceType = 22, serviceType = ServiceTypeInfo{ServiceID = 22, ServiceState = 1, ServiceCPU = 4, ServiceMemory = 5, ServiceProcessingRate = 4}, transitionProbabilities = {}, ArrivalRate_On_Node = 0.0, Instance_To_Deploy = 0, DeployedNode = null}=1.0}, ArrivalRate_On_Node = 0.0, Instance_To_Deploy = 0, DeployedNode = null}" : 0.4113459349240606
+        "NodeInfo{ServiceType = 9, serviceType = ServiceTypeInfo{ServiceID = 9, ServiceState = 1, ServiceCPU = 4, ServiceMemory = 5, ServiceProcessingRate = 4}, transitionProbabilities = {}, ArrivalRate_On_Node = 0.0, Instance_To_Deploy = 0, DeployedNode = null}" : 1.0
       },
-      "instance_To_Deploy" : 0,
-      "serviceType" : 41,
+      "serviceType" : 3,
       "deployedNode" : null,
+      "instance_To_Deploy" : 0,
       "arrivalRate_On_Node" : 0.0
     }, {
       "serviceTypeState" : {
-        "serviceProcessingRate" : 4,
-        "serviceMemory" : 5,
-        "serviceID" : 22,
         "serviceState" : 1,
-        "serviceCPU" : 4
+        "serviceCPU" : 4,
+        "serviceMemory" : 5,
+        "serviceID" : 9,
+        "serviceProcessingRate" : 4
       },
       "transitionProbabilities" : { },
-      "instance_To_Deploy" : 0,
-      "serviceType" : 22,
+      "serviceType" : 9,
       "deployedNode" : null,
+      "instance_To_Deploy" : 0,
       "arrivalRate_On_Node" : 0.0
     } ],
-    "probability" : 0.5886540650759394,
+    "probability" : 1.0,
     "physicalRoutingInfos" : null,
     "arrivalRate" : 0.0,
-    "tighterToleranceLatency" : 0.0,
-    "routing_tables_eachPath" : null
-  }, {
-    "nodeInfos" : [ {
-      "serviceTypeState" : {
-        "serviceProcessingRate" : 4,
-        "serviceMemory" : 5,
-        "serviceID" : 41,
-        "serviceState" : 1,
-        "serviceCPU" : 4
-      },
-      "transitionProbabilities" : {
-        "NodeInfo{ServiceType = 22, serviceType = ServiceTypeInfo{ServiceID = 22, ServiceState = 1, ServiceCPU = 4, ServiceMemory = 5, ServiceProcessingRate = 4}, transitionProbabilities = {}, ArrivalRate_On_Node = 0.0, Instance_To_Deploy = 0, DeployedNode = null}" : 0.5886540650759394,
-        "NodeInfo{ServiceType = 12, serviceType = ServiceTypeInfo{ServiceID = 12, ServiceState = 1, ServiceCPU = 4, ServiceMemory = 5, ServiceProcessingRate = 4}, transitionProbabilities = {NodeInfo{ServiceType = 22, serviceType = ServiceTypeInfo{ServiceID = 22, ServiceState = 1, ServiceCPU = 4, ServiceMemory = 5, ServiceProcessingRate = 4}, transitionProbabilities = {}, ArrivalRate_On_Node = 0.0, Instance_To_Deploy = 0, DeployedNode = null}=1.0}, ArrivalRate_On_Node = 0.0, Instance_To_Deploy = 0, DeployedNode = null}" : 0.4113459349240606
-      },
-      "instance_To_Deploy" : 0,
-      "serviceType" : 41,
-      "deployedNode" : null,
-      "arrivalRate_On_Node" : 0.0
-    }, {
-      "serviceTypeState" : {
-        "serviceProcessingRate" : 4,
-        "serviceMemory" : 5,
-        "serviceID" : 12,
-        "serviceState" : 1,
-        "serviceCPU" : 4
-      },
-      "transitionProbabilities" : {
-        "NodeInfo{ServiceType = 22, serviceType = ServiceTypeInfo{ServiceID = 22, ServiceState = 1, ServiceCPU = 4, ServiceMemory = 5, ServiceProcessingRate = 4}, transitionProbabilities = {}, ArrivalRate_On_Node = 0.0, Instance_To_Deploy = 0, DeployedNode = null}" : 1.0
-      },
-      "instance_To_Deploy" : 0,
-      "serviceType" : 12,
-      "deployedNode" : null,
-      "arrivalRate_On_Node" : 0.0
-    }, {
-      "serviceTypeState" : {
-        "serviceProcessingRate" : 4,
-        "serviceMemory" : 5,
-        "serviceID" : 22,
-        "serviceState" : 1,
-        "serviceCPU" : 4
-      },
-      "transitionProbabilities" : { },
-      "instance_To_Deploy" : 0,
-      "serviceType" : 22,
-      "deployedNode" : null,
-      "arrivalRate_On_Node" : 0.0
-    } ],
-    "probability" : 0.4113459349240606,
-    "physicalRoutingInfos" : null,
-    "arrivalRate" : 0.0,
-    "tighterToleranceLatency" : 0.0,
-    "routing_tables_eachPath" : null
+    "routing_tables_eachPath" : null,
+    "tighterToleranceLatency" : 0.0
   } ],
-  "adjMatrix" : [ [ 0, 1, 0 ], [ 0, 0, 0 ], [ 1, 1, 0 ] ],
-  "arrivalRate" : 3.9025945976771506,
+  "adjMatrix" : [ [ 0, 0 ], [ 1, 0 ] ],
+  "arrivalRate" : 4.4830596300031145,
+  "appMaxToleranceLatency" : 8.756309671076616,
   "num_MicroService" : 50,
-  "appMaxToleranceLatency" : 8.562202516056516,
+  "num_Dag_Node" : 2,
   "appType" : 0,
-  "num_Dag_Node" : 3,
-  "num_Dag_Edge" : 3
+  "num_Dag_Edge" : 1
 }

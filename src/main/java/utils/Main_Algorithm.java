@@ -32,15 +32,15 @@ public class Main_Algorithm {
         appParams.setNum_Microservice(50);
         appParams.setNum_Application(30);
         appParams.setNum_Time_Slot(20);
-        appParams.setNum_CPU_Core(30);
+        appParams.setNum_CPU_Core(50);
         appParams.setMAX1(100);
         appParams.setAvgArrivalRateDataSize(1);
         appParams.setDataBaseCommunicationDelay(0);//不知道要不要写到appParams中作为常量还是后续要详细计算 目前当常量考虑 //0.1
         appParams.setRoundRobinParam(2);
-        appParams.setApp_Num(new int[]{5,5});
+        appParams.setApp_Num(new int[]{100,100});
         appParams.setTTL_Max_Tolerance_Latency_Range(new int[]{8,10});
         appParams.setUnit_Rate_Bandwidth_Range(new double[]{0.11,2});
-        appParams.setAverage_Arrival_Rate_Range(new int[]{1,10});
+        appParams.setAverage_Arrival_Rate_Range(new int[]{4,6});
         appParams.setNum_Node_Range(new int[]{2,6});
         appParams.setNum_Edge_Range(new int[]{1,6});
         appParams.setDAG_Category_Range(new int[]{0,1});
@@ -300,7 +300,7 @@ public class Main_Algorithm {
                     }
                     System.out.println();
                     System.out.println("ArrivateRate:" + one_mspath.getArrivalRate() + "微服务路径概率:" + one_mspath.getProbability());
-                    List<List> Routing_tables_eachPath = one_mspath.genPathRouting_tables(InstanceDeployOnNode);
+                    List<List<List<Object>>> Routing_tables_eachPath = one_mspath.genPathRouting_tables(InstanceDeployOnNode);
                     System.out.println(Routing_tables_eachPath);
                 }
             }
@@ -318,16 +318,95 @@ public class Main_Algorithm {
         for(int time = 0; time < alltimeApp.size(); time++){
             double[][] bandwidthResource = alltimeApp.get(time).getBandwidthResource();
             Map<NodePair, Double> bandwidthMap = sortBandwidthResource(bandwidthResource);
+            int[][] instanceDeployOnNode = alltimeApp.get(time).getInstanceDeployOnNode();
             for (Map.Entry<NodePair, Double> entry : bandwidthMap.entrySet()) {
                 NodePair nodePair  = entry.getKey();
                 double accessibleBandwidth = entry.getValue();
-                if(accessibleBandwidth<0){
 
+                if(accessibleBandwidth<0){
+                    List<List<Object>> topologyPairs = new ArrayList<>();
+                    ArrayList<AppPathInfo> appPathInfos = alltimeApp.get(time).getAppPathInfos();
+                    for (AppPathInfo appPathInfo : appPathInfos) {
+                        List<PathProbability> pathProbabilities = appPathInfo.getPathProbabilities();
+                        for (PathProbability pathProbability : pathProbabilities) {
+                            List<List<List<Object>>>routing_tables_eachPath = pathProbability.getRouting_tables_eachPath();
+                            for (List<List<Object>> microService : routing_tables_eachPath) {
+                                //这层循环遍历该路径所有微服务
+                                for (List<Object> transRoute : microService) {
+                                    int startService = (int) transRoute.get(0);
+                                    int startNode = (int) transRoute.get(1);
+                                    int endService = (int) transRoute.get(2);
+                                    int endNode = (int) transRoute.get(3);
+                                    double transpro = (double) transRoute.get(4);
+                                    List<Object> transferableTopologyPair = new ArrayList<>();
+                                    int bandNode1 =  nodePair.getNode1();
+                                    int bandNode2 =  nodePair.getNode2();
+                                    if(startNode == bandNode1){
+                                        if(endNode == bandNode2){
+                                            transferableTopologyPair.add(startService);
+                                            transferableTopologyPair.add(startNode);
+                                            transferableTopologyPair.add(endService);
+                                            transferableTopologyPair.add(endNode);
+                                            transferableTopologyPair.add(transpro*pathProbability.getArrivalRate());
+                                            topologyPairs.add(transferableTopologyPair);
+                                        }
+                                    }
+                                    if(startNode == bandNode2){
+                                        if(endNode == bandNode1){
+                                            transferableTopologyPair.add(startService);
+                                            transferableTopologyPair.add(startNode);
+                                            transferableTopologyPair.add(endService);
+                                            transferableTopologyPair.add(endNode);
+                                            transferableTopologyPair.add(transpro*pathProbability.getArrivalRate());
+                                            topologyPairs.add(transferableTopologyPair);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    // 将topologyPairs根据里面List<Object>的第五个元素数据通信量进行升序排序
+                    Collections.sort(topologyPairs, new Comparator<List<Object>>() {
+                        @Override
+                        public int compare(List<Object> o1, List<Object> o2) {
+                            Double value1 = (Double) o1.get(4);
+                            Double value2 = (Double) o2.get(4);
+                            return value1.compareTo(value2);
+                        }
+                    });
+                    double bandwidthToTighten = 0-accessibleBandwidth;//为正，即需要迁移走的数据量
+                    // 输出排序后的结果
+                    for (List<Object> list : topologyPairs) {
+                        System.out.println(list);
+                    }
+                    //初始化迁移列表
+                    List<List<Integer>> migrationList = new ArrayList<>();
+                    for (List<Object> topologyPair : topologyPairs) {
+                        int instanceToTighten = 0;
+                        int startService = (int) topologyPair.get(0);
+                        int startNode = (int) topologyPair.get(1);
+                        int initStartServiceOnStartNode = instanceDeployOnNode[startNode][startService];
+                        int endService = (int) topologyPair.get(2);
+                        int endNode = (int) topologyPair.get(3);
+                        double dataTraffic = (double) topologyPair.get(4);
+                        List<Integer> migrationPair = new ArrayList<>();
+                        while(bandwidthToTighten > 0){
+                            instanceToTighten += 1;
+                            //计算出产生变化的数据通信量
+                            double dataTrafficToTighten = (double) (instanceToTighten/initStartServiceOnStartNode*dataTraffic);
+                            if(dataTrafficToTighten > bandwidthToTighten && instanceToTighten == initStartServiceOnStartNode){
+                                //将迁移对象加入到迁移列表
+                                migrationPair.add(startService);
+                                migrationPair.add(startNode);
+                                migrationPair.add(instanceToTighten);
+                                //更新残余带宽
+                            }
+                        }
+                        migrationList.add(migrationPair);
+                    }
                 }
             }
         }
-
-
     }
 
     /**
@@ -381,6 +460,15 @@ public class Main_Algorithm {
         public NodePair(int node1, int node2) {
             this.node1 = node1;
             this.node2 = node2;
+        }
+
+
+        public int getNode1() {
+            return node1;
+        }
+
+        public int getNode2() {
+            return node2;
         }
 
         @Override
