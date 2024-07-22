@@ -48,8 +48,8 @@ public class Main_Algorithm {
         appParams.setMicroservice_Type_Memory(new int[]{1,5});
         appParams.setLowest_Communication_Latency(0.5);
         appParams.setHighest_Communication_Latency(1);
-        appParams.setLowest_Bandwidth_Capacity(50);
-        appParams.setHighest_Bandwidth_Capacity(100);
+        appParams.setLowest_Bandwidth_Capacity(80);
+        appParams.setHighest_Bandwidth_Capacity(150);
         appParams.setLowest_Microservice_Bandwidth_Requirement(1);
         appParams.setHighest_Microservice_Bandwidth_Requirement(2);
         appParams.setLowest_Microservice_Type_Unit_Process_Ability(3);
@@ -110,7 +110,7 @@ public class Main_Algorithm {
                     int pastServiceInstanceNum = PastEntry.getValue();
                     int incrementInstanceNum = nowServiceInstanceNum - pastServiceInstanceNum;
                     //如果是第一个时隙 那么直接采用贪心的部署方法 部署当前时隙需要的所有微服务实例
-                    InitDeployMsOnNode(alltimeApp.get(time).getInstanceDeployOnNode(),appParams,ServiceID,incrementInstanceNum);
+                    alltimeApp.get(time).setInstanceDeployOnNode(InitDeployMsOnNode(alltimeApp.get(time).getInstanceDeployOnNode(),appParams,ServiceID,incrementInstanceNum));
                 }
                 System.out.println("当前"+(time+1)+"时隙部署结果"+Arrays.deepToString(InstanceDeployOnNode));
                 System.out.println();
@@ -118,7 +118,7 @@ public class Main_Algorithm {
                 System.out.println("进行第"+(time+1)+"个时隙的实例部署");
                 PastServiceInstanceNum = alltimeApp.get(time-1).getServiceInstanceNum();//获取前一个时隙后的app情况
                 //在第一个时隙初始化部署矩阵
-                int[][] InstanceDeployOnNode = alltimeApp.get(time-1).getInstanceDeployOnNode();
+                int[][] InstanceDeployOnNode = deepCopy(alltimeApp.get(time-1).getInstanceDeployOnNode());
                 double redundantFactor = calculateRedundantFactor(InstanceDeployOnNode,NowServiceInstanceNum);//当前时隙的冗余因子
                 //将该时隙微服务数量按升序排序
                 Map<Integer,Integer> sortedNowServiceInstanceNum = ArrayToSortedMap(NowServiceInstanceNum);
@@ -274,7 +274,8 @@ public class Main_Algorithm {
                     }
                     alltimeApp.get(time).setInstanceDeployOnNode(InstanceDeployOnNode);
                 }
-                System.out.println("当前"+(time+1)+"时隙部署结果"+Arrays.deepToString(InstanceDeployOnNode));
+
+                System.out.println("当前第"+(time+1)+"个时隙部署结果"+Arrays.deepToString(InstanceDeployOnNode));
             }
             //计算当前时隙路由
             //打印部署结果
@@ -303,10 +304,11 @@ public class Main_Algorithm {
             }
             int[][] Routing_decision_Y = alltimeApp.get(time).genRouting_decision_Y(); //决策变量，论文中的Y(t)，其实感觉没啥吊用
             alltimeApp.get(time).genBandwidthResource(appParams);
-
         }
 
-        //准备部署实例
+
+
+        //准备路由迁移
         for(int time = 0; time < alltimeApp.size(); time++){
             double[][] bandwidthResource = alltimeApp.get(time).getBandwidthResource();
             Map<NodePair, Double> bandwidthMap = sortBandwidthResource(bandwidthResource);
@@ -314,7 +316,6 @@ public class Main_Algorithm {
             for (Map.Entry<NodePair, Double> entry : bandwidthMap.entrySet()) {
                 NodePair nodePair  = entry.getKey();
                 double accessibleBandwidth = entry.getValue();
-
                 if(accessibleBandwidth<0){
                     List<List<Object>> topologyPairs = new ArrayList<>();
                     ArrayList<AppPathInfo> appPathInfos = alltimeApp.get(time).getAppPathInfos();
@@ -386,21 +387,39 @@ public class Main_Algorithm {
                             instanceToTighten += 1;
                             //计算出产生变化的数据通信量
                             double dataTrafficToTighten = (double) (instanceToTighten/initStartServiceOnStartNode*dataTraffic);
-                            if(dataTrafficToTighten > bandwidthToTighten && instanceToTighten == initStartServiceOnStartNode){
+                            if(dataTrafficToTighten > bandwidthToTighten || instanceToTighten == initStartServiceOnStartNode){
                                 //将迁移对象加入到迁移列表
                                 migrationPair.add(startService);
                                 migrationPair.add(startNode);
                                 migrationPair.add(instanceToTighten);
                                 //更新残余带宽
+                                bandwidthToTighten -= dataTrafficToTighten;
+                                break;
                             }
                         }
                         migrationList.add(migrationPair);
+                    }
+                    for (List<Integer> topologyPair : migrationList) {
+
                     }
                 }
             }
         }
     }
 
+
+    // 深拷贝方法
+    public static int[][] deepCopy(int[][] original) {
+        if (original == null) {
+            return null;
+        }
+
+        int[][] result = new int[original.length][];
+        for (int i = 0; i < original.length; i++) {
+            result[i] = original[i].clone();
+        }
+        return result;
+    }
     /**
       * @Description : 将特定类型map按照value值进行升序排序
       * @Author : Dior
@@ -412,7 +431,6 @@ public class Main_Algorithm {
       **/
     public static Map<NodePair, Double> sortBandwidthResource(double[][] bandwidthResource) {
         Map<NodePair, Double> bandwidthMap = new HashMap<>();
-
         int numNodes = bandwidthResource.length;
         for (int i = 0; i < numNodes; i++) {
             for (int j = i + 1; j < numNodes; j++) {
