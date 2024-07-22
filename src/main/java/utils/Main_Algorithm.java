@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -289,12 +288,10 @@ public class Main_Algorithm {
             }
             //遍历每条请求流
             for (int i = 0; i < alltimeApp.get(time).getAppPathInfos().size(); i++) {
-                System.out.println("APP" + i + " =======");
+                System.out.println("APP" + i + "=======");
                 int[][] InstanceDeployOnNode = alltimeApp.get(time).getInstanceDeployOnNode();
-                Iterator<PathProbability> it_mspath = alltimeApp.get(time).getAppPathInfos().get(i).getPathProbabilities().iterator();
-                while (it_mspath.hasNext()){
-                    PathProbability one_mspath = it_mspath.next();
-                    System.out.printf("链: ");
+                for (PathProbability one_mspath : alltimeApp.get(time).getAppPathInfos().get(i).getPathProbabilities()) {
+                    System.out.print("链: ");
                     for (int j = 0; j < one_mspath.getNodeInfos().size(); j++) {
                         System.out.printf("微服务" + one_mspath.getNodeInfos().get(j).getServiceType() + " ");
                     }
@@ -305,6 +302,8 @@ public class Main_Algorithm {
                 }
             }
             int[][] Routing_decision_Y = alltimeApp.get(time).genRouting_decision_Y(); //决策变量，论文中的Y(t)，其实感觉没啥吊用
+            alltimeApp.get(time).genBandwidthResource(appParams);
+            System.out.println("chx");
             /*for (int i = 0; i < Routing_decision_Y.length; i++) {
                 for (int k = 0; k < Routing_decision_Y[0].length; k++) {
                     System.out.print(Routing_decision_Y[i][k]);

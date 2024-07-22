@@ -46,7 +46,19 @@ public class GenerateApp {
                 currentApps.add(dagPathInfo);
             }
             CurrentTimeApps currentTimeApps = new CurrentTimeApps();
+            //初始剩余带宽
+            double[][] BandwidthResource = new double[appParams.getNum_Server()][appParams.getNum_Server()];
+            for (int i = 0; i < appParams.getPhysicalConnectionBandwidth().length; i++) {
+                for (int j = 0; j < appParams.getPhysicalConnectionBandwidth()[i].length; j++) {
+                    BandwidthResource[i][j] = appParams.getPhysicalConnectionBandwidth()[i][j];
+                }
+            }
             currentTimeApps.setAppPathInfos(currentApps);
+            currentTimeApps.setBandwidthResource(BandwidthResource);
+            System.out.println("===初始化带宽===");
+            for (int i = 0; i < BandwidthResource.length; i++) {
+                System.out.println(Arrays.toString(BandwidthResource[i]));;
+            }
             alltimeApp.add(currentTimeApps);
         }
         return alltimeApp;

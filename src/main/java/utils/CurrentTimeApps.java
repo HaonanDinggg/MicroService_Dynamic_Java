@@ -1,6 +1,8 @@
 package utils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -13,7 +15,7 @@ public class CurrentTimeApps {
     private ArrayList<Integer> ServiceInstanceNum; //当前时隙微服务实例的数量
     private int[][] InstanceDeployOnNode; // 各个节点的部署结果 第一维为节点数，第二维为微服务种类
     private int[][] Routing_decision_Y; //路由决策变量，论文中的Y(t)
-    private double[][] BandwidthResource; // 各个节点的部署结果 第一维为节点数，第二维为微服务种类
+    private double[][] BandwidthResource; // 节点间剩余带宽
 
 
     public CurrentTimeApps() {
@@ -32,6 +34,53 @@ public class CurrentTimeApps {
         this.BandwidthResource = BandwidthResource;
     }
 
+    public double[][] genBandwidthResource(App_Params app_params) {
+        int forward_ms_type, forward_ms_node, backward_ms_type, backward_ms_node;
+        double p;
+        //遍历当前时隙下所有app
+        Iterator<AppPathInfo> it_appPathInfos = appPathInfos.iterator();
+        while (it_appPathInfos.hasNext()){
+            AppPathInfo appPathInfo = it_appPathInfos.next();
+            Iterator<PathProbability> it_PathProbabilities = appPathInfo.getPathProbabilities().iterator();
+            while (it_PathProbabilities.hasNext()){
+                PathProbability pathProbability = it_PathProbabilities.next();
+                double ArrivalRate = pathProbability.getArrivalRate();
+                List<List<List<Object>>> Routing_tables_eachPath = pathProbability.getRouting_tables_eachPath();
+                double[][] ArrivalRate_eachNode_asBackwardMs = new double[app_params.getNum_Server()][app_params.getNum_Microservice()]; //在当前路由表策略下的每个节点作为后继节点的到达率，[节点数][微服务数]
+                for (int i = 0; i < Routing_tables_eachPath.size(); i++) {
+                    for (int j = 0; j < Routing_tables_eachPath.get(i).size(); j++) {
+                        List<Object> routing_table = Routing_tables_eachPath.get(i).get(j);
+                        forward_ms_type = (int)routing_table.get(0);
+                        forward_ms_node = (int)routing_table.get(1);
+                        backward_ms_type = (int)routing_table.get(2);
+                        backward_ms_node = (int)routing_table.get(3);
+                        p = (double)routing_table.get(4);
+                        if (forward_ms_type == -1){
+                            //首节点
+                            ArrivalRate_eachNode_asBackwardMs[backward_ms_node][backward_ms_type] = ArrivalRate * p;
+                        }else {
+                            //非首节点
+                            double band_cost = ArrivalRate_eachNode_asBackwardMs[forward_ms_node][forward_ms_type] * p;
+                            ArrivalRate_eachNode_asBackwardMs[backward_ms_node][backward_ms_type] += band_cost;
+                            this.BandwidthResource[forward_ms_node][backward_ms_node] -= band_cost;
+                            if (forward_ms_node != backward_ms_node) this.BandwidthResource[backward_ms_node][forward_ms_node] -= band_cost;
+                        }
+                    }
+                }
+                /*double s = 0;
+                for (int i = 0; i < app_params.getNum_Server(); i++) {
+                    s+=ArrivalRate_eachNode_asBackwardMs[i][pathProbability.getNodeInfos().get(Routing_tables_eachPath.size()-1).getServiceType()];
+                }
+                System.out.println(ArrivalRate);
+                System.out.println(s);*/
+            }
+        }
+        System.out.println("当前节点带宽:");
+        for (int i = 0; i < BandwidthResource.length; i++) {
+            System.out.println(Arrays.toString(BandwidthResource[i]));;
+        }
+        return this.BandwidthResource;
+    }
 
     public int[][] genRouting_decision_Y(){
         int[][] Routing_decision_Y = new int[InstanceDeployOnNode.length][InstanceDeployOnNode[0].length];
