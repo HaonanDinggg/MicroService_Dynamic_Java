@@ -112,12 +112,14 @@ public class Main_Algorithm {
                     //如果是第一个时隙 那么直接采用贪心的部署方法 部署当前时隙需要的所有微服务实例
                     InitDeployMsOnNode(alltimeApp.get(time).getInstanceDeployOnNode(),appParams,ServiceID,incrementInstanceNum);
                 }
+                System.out.println("当前"+time+"时隙部署结果"+Arrays.deepToString(InstanceDeployOnNode));
                 System.out.println();
             }else {
                 System.out.println("进行第"+(time+1)+"个时隙的实例部署");
                 PastServiceInstanceNum = alltimeApp.get(time-1).getServiceInstanceNum();//获取前一个时隙后的app情况
                 //在第一个时隙初始化部署矩阵
                 int[][] InstanceDeployOnNode = alltimeApp.get(time-1).getInstanceDeployOnNode();
+                double redundantFactor = calculateRedundantFactor(InstanceDeployOnNode,NowServiceInstanceNum);//当前时隙的冗余因子
                 //将该时隙微服务数量按升序排序
                 Map<Integer,Integer> sortedNowServiceInstanceNum = ArrayToSortedMap(NowServiceInstanceNum);
                 Map<Integer,Integer> sortedPastServiceInstanceNum = ArrayToSortedMap(PastServiceInstanceNum);
@@ -131,12 +133,41 @@ public class Main_Algorithm {
 
                     if(nowEntry.getValue() == 0){
                         //如果该时隙下不存在该微服务的实例 回收微服务m的所有实例
+                        for(int node = 0; node < appParams.getNum_Server(); node++){
+                            InstanceDeployOnNode[node][ServiceID] = 0;
+                        }
+                        continue;
                     }
                     if(nowServiceInstanceNum < pastServiceInstanceNum){
-                        //因为为第一个时隙 不会进入该段
-
+                        int pastDeployedServiceNum = 0;
+                        Map<Integer,Integer> serviceDeloyedNum = new HashMap<>();
+                        for(int node = 0; node < appParams.getNum_Server(); node++){
+                            pastDeployedServiceNum += InstanceDeployOnNode[node][ServiceID];
+                            if(InstanceDeployOnNode[node][ServiceID] > 0){
+                                serviceDeloyedNum.put(node,InstanceDeployOnNode[node][ServiceID]);
+                            }
+                        }
+                        int actualDeployedServiceNum = nowServiceInstanceNum + (int) redundantFactor*(nowServiceInstanceNum-pastDeployedServiceNum);//实际需要部署的实例
+                        int deployedServiceNumToReduce = pastDeployedServiceNum - actualDeployedServiceNum;
+                        sortByValueAscending(serviceDeloyedNum);
+                        for (Map.Entry<Integer, Integer> entry : serviceDeloyedNum.entrySet()) {
+                            //遍历所有包含m的节点 升序排序，先清除小的
+                            int nodeID = entry.getKey();
+                            int result1 = appParams.getNum_CPU_Core(); //存储在当前时隙该节点可用的资源数量
+                            //计算当前节点可用资源数量
+                            for (int service = 0; service < appParams.getNum_Server(); service++) {
+                                result1 -= InstanceDeployOnNode[nodeID][service];
+                            }
+                            if(result1 > deployedServiceNumToReduce){
+                                InstanceDeployOnNode[nodeID][ServiceID] -= deployedServiceNumToReduce;
+                                deployedServiceNumToReduce = 0;
+                            } else if (result1 > 0 && result1<deployedServiceNumToReduce) {
+                                InstanceDeployOnNode[nodeID][ServiceID] = 0;
+                                deployedServiceNumToReduce -= result1;
+                            }
+                        }
                     } else if (nowServiceInstanceNum == pastServiceInstanceNum) {
-                        //因为为第一个时隙 进入该段也不会有任何操作
+                        //对所有服务器节点n，保持微服务m现有的部署方案
                     } else if (nowServiceInstanceNum > pastServiceInstanceNum) {
                         //更新节点利用率
                         Map<Integer,Double> utilizationActive = CalUtilizationActive(InstanceDeployOnNode, appParams.getNum_CPU_Core());//这边索引对应的是节点的id
@@ -205,6 +236,7 @@ public class Main_Algorithm {
                         Map<Integer,Double> weightedSum = calculateWeightedSum(utilizationActive,totalServiceInstances,pastServiceInstanceNum);
                         int incrementInstanceNum = nowServiceInstanceNum - pastServiceInstanceNum;
                         while (incrementInstanceNum>0) {
+                            int lastNode = 0;
                             for (Map.Entry<Integer, Double> entry : weightedSum.entrySet()) {
                                 int nodeID = entry.getKey();
                                 int result1 = (int) equalizationCoefficient * appParams.getNum_CPU_Core();//存储每个节点均衡部署的实例数量
@@ -228,10 +260,13 @@ public class Main_Algorithm {
                                 if (incrementInstanceNum == 0) {
                                     break;
                                 }
+                                if (incrementInstanceNum > 0) {
+                                    lastNode = nodeID;
+                                }
                             }
                             //现有的服务器不足够了，这个时候需要增加新的激活服务器来满足计算资源需求
                             if (incrementInstanceNum > 0) {
-                                int activateNode = FindNewNodeToActivate(InstanceDeployOnNode, appParams.getNum_Server(), appParams.getNum_Microservice());
+                                int activateNode = FindNewNodeToActivate(InstanceDeployOnNode,appParams,lastNode);
                                 InstanceDeployOnNode[activateNode][ServiceID] += incrementInstanceNum;
                                 incrementInstanceNum = 0;//被完全部署
                             }
@@ -239,7 +274,7 @@ public class Main_Algorithm {
                     }
                     alltimeApp.get(time).setInstanceDeployOnNode(InstanceDeployOnNode);
                 }
-                System.out.println();
+                System.out.println("当前"+time+"时隙部署结果"+Arrays.deepToString(InstanceDeployOnNode));
             }
             //计算当前时隙路由
             //打印部署结果
@@ -279,18 +314,51 @@ public class Main_Algorithm {
         }
     }
 
-    public static int FindNewNodeToActivate(int[][] InstanceDeployOnNode,int nodeNum,int serviceNum) {
-        for (int node = 0; node < nodeNum; node++) {
+
+    /**
+      * @Description : 寻找满足约束的通信时延最小，带宽最大的节点
+      * @Author : Dior
+      *  * @param InstanceDeployOnNode
+ * @param appParams
+ * @param lastNode
+      * @return : int
+      * @Date : 2024/7/19
+      * @Version : 1.0
+      * @Copyright : © 2024 All Rights Reserved.
+      **/
+    public static int FindNewNodeToActivate(int[][] InstanceDeployOnNode,App_Params appParams,int lastNode) {
+        Map<Integer,Double> optionalNodes = new HashMap<>();
+        for (int node = 0; node < appParams.getNum_Server(); node++) {
             //找到未部署过微服务的节点
             int DeployedNum = 0;
-            for (int service = 0; service < serviceNum; service++) {
+            for (int service = 0; service < appParams.getNum_Microservice(); service++) {
                 DeployedNum += InstanceDeployOnNode[node][service];
             }
             if(DeployedNum==0){
-                return  node;
+                double  comparisonsCoefficient = 0.5*appParams.getPhysicalConnectionDelay()[node][lastNode] +0.5/appParams.getPhysicalConnectionBandwidth()[node][lastNode];
+                optionalNodes.put(node,comparisonsCoefficient);
             }
         }
-        return 0;
+        sortByValueAscendingDouble(optionalNodes);
+        int targetNode = optionalNodes.entrySet().iterator().next().getKey();
+        return targetNode;
+    }
+
+    private static double calculateRedundantFactor (int[][] InstanceDeployOnNode, ArrayList<Integer> nowServiceInstanceNum) {
+        double RedundantFactor= 0;
+        double molecule = 0;
+        double denominator = 0;
+        for (int service = 0; service < InstanceDeployOnNode[0].length; service++) {
+            int serviceInstanceNum = 0;
+            for (int node = 0; node < InstanceDeployOnNode.length; node++) {
+                 serviceInstanceNum +=InstanceDeployOnNode[node][service];
+            }
+            double higherValue = serviceInstanceNum-nowServiceInstanceNum.get(service)>0 ? serviceInstanceNum-nowServiceInstanceNum.get(service) : 0;
+            molecule +=  higherValue;
+            denominator = higherValue > denominator ? higherValue : denominator;
+        }
+        RedundantFactor = molecule/InstanceDeployOnNode[0].length/denominator;
+        return RedundantFactor;
     }
 
     /**
@@ -526,7 +594,7 @@ public class Main_Algorithm {
 
 
     /**
-      * @Description : 将当前map按照value值降序排序
+      * @Description : 将当前map按照value值升序排序
       * @Author : Dior
       *  * @param map
       * @return : java.util.Map<java.lang.Integer,java.lang.Integer>

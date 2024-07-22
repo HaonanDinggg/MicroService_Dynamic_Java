@@ -13,7 +13,7 @@ import java.util.Objects;
 public class PhysicalPathNodeInfo {
     private PhysicalNodeInfo physicalNode; //当前物理路径访问的物理节点，只需要访问该对象的NodeID
     private int ServiceType; //当前物理路径在当前次序访问该节点的微服务类型 可以从上级物理路径的上级DAG路径的NodeInfo的serviceType获取
-    private ServiceTypeInfo serviceType; //当前微服务类型 主要区分有状态和无状态
+    private ServiceTypeInfo serviceTypeState; //当前微服务类型 主要区分有状态和无状态
     private int ServiceNum; //当前物理路径在当前次序访问该节点的微服务类型的实例数量
     private Map<PhysicalPathNodeInfo, Double> transitionProbabilities; //当前物理路径的该微服务在经过该节点处理后的后继节点的信息，将该physicalNode上对ServiceNum数量的ServiceType实例处理完成后转发至后续微服务在不同节点的概率，其和为1，概率由实例数量比例决定
     //在该节点部署的的该微服务类型的实例数量 ServiceNum/NodeInfo.Instance_To_Deploy=
@@ -30,7 +30,7 @@ public class PhysicalPathNodeInfo {
     public PhysicalPathNodeInfo(PhysicalNodeInfo physicalNode, int ServiceType, ServiceTypeInfo serviceType, int ServiceNum, Map<PhysicalPathNodeInfo, Double> transitionProbabilities) {
         this.physicalNode = physicalNode;
         this.ServiceType = ServiceType;
-        this.serviceType = serviceType;
+        this.serviceTypeState = serviceType;
         this.ServiceNum = ServiceNum;
         this.transitionProbabilities = transitionProbabilities;
     }
@@ -112,5 +112,21 @@ public class PhysicalPathNodeInfo {
 
     public String toString() {
         return "PhysicalPathNodeInfo{physicalNode = " + physicalNode + ", ServiceType = " + ServiceType + ", ServiceNum = " + ServiceNum + ", transitionProbabilities = " + transitionProbabilities + "}";
+    }
+
+    /**
+     * 获取
+     * @return serviceTypeState
+     */
+    public ServiceTypeInfo getServiceTypeState() {
+        return serviceTypeState;
+    }
+
+    /**
+     * 设置
+     * @param serviceTypeState
+     */
+    public void setServiceTypeState(ServiceTypeInfo serviceTypeState) {
+        this.serviceTypeState = serviceTypeState;
     }
 }

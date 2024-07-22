@@ -50,8 +50,8 @@ public class App_Params {
 
     private int Lowest_Microservice_Type_Unit_Process_Ability; // 微服务一个实例的最低处理能力1
     private int Highest_Microservice_Type_Unit_Process_Ability; // 微服务一个实例的最高处理能力1
-    private double[][] PhysicalConnectionDelay;//1
-    private int[][] PhysicalConnectionBandwidth;//1
+    private double[][] PhysicalConnectionDelay;//物理节点传输时延
+    private int[][] PhysicalConnectionBandwidth;//物理节点传输带宽
     private int[][] MicroServiceConnectionDelay;//1
 
 
