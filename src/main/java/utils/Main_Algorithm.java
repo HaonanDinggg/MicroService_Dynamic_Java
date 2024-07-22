@@ -37,8 +37,8 @@ public class Main_Algorithm {
         appParams.setAvgArrivalRateDataSize(1);
         appParams.setDataBaseCommunicationDelay(0);//不知道要不要写到appParams中作为常量还是后续要详细计算 目前当常量考虑 //0.1
         appParams.setRoundRobinParam(2);
-        appParams.setApp_Num(new int[]{1,5});
-        appParams.setTTL_Max_Tolerance_Latency_Range(new int[]{5,10});
+        appParams.setApp_Num(new int[]{5,5});
+        appParams.setTTL_Max_Tolerance_Latency_Range(new int[]{8,10});
         appParams.setUnit_Rate_Bandwidth_Range(new double[]{0.11,2});
         appParams.setAverage_Arrival_Rate_Range(new int[]{1,10});
         appParams.setNum_Node_Range(new int[]{2,6});
@@ -113,7 +113,7 @@ public class Main_Algorithm {
                     //如果是第一个时隙 那么直接采用贪心的部署方法 部署当前时隙需要的所有微服务实例
                     InitDeployMsOnNode(alltimeApp.get(time).getInstanceDeployOnNode(),appParams,ServiceID,incrementInstanceNum);
                 }
-                System.out.println("当前"+time+"时隙部署结果"+Arrays.deepToString(InstanceDeployOnNode));
+                System.out.println("当前"+(time+1)+"时隙部署结果"+Arrays.deepToString(InstanceDeployOnNode));
                 System.out.println();
             }else {
                 System.out.println("进行第"+(time+1)+"个时隙的实例部署");
@@ -240,7 +240,7 @@ public class Main_Algorithm {
                             int lastNode = 0;
                             for (Map.Entry<Integer, Double> entry : weightedSum.entrySet()) {
                                 int nodeID = entry.getKey();
-                                int result1 = (int) equalizationCoefficient * appParams.getNum_CPU_Core();//存储每个节点均衡部署的实例数量
+                                int result1 = (int) (equalizationCoefficient * appParams.getNum_CPU_Core());//存储每个节点均衡部署的实例数量
                                 int result2 = appParams.getNum_CPU_Core();//存储每个节点可部署最多的实例数量
                                 int result3 = appParams.getNum_CPU_Core(); //存储在当前时隙该节点可用的资源数量
                                 int result4 = result1 - result2 + result3;
@@ -275,7 +275,7 @@ public class Main_Algorithm {
                     }
                     alltimeApp.get(time).setInstanceDeployOnNode(InstanceDeployOnNode);
                 }
-                System.out.println("当前"+time+"时隙部署结果"+Arrays.deepToString(InstanceDeployOnNode));
+                System.out.println("当前"+(time+1)+"时隙部署结果"+Arrays.deepToString(InstanceDeployOnNode));
             }
             //计算当前时隙路由
             //打印部署结果
@@ -475,8 +475,11 @@ public class Main_Algorithm {
         for (int node = 0; node < nodeNum; node++) {
             Map.Entry<Integer, Double> utilizationEntry = getEntryByKeyDouble(utilizationActive, node);
             Map.Entry<Integer, Integer> serviceInstancesEntry = getEntryByKey(totalServiceInstances, node);
-            if(utilizationEntry.getValue()!=0) {
+            if(utilizationEntry.getValue()!=0&&pastServiceInstanceNum>0) {
                 double weightedSum = coefficient1 * utilizationEntry.getValue() + coefficient2 * serviceInstancesEntry.getValue() / pastServiceInstanceNum;
+                weightedSumNode.put(node, weightedSum);
+            }else {
+                double weightedSum = utilizationEntry.getValue();
                 weightedSumNode.put(node, weightedSum);
             }
         }
