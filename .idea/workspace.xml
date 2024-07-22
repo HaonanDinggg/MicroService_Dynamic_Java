@@ -6,11 +6,8 @@
   <component name="ChangeListManager">
     <list default="true" id="731f939b-15dd-4006-aaf8-2515b5a369d8" name="Changes" comment="完成当前时隙部署服务数量大于前一时隙部署服务的数量">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/daginfos/timeslot1/dagPathInfo3.json" beforeDir="false" afterPath="$PROJECT_DIR$/daginfos/timeslot1/dagPathInfo3.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/utils/App_Params.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/utils/App_Params.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/utils/Main_Algorithm.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/utils/Main_Algorithm.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/utils/PhysicalPathNodeInfo.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/utils/PhysicalPathNodeInfo.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/utils/test1.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/utils/test1.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/utils/PhysicalPathNodeInfo.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/utils/PhysicalPathNodeInfo.class" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -50,7 +47,7 @@
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "last_opened_file_path": "D:/华科工作/实验室工作/胡毅学长第一篇论文 lego对比算法/code",
+    "last_opened_file_path": "D:/华科工作/实验室工作/胡毅学长动态/Dynamic_Java",
     "project.structure.last.edited": "Modules",
     "project.structure.proportion": "0.15",
     "project.structure.side.proportion": "0.2",
@@ -167,7 +164,6 @@
         <item itemvalue="Application.test1" />
         <item itemvalue="Application.Main_Algorithm" />
         <item itemvalue="Application.Main_Algorithm" />
-        <item itemvalue="Application.test (1)" />
         <item itemvalue="Application.test" />
       </list>
     </recent_temporary>
@@ -251,7 +247,14 @@
       <option name="project" value="LOCAL" />
       <updated>1721272733791</updated>
     </task>
-    <option name="localTasksCounter" value="11" />
+    <task id="LOCAL-00011" summary="完成当前时隙部署服务数量大于前一时隙部署服务的数量">
+      <created>1721455681555</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1721455681556</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="Vcs.Log.History.Properties">

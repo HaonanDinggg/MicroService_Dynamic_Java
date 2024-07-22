@@ -273,7 +273,6 @@ public class Main_Algorithm {
                     alltimeApp.get(time).setInstanceDeployOnNode(InstanceDeployOnNode);
                 }
                 System.out.println("当前"+time+"时隙部署结果"+Arrays.deepToString(InstanceDeployOnNode));
-
             }
         }
     }
