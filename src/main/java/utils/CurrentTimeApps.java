@@ -13,6 +13,7 @@ public class CurrentTimeApps {
     private ArrayList<Integer> ServiceInstanceNum; //当前时隙微服务实例的数量
     private int[][] InstanceDeployOnNode; // 各个节点的部署结果 第一维为节点数，第二维为微服务种类
     private int[][] Routing_decision_Y; //路由决策变量，论文中的Y(t)
+    private double[][] BandwidthResource; // 各个节点的部署结果 第一维为节点数，第二维为微服务种类
 
 
     public CurrentTimeApps() {
@@ -22,6 +23,13 @@ public class CurrentTimeApps {
         this.appPathInfos = appPathInfos;
         this.ServiceInstanceNum = ServiceInstanceNum;
         this.InstanceDeployOnNode = InstanceDeployOnNode;
+    }
+
+    public CurrentTimeApps(ArrayList<AppPathInfo> appPathInfos, ArrayList<Integer> ServiceInstanceNum, int[][] InstanceDeployOnNode, double[][] BandwidthResource) {
+        this.appPathInfos = appPathInfos;
+        this.ServiceInstanceNum = ServiceInstanceNum;
+        this.InstanceDeployOnNode = InstanceDeployOnNode;
+        this.BandwidthResource = BandwidthResource;
     }
 
 
@@ -88,5 +96,21 @@ public class CurrentTimeApps {
      */
     public void setInstanceDeployOnNode(int[][] InstanceDeployOnNode) {
         this.InstanceDeployOnNode = InstanceDeployOnNode;
+    }
+
+    /**
+     * 获取
+     * @return BandwidthResource
+     */
+    public double[][] getBandwidthResource() {
+        return BandwidthResource;
+    }
+
+    /**
+     * 设置
+     * @param BandwidthResource
+     */
+    public void setBandwidthResource(double[][] BandwidthResource) {
+        this.BandwidthResource = BandwidthResource;
     }
 }

@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Array;
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 import static utils.WaitingTime.calculateMicroserviceNodeAverageServiceTime;
@@ -312,7 +313,101 @@ public class Main_Algorithm {
             }*/
 
         }
+
+        //准备部署实例
+        for(int time = 0; time < alltimeApp.size(); time++){
+            double[][] bandwidthResource = alltimeApp.get(time).getBandwidthResource();
+            Map<NodePair, Double> bandwidthMap = sortBandwidthResource(bandwidthResource);
+            for (Map.Entry<NodePair, Double> entry : bandwidthMap.entrySet()) {
+                NodePair nodePair  = entry.getKey();
+                double accessibleBandwidth = entry.getValue();
+                if(accessibleBandwidth<0){
+
+                }
+            }
+        }
+
+
     }
+
+    /**
+      * @Description : 将特定类型map按照value值进行升序排序
+      * @Author : Dior
+      *  * @param bandwidthResource
+      * @return : java.util.Map<utils.Main_Algorithm.NodePair,java.lang.Double>
+      * @Date : 2024/7/22
+      * @Version : 1.0
+      * @Copyright : © 2024 All Rights Reserved.
+      **/
+    public static Map<NodePair, Double> sortBandwidthResource(double[][] bandwidthResource) {
+        Map<NodePair, Double> bandwidthMap = new HashMap<>();
+
+        int numNodes = bandwidthResource.length;
+        for (int i = 0; i < numNodes; i++) {
+            for (int j = i + 1; j < numNodes; j++) {
+                NodePair key = new NodePair(i, j);
+                double bandwidth = bandwidthResource[i][j];
+                bandwidthMap.put(key, bandwidth);
+            }
+        }
+
+        // 按value值进行升序排序
+        Map<NodePair, Double> sortedBandwidthMap = bandwidthMap.entrySet()
+                .stream()
+                .sorted(Map.Entry.comparingByValue())
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue,
+                        (e1, e2) -> e1,
+                        LinkedHashMap::new
+                ));
+
+        return sortedBandwidthMap;
+    }
+
+    /**
+      * @Description : 该类存储key值的节点对
+      * @Author : Dior
+      *  * @param null
+      * @return :
+      * @Date : 2024/7/22
+      * @Version : 1.0
+      * @Copyright : © 2024 All Rights Reserved.
+      **/
+    private static class NodePair {
+        private final int node1;
+        private final int node2;
+
+        public NodePair(int node1, int node2) {
+            this.node1 = node1;
+            this.node2 = node2;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            NodePair nodePair = (NodePair) o;
+            return (node1 == nodePair.node1 && node2 == nodePair.node2) ||
+                    (node1 == nodePair.node2 && node2 == nodePair.node1);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(Math.min(node1, node2), Math.max(node1, node2));
+        }
+
+        @Override
+        public String toString() {
+            return "NodePair{" +
+                    "node1=" + node1 +
+                    ", node2=" + node2 +
+                    '}';
+        }
+    }
+
+
+
 
 
     /**
