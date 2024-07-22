@@ -34,6 +34,10 @@ public class CurrentTimeApps {
         this.BandwidthResource = BandwidthResource;
     }
 
+    /**
+     * 更新当前时隙下所有请求流app部署后的节点剩余带宽矩阵
+     * @return Routing_tables_eachPath
+     */
     public double[][] genBandwidthResource(App_Params app_params) {
         int forward_ms_type, forward_ms_node, backward_ms_type, backward_ms_node;
         double p;

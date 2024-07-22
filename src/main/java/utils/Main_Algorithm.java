@@ -303,13 +303,6 @@ public class Main_Algorithm {
             }
             int[][] Routing_decision_Y = alltimeApp.get(time).genRouting_decision_Y(); //决策变量，论文中的Y(t)，其实感觉没啥吊用
             alltimeApp.get(time).genBandwidthResource(appParams);
-            System.out.println("chx");
-            /*for (int i = 0; i < Routing_decision_Y.length; i++) {
-                for (int k = 0; k < Routing_decision_Y[0].length; k++) {
-                    System.out.print(Routing_decision_Y[i][k]);
-                }
-                System.out.println();
-            }*/
 
         }
 
