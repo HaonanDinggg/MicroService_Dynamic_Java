@@ -16,6 +16,7 @@ public class CurrentTimeApps {
     private int[][] InstanceDeployOnNode; // 各个节点的部署结果 第一维为节点数，第二维为微服务种类
     private int[][] Routing_decision_Y; //路由决策变量，论文中的Y(t)
     private double[][] BandwidthResource; // 节点间剩余带宽
+    private double[][] ArrivalRate_matrix; //节点上的到达率 第一维为节点数，第二维为微服务种类
 
 
     public CurrentTimeApps() {
@@ -35,10 +36,10 @@ public class CurrentTimeApps {
     }
 
     /**
-     * 更新当前时隙下所有请求流app部署后的节点剩余带宽矩阵
+     * 更新当前时隙下所有请求流app部署后的节点剩余带宽矩阵和节点的到达率矩阵
      * @return Routing_tables_eachPath
      */
-    public double[][] genBandwidthResource(App_Params app_params) {
+    public double[][] genBandwidthResourceAndArrivalmatrix(App_Params app_params) {
         int forward_ms_type, forward_ms_node, backward_ms_type, backward_ms_node;
         double p;
         //遍历当前时隙下所有app
@@ -61,13 +62,16 @@ public class CurrentTimeApps {
                         p = (double)routing_table.get(4);
                         if (forward_ms_type == -1){
                             //首节点
-                            ArrivalRate_eachNode_asBackwardMs[backward_ms_node][backward_ms_type] = ArrivalRate * p;
+                            double band_cost = ArrivalRate * p;
+                            ArrivalRate_eachNode_asBackwardMs[backward_ms_node][backward_ms_type] = band_cost;
+                            this.ArrivalRate_matrix[backward_ms_node][backward_ms_type] += ArrivalRate * p;
                         }else {
                             //非首节点
                             double band_cost = ArrivalRate_eachNode_asBackwardMs[forward_ms_node][forward_ms_type] * p;
                             ArrivalRate_eachNode_asBackwardMs[backward_ms_node][backward_ms_type] += band_cost;
                             this.BandwidthResource[forward_ms_node][backward_ms_node] -= band_cost;
                             if (forward_ms_node != backward_ms_node) this.BandwidthResource[backward_ms_node][forward_ms_node] -= band_cost;
+                            this.ArrivalRate_matrix[backward_ms_node][backward_ms_type] += ArrivalRate_eachNode_asBackwardMs[forward_ms_node][forward_ms_type] * p;
                         }
                     }
                 }
@@ -165,5 +169,13 @@ public class CurrentTimeApps {
      */
     public void setBandwidthResource(double[][] BandwidthResource) {
         this.BandwidthResource = BandwidthResource;
+    }
+
+    public double[][] getArrivalRate_matrix() {
+        return ArrivalRate_matrix;
+    }
+
+    public void setArrivalRate_matrix(double[][] arrivalRate_matrix) {
+        ArrivalRate_matrix = arrivalRate_matrix;
     }
 }

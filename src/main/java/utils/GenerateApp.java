@@ -60,6 +60,9 @@ public class GenerateApp {
                 System.out.println(Arrays.toString(BandwidthResource[i]));;
             }
             alltimeApp.add(currentTimeApps);
+            //初始到达率矩阵
+            double[][] Arrival_matrix = new double[appParams.getNum_Server()][appParams.getNum_Microservice()];
+            currentTimeApps.setArrivalRate_matrix(Arrival_matrix);
         }
         return alltimeApp;
     }
