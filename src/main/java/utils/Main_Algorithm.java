@@ -423,9 +423,9 @@ public class Main_Algorithm {
                     }
 
                     for (List<Integer> topologyPair : migrationList) {
-                        int migrationService = (int) topologyPair.get(0);
-                        int migrationNode = (int) topologyPair.get(1);
-                        int instanceToTighten = (int) topologyPair.get(2);
+                        int migrationService = (int) topologyPair.get(0);//从该微服务转出
+                        int migrationNode = (int) topologyPair.get(1);//从该节点转出
+                        int instanceToTighten = (int) topologyPair.get(2);//从该节点的该微服务转出的实例数量
                         ArrayList<AppPathInfo> currentAppList = alltimeApp.get(time).getAppPathInfos();
                         Map<Integer,Integer> backwardServiceInstanceNum = initMapInt(appParams);
                         Map<Integer,Integer> forwardServiceInstanceNum = initMapInt(appParams);
@@ -530,15 +530,18 @@ public class Main_Algorithm {
                         Map<Integer, Integer> totalServiceInstances = mergeMaps(backwardServiceInstanceNum, forwardServiceInstanceNum);
                         //计算加权和,对服务器节点集合进行降序排序
                         Map<Integer,Double> weightedSum = calculateWeightedSumMigration(utilizationActive,totalServiceInstances,migrationNode,appParams.getPhysicalConnectionDelay());
-                        Map<Integer,Integer> migrationNodeList = new HashMap<>();
+
                         while(instanceToTighten > 0){
                             //初始化每个节点的最大可迁移数量和目的服务器节点列表Migration_Destination_List
+                            Map<Integer,Integer> migrationDestinationList = new HashMap<>();
                             for (Map.Entry<Integer, Double> nodeAccessibleEntry : weightedSum.entrySet()) {
                                 int nodeID = nodeAccessibleEntry.getKey();
                                 int instanceMigration = 0;
                                 int nodeResource = appParams.getNum_CPU_Core();
+
                                 while (true){
                                     int nodeAccessibleResource = CalNodeAccessibleResource(instanceDeployOnNode,nodeResource,nodeID,appParams.getNum_Microservice(),equalizationCoefficient);
+                                    boolean flag = false;
                                     if(instanceMigration < (int) (avgNetworkResourceUtilization*nodeResource) - nodeResource + nodeAccessibleResource ){
                                         instanceMigration++;
                                     }
@@ -547,22 +550,77 @@ public class Main_Algorithm {
                                     for(int migratenode = 0;migratenode < appParams.getNum_Server();migratenode ++) {
                                         double variationalBackwardServiceArrivalRate = getEntryByKeyDouble(backwardServiceArrivalRate, migratenode).getValue() * instanceToTighten / instanceDeployOnNode[migrationNode][migrationService];
                                         double variationalForwardServiceArrivalRate = getEntryByKeyDouble(forwardServiceArrivalRate, migratenode).getValue() * instanceToTighten / instanceDeployOnNode[migrationNode][migrationService];
-                                        if(bandwidthResource[nodeID][migratenode] - (variationalBackwardServiceArrivalRate+variationalForwardServiceArrivalRate) < 0 && instanceMigration > nodeAccessibleResource){
-                                            instanceMigration--;
-                                            migrationNodeList.put(nodeID,instanceMigration);
-                                            break;
+                                        if(bandwidthResource[nodeID][migratenode] - (variationalBackwardServiceArrivalRate+variationalForwardServiceArrivalRate) < 0){
+                                            flag = true;
                                         }
+                                    }
+                                    if(flag || instanceMigration > nodeAccessibleResource || instanceMigration > instanceToTighten){
+                                        instanceMigration--;
+                                        migrationDestinationList.put(nodeID,instanceMigration);
+                                        break;
                                     }
                                 }
                             }
+                            Map<Integer,List<Object>> decreaseMigrationDestinationList = new HashMap<>();
+                            for (Map.Entry<Integer,Integer> migrationDestinationEntry : migrationDestinationList.entrySet()) {
+                                int migrationDestinationNode = migrationDestinationEntry.getKey();//转入的节点id
+                                int migrationInstanceNum = migrationDestinationEntry.getValue();//转入的实例数量
+                                double gain = 0;
+                                List<Object> migrationInfo = new ArrayList<>();//该列表第一个元素为迁移实例数量，第二个为迁移增益
+                                //计算实验增益
 
+                                migrationInfo.add(migrationInstanceNum);
+                                migrationInfo.add(gain);
+                                decreaseMigrationDestinationList.put(migrationDestinationNode,migrationInfo);
+                            }
+                            Map<Integer, List<Object>> sortedMap = sortMapByDelayGainDesc(decreaseMigrationDestinationList);
 
-
+                            // 输出结果
+                            for (Map.Entry<Integer, List<Object>> decreaseMigrationDestinationEntry : sortedMap.entrySet()) {
+                                System.out.println("migrationDestinationNode: " + decreaseMigrationDestinationEntry.getKey() + ", migrationInstanceNum: " + decreaseMigrationDestinationEntry.getValue().get(0) + ", Delay Gain: " + decreaseMigrationDestinationEntry.getValue().get(1));
+                            }
+                            for (Map.Entry<Integer, List<Object>> decreaseMigrationDestinationEntry : sortedMap.entrySet()) {
+                                int migrationDestinationNode = decreaseMigrationDestinationEntry.getKey();//转入的节点id
+                                int migrationInstanceNum = (int)decreaseMigrationDestinationEntry.getValue().get(0);//转入的实例数量
+                                if(migrationInstanceNum>0){
+                                    instanceDeployOnNode[migrationDestinationNode][migrationService] += 0;
+                                    instanceDeployOnNode[migrationNode][migrationService] += 0;
+                                }
+                            }
                         }
                     }
                 }
             }
         }
+    }
+
+    /**
+      * @Description : map，其value值List<Object>的内容包含了两项，list.get(0)存储的是int类型的节点id信息，list.get(1)存储的是double类型的时延增益信息，请你帮我根据每个list的时延增益信息将map进行降序排序
+      * @Author : Dior
+      *  * @param map
+      * @return : java.util.Map<java.lang.Integer,java.util.List<java.lang.Object>>
+      * @Date : 2024/7/24 
+      * @Version : 1.0
+      * @Copyright : © 2024 All Rights Reserved.       
+      **/
+    public static Map<Integer, List<Object>> sortMapByDelayGainDesc(Map<Integer, List<Object>> map) {
+        // 将Map的条目存入List
+        List<Map.Entry<Integer, List<Object>>> entryList = new ArrayList<>(map.entrySet());
+
+        // 使用Comparator按时延增益进行降序排序
+        entryList.sort((entry1, entry2) -> {
+            Double delayGain1 = (Double) entry1.getValue().get(1);
+            Double delayGain2 = (Double) entry2.getValue().get(1);
+            return delayGain2.compareTo(delayGain1);
+        });
+
+        // 将排序后的条目存入LinkedHashMap以保持顺序
+        Map<Integer, List<Object>> sortedMap = new LinkedHashMap<>();
+        for (Map.Entry<Integer, List<Object>> entry : entryList) {
+            sortedMap.put(entry.getKey(), entry.getValue());
+        }
+
+        return sortedMap;
     }
 
     public static int CalNodeAccessibleResource (int[][] instanceDeployOnNode,int nodeResource,int nodeID,int serviceNum,double equalizationCoefficient) {
