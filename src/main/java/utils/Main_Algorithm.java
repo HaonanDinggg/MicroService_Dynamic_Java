@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InterruptedIOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -313,7 +314,11 @@ public class Main_Algorithm {
             double[][] bandwidthResource = alltimeApp.get(time).getBandwidthResource();
             Map<NodePair, Double> bandwidthMap = sortBandwidthResource(bandwidthResource);
             int[][] instanceDeployOnNode = alltimeApp.get(time).getInstanceDeployOnNode();
+            Map<Integer,Double> utilizationActive = CalUtilizationActive(instanceDeployOnNode, appParams.getNum_CPU_Core());//这边索引对应的是节点的id
+            double avgNetworkResourceUtilization = 0.95;
+            double equalizationCoefficient = 0.9;//公平指数下限
             for (Map.Entry<NodePair, Double> entry : bandwidthMap.entrySet()) {
+                System.out.println("处理当前连接");
                 NodePair nodePair  = entry.getKey();
                 double accessibleBandwidth = entry.getValue();
                 if(accessibleBandwidth<0){
@@ -358,6 +363,7 @@ public class Main_Algorithm {
                             }
                         }
                     }
+                    topologyPairs = MergeTopologyPairs(topologyPairs);
                     // 将topologyPairs根据里面List<Object>的第五个元素数据通信量进行升序排序
                     Collections.sort(topologyPairs, new Comparator<List<Object>>() {
                         @Override
@@ -394,19 +400,248 @@ public class Main_Algorithm {
                                 migrationPair.add(instanceToTighten);
                                 //更新残余带宽
                                 bandwidthToTighten -= dataTrafficToTighten;
+                                migrationList.add(migrationPair);
                                 break;
                             }
                         }
-                        migrationList.add(migrationPair);
                     }
-                    for (List<Integer> topologyPair : migrationList) {
+                    System.out.println("打印需要迁移的实例对象");
+                    for (List<Integer> list : migrationList) {
+                        System.out.println(list);
+                    }
 
+                    for (List<Integer> topologyPair : migrationList) {
+                        int migrationService = (int) topologyPair.get(0);
+                        int migrationNode = (int) topologyPair.get(1);
+                        int instanceToTighten = (int) topologyPair.get(2);
+                        ArrayList<AppPathInfo> currentAppList = alltimeApp.get(time).getAppPathInfos();
+                        Map<Integer,Integer> backwardServiceInstanceNum = initMapInt(appParams);
+                        Map<Integer,Integer> forwardServiceInstanceNum = initMapInt(appParams);
+                        Map<Integer,Double> backwardServiceArrivalRate = initMapDouble(appParams);
+                        Map<Integer,Double> forwardServiceArrivalRate = initMapDouble(appParams);
+                        for (AppPathInfo app : currentAppList) {
+                            //循环各个app的服务路径，找到微服务m的前继微服务以及后继微服务
+                            List<PathProbability> pathProbabilities = app.getPathProbabilities();
+                            for (PathProbability pathProbability : pathProbabilities) {
+                                List<NodeInfo> nodeInfos = pathProbability.getNodeInfos();
+                                List<List<List<Object>>>routing_tables_eachPath = pathProbability.getRouting_tables_eachPath();
+                                for (int index = 0; index < nodeInfos.size(); index++) {
+                                    NodeInfo nodeInfo = nodeInfos.get(index);
+                                    if (nodeInfo.getServiceType() == migrationService) {
+                                        if (index == 0) {
+                                            //如果m是头节点
+                                            NodeInfo forwardNode = nodeInfos.get(index + 1);
+                                            int forwardSeviceID = forwardNode.getServiceType();//后继微服务的id
+                                            for (List<List<Object>> microService : routing_tables_eachPath) {
+                                                //这层循环遍历该路径所有微服务
+                                                for (List<Object> transRoute : microService) {
+                                                    int startService = (int) transRoute.get(0);
+                                                    int startNode = (int) transRoute.get(1);
+                                                    int endService = (int) transRoute.get(2);
+                                                    int endNode = (int) transRoute.get(3);
+                                                    double transpro = (double) transRoute.get(4);
+                                                    if(startNode == migrationNode && startService == migrationService && endService == forwardSeviceID){
+                                                        //此时找到后继微服务 在endNode上的endService
+                                                        int forwardSeviceOnNode = instanceDeployOnNode[endNode][endService];
+                                                        double forwardSeviceArrivaRateOnNode = transpro*pathProbability.getArrivalRate();
+                                                        Map.Entry<Integer, Integer> forwardserviceEntry = getEntryByKey(forwardServiceInstanceNum, endNode);
+                                                        Map.Entry<Integer, Double> forwardserviceArrivalRateEntry = getEntryByKeyDouble(forwardServiceArrivalRate, endNode);
+                                                        forwardServiceInstanceNum.replace(endNode,forwardserviceEntry.getValue()+forwardSeviceOnNode);
+                                                        forwardServiceArrivalRate.replace(endNode,forwardserviceArrivalRateEntry.getValue()+forwardSeviceArrivaRateOnNode);
+                                                    }
+                                                }
+                                            }
+
+                                        } else if (index == nodeInfos.size() - 1) {
+                                            //如果m是尾节点
+                                            NodeInfo backwardNode = nodeInfos.get(index - 1);
+                                            int backwardSeviceID = backwardNode.getServiceType();//前继微服务的id
+                                            for (List<List<Object>> microService : routing_tables_eachPath) {
+                                                //这层循环遍历该路径所有微服务
+                                                for (List<Object> transRoute : microService) {
+                                                    int startService = (int) transRoute.get(0);
+                                                    int startNode = (int) transRoute.get(1);
+                                                    int endService = (int) transRoute.get(2);
+                                                    int endNode = (int) transRoute.get(3);
+                                                    double transpro = (double) transRoute.get(4);
+                                                    if(endNode == migrationNode && endService == migrationService && startService == backwardSeviceID){
+                                                        //此时找到前继微服务 在startNode上的startService
+                                                        int backwardSeviceOnNode = instanceDeployOnNode[startNode][startService];
+                                                        double backwardSeviceArrivaRateOnNode = transpro*pathProbability.getArrivalRate();
+                                                        Map.Entry<Integer, Integer> backwardserviceEntry = getEntryByKey(backwardServiceInstanceNum, startNode);
+                                                        Map.Entry<Integer, Double> backwardserviceArrivalRateEntry = getEntryByKeyDouble(backwardServiceArrivalRate, startNode);
+                                                        backwardServiceInstanceNum.replace(startNode,backwardserviceEntry.getValue()+backwardSeviceOnNode);
+                                                        backwardServiceArrivalRate.replace(startNode,backwardserviceArrivalRateEntry.getValue()+backwardSeviceArrivaRateOnNode);
+                                                    }
+                                                }
+                                            }
+                                        } else {
+                                            //如果m为dag中间节点
+                                            NodeInfo forwardNode = nodeInfos.get(index + 1);
+                                            NodeInfo backwardNode = nodeInfos.get(index - 1);
+                                            int forwardSeviceID = forwardNode.getServiceType();//后继微服务的id
+                                            int backwardSeviceID = backwardNode.getServiceType();//后继微服务的实例数
+                                            for (List<List<Object>> microService : routing_tables_eachPath) {
+                                                //这层循环遍历该路径所有微服务
+                                                for (List<Object> transRoute : microService) {
+                                                    int startService = (int) transRoute.get(0);
+                                                    int startNode = (int) transRoute.get(1);
+                                                    int endService = (int) transRoute.get(2);
+                                                    int endNode = (int) transRoute.get(3);
+                                                    double transpro = (double) transRoute.get(4);
+                                                    if(endNode == migrationNode && endService == migrationService && startService == backwardSeviceID){
+                                                        //此时找到前继微服务
+                                                        int backwardSeviceOnNode = instanceDeployOnNode[startNode][startService];
+                                                        double backwardSeviceArrivaRateOnNode = transpro*pathProbability.getArrivalRate();
+                                                        Map.Entry<Integer, Integer> backwardserviceEntry = getEntryByKey(backwardServiceInstanceNum, startNode);
+                                                        Map.Entry<Integer, Double> backwardserviceArrivalRateEntry = getEntryByKeyDouble(backwardServiceArrivalRate, startNode);
+                                                        backwardServiceInstanceNum.replace(startNode,backwardserviceEntry.getValue()+backwardSeviceOnNode);
+                                                        backwardServiceArrivalRate.replace(startNode,backwardserviceArrivalRateEntry.getValue()+backwardSeviceArrivaRateOnNode);
+                                                    }
+                                                    if(startNode == migrationNode && startService == migrationService && endService == forwardSeviceID){
+                                                        //此时找到后继微服务
+                                                        int forwardSeviceOnNode = instanceDeployOnNode[endNode][endService];
+                                                        double forwardSeviceArrivaRateOnNode = transpro*pathProbability.getArrivalRate();
+                                                        Map.Entry<Integer, Integer> forwardserviceEntry = getEntryByKey(forwardServiceInstanceNum, endNode);
+                                                        Map.Entry<Integer, Double> forwardserviceArrivalRateEntry = getEntryByKeyDouble(forwardServiceArrivalRate, endNode);
+                                                        forwardServiceInstanceNum.replace(endNode,forwardserviceEntry.getValue()+forwardSeviceOnNode);
+                                                        forwardServiceArrivalRate.replace(endNode,forwardserviceArrivalRateEntry.getValue()+forwardSeviceArrivaRateOnNode);
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        // 合并两个Map
+                        Map<Integer, Integer> totalServiceInstances = mergeMaps(backwardServiceInstanceNum, forwardServiceInstanceNum);
+                        //计算加权和,对服务器节点集合进行降序排序
+                        Map<Integer,Double> weightedSum = calculateWeightedSumMigration(utilizationActive,totalServiceInstances,migrationNode,appParams.getPhysicalConnectionDelay());
+                        Map<Integer,Integer> migrationNodeList = new HashMap<>();
+                        while(instanceToTighten > 0){
+                            //初始化每个节点的最大可迁移数量和目的服务器节点列表Migration_Destination_List
+                            for (Map.Entry<Integer, Double> nodeAccessibleEntry : weightedSum.entrySet()) {
+                                int nodeID = nodeAccessibleEntry.getKey();
+                                int instanceMigration = 0;
+                                int nodeResource = appParams.getNum_CPU_Core();
+                                while (true){
+                                    int nodeAccessibleResource = CalNodeAccessibleResource(instanceDeployOnNode,nodeResource,nodeID,appParams.getNum_Microservice(),equalizationCoefficient);
+                                    if(instanceMigration < (int) (avgNetworkResourceUtilization*nodeResource) - nodeResource + nodeAccessibleResource ){
+                                        instanceMigration++;
+                                    }
+                                    //计算数据通信量变化 即需要迁移的服务占比
+                                    //需要遍历所有的节点 看是否满足约束
+                                    for(int migratenode = 0;migratenode < appParams.getNum_Server();migratenode ++) {
+                                        double variationalBackwardServiceArrivalRate = getEntryByKeyDouble(backwardServiceArrivalRate, migratenode).getValue() * instanceToTighten / instanceDeployOnNode[migrationNode][migrationService];
+                                        double variationalForwardServiceArrivalRate = getEntryByKeyDouble(forwardServiceArrivalRate, migratenode).getValue() * instanceToTighten / instanceDeployOnNode[migrationNode][migrationService];
+                                        if(bandwidthResource[nodeID][migratenode] - (variationalBackwardServiceArrivalRate+variationalForwardServiceArrivalRate) < 0 && instanceMigration > nodeAccessibleResource){
+                                            instanceMigration--;
+                                            migrationNodeList.put(nodeID,instanceMigration);
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+
+
+
+                        }
                     }
                 }
             }
         }
     }
 
+    public static int CalNodeAccessibleResource (int[][] instanceDeployOnNode,int nodeResource,int nodeID,int serviceNum,double equalizationCoefficient) {
+        int nodeAccessibleResource = (int)(nodeResource*equalizationCoefficient);
+        for(int service = 0;service < serviceNum;service ++){
+            nodeAccessibleResource -= instanceDeployOnNode[nodeID][service];
+        }
+        return nodeAccessibleResource;
+    }
+
+
+    /**
+      * @Description : 计算迁移的权重参数
+      * @Author : Dior
+      *  * @param utilizationActive
+ * @param totalServiceInstances
+ * @param migrationNode
+ * @param PhysicalConnectionDelay
+      * @return : java.util.Map<java.lang.Integer,java.lang.Double>
+      * @Date : 2024/7/23
+      * @Version : 1.0
+      * @Copyright : © 2024 All Rights Reserved.
+      **/
+    private static Map<Integer, Double> calculateWeightedSumMigration(Map<Integer, Double> utilizationActive, Map<Integer, Integer> totalServiceInstances, int migrationNode,double[][] PhysicalConnectionDelay) {
+        int nodeNum = utilizationActive.size();
+        Map<Integer, Double> weightedSumNode = new HashMap<>();
+        double coefficient1 = 0.5;
+        double coefficient2 =0.5;
+        for (int node = 0; node < nodeNum; node++) {
+            Map.Entry<Integer, Double> utilizationEntry = getEntryByKeyDouble(utilizationActive, node);
+            Map.Entry<Integer, Integer> serviceInstancesEntry = getEntryByKey(totalServiceInstances, node);
+            if(utilizationEntry.getValue()!=0) {
+                double weightedSum = coefficient1 * serviceInstancesEntry.getValue() - coefficient2 * PhysicalConnectionDelay[node][migrationNode];
+                weightedSumNode.put(node, weightedSum);
+            }
+        }
+        sortByValuesDescendingDouble(weightedSumNode);
+        return weightedSumNode;
+    }
+
+    public static Map<Integer, Integer> mergeMaps(Map<Integer, Integer> map1, Map<Integer, Integer> map2) {
+        // 创建一个新Map来存储合并后的结果
+        Map<Integer, Integer> mergedMap = new HashMap<>(map1);
+
+        // 遍历第二个Map，将值合并到第一个Map中
+        for (Map.Entry<Integer, Integer> entry : map2.entrySet()) {
+            Integer key = entry.getKey();
+            Integer value = entry.getValue();
+
+            mergedMap.merge(key, value, Integer::sum);
+        }
+
+        return mergedMap;
+    }
+
+
+
+    /**
+      * @Description : 将数据通信量集合
+      * @Author : Dior
+      *  * @param migrationList
+      * @return : java.util.List<java.util.List<java.lang.Integer>>
+      * @Date : 2024/7/23
+      * @Version : 1.0
+      * @Copyright : © 2024 All Rights Reserved.
+      **/
+    public static List<List<Object>> MergeTopologyPairs(List<List<Object>> topologyPairs) {
+        // 使用Map来合并具有相同起点和终点的拓扑对
+        Map<String, List<Object>> mergedMap = new HashMap<>();
+
+        for (List<Object> migrationPair : topologyPairs) {
+            int startMicroservice = (int) migrationPair.get(0);
+            int startNode = (int) migrationPair.get(1);
+            int endMicroservice = (int) migrationPair.get(2);
+            int endNode = (int) migrationPair.get(3);
+            double arrivalRate = (double) migrationPair.get(4);
+
+            String key = startMicroservice + "-" + startNode + "-" + endMicroservice + "-" + endNode;
+
+            if (mergedMap.containsKey(key)) {
+                List<Object> existingPair = mergedMap.get(key);
+                double existingArrivalRate = (double) existingPair.get(4);
+                existingPair.set(4, existingArrivalRate + arrivalRate);
+            } else {
+                mergedMap.put(key, new ArrayList<>(migrationPair));
+            }
+        }
+
+        // 将合并后的结果转换回List<List<Object>>
+        return new ArrayList<>(mergedMap.values());
+    }
 
     // 深拷贝方法
     public static int[][] deepCopy(int[][] original) {
@@ -503,10 +738,7 @@ public class Main_Algorithm {
                     '}';
         }
     }
-
-
-
-
+    
 
     /**
       * @Description : 寻找满足约束的通信时延最小，带宽最大的节点
@@ -537,6 +769,16 @@ public class Main_Algorithm {
         return targetNode;
     }
 
+    /**
+      * @Description : 当前时隙的冗余因子
+      * @Author : Dior
+      *  * @param InstanceDeployOnNode
+ * @param nowServiceInstanceNum
+      * @return : double
+      * @Date : 2024/7/23 
+      * @Version : 1.0
+      * @Copyright : © 2024 All Rights Reserved.       
+      **/
     private static double calculateRedundantFactor (int[][] InstanceDeployOnNode, ArrayList<Integer> nowServiceInstanceNum) {
         double RedundantFactor= 0;
         double molecule = 0;
@@ -555,7 +797,7 @@ public class Main_Algorithm {
     }
 
     /**
-      * @Description : 计算加权和
+      * @Description : 计算加权和1
       * @Author : Dior
       *  * @param utilizationActive
  * @param totalServiceInstances
@@ -686,6 +928,40 @@ public class Main_Algorithm {
         return ServiceInstance;
     }
 
+    /**
+     * @Description : 初始化map 便于后续进行内容替换
+     * @Author : Dior
+     *  * @param appParams
+     * @return : java.util.Map<java.lang.Integer,java.util.Map<java.lang.Integer,java.lang.Integer>>
+     * @Date : 2024/7/17
+     * @Version : 1.0
+     * @Copyright : © 2024 All Rights Reserved.
+     **/
+    public static Map<Integer,Integer> initMapInt(App_Params appParams) {
+        Map<Integer,Integer> ServiceInstance = new HashMap<>();
+        for (int node = 0; node < appParams.getNum_Server(); node++){
+            ServiceInstance.put(node,0);
+        }
+        return ServiceInstance;
+    }
+
+    /**
+     * @Description : 初始化map 便于后续进行内容替换
+     * @Author : Dior
+     *  * @param appParams
+     * @return : java.util.Map<java.lang.Integer,java.util.Map<java.lang.Integer,java.lang.Integer>>
+     * @Date : 2024/7/17
+     * @Version : 1.0
+     * @Copyright : © 2024 All Rights Reserved.
+     **/
+    public static Map<Integer,Double> initMapDouble(App_Params appParams) {
+        Map<Integer,Double> ServiceInstance = new HashMap<>();
+        for (int node = 0; node < appParams.getNum_Server(); node++){
+            ServiceInstance.put(node, 0.0);
+        }
+        return ServiceInstance;
+    }
+
 
     /**
       * @Description : 找到指定key值的键值对
@@ -804,6 +1080,30 @@ public class Main_Algorithm {
 
         // 按值进行升序排序
         list.sort((entry1, entry2) -> entry1.getValue().compareTo(entry2.getValue()));
+
+        // 创建一个有序的LinkedHashMap
+        Map<Integer, Double> sortedMap = new LinkedHashMap<>();
+        for (Map.Entry<Integer, Double> entry : list) {
+            sortedMap.put(entry.getKey(), entry.getValue());
+        }
+        return sortedMap;
+    }
+
+    /**
+     * @Description : 将当前map按照value值升序排序
+     * @Author : Dior
+     *  * @param map
+     * @return : java.util.Map<java.lang.Integer,java.lang.Integer>
+     * @Date : 2024/7/17
+     * @Version : 1.0
+     * @Copyright : © 2024 All Rights Reserved.
+     **/
+    public static Map<Integer, Double> sortByValuesDescendingDouble(Map<Integer, Double> map) {
+        // 将Map的Entry放入List
+        List<Map.Entry<Integer, Double>> list = new ArrayList<>(map.entrySet());
+
+        // 按值进行升序排序
+        list.sort((entry1, entry2) -> entry2.getValue().compareTo(entry1.getValue()));
 
         // 创建一个有序的LinkedHashMap
         Map<Integer, Double> sortedMap = new LinkedHashMap<>();

@@ -5,57 +5,45 @@ import java.util.*;
 public class test1 {
 
     public static void main(String[] args) {
-        // 示例数据
-        int[][] InstanceDeployOnNode = {
-                {5, 2, 0},
-                {3, 0, 4},
-                {0, 1, 6}
-        };
+        // 示例输入数据
+        List<List<Object>> migrationList = new ArrayList<>();
+        migrationList.add(Arrays.asList(1, 1, 2, 2, 0.5));
+        migrationList.add(Arrays.asList(1, 1, 2, 2, 0.3));
+        migrationList.add(Arrays.asList(1, 2, 3, 4, 0.4));
 
-        List<Integer> serviceChain = Arrays.asList(0, 1, 2);
-        double arrivalRate = 100.0;
+        // 合并迁移列表
+        List<List<Object>> mergedList = mergeMigrationList(migrationList);
 
-        // 计算所有可能的路由路径及其概率
-        List<Map<Integer, Double>> routes = calculateRoutes(InstanceDeployOnNode, serviceChain, arrivalRate);
-
-        // 打印结果
-        for (Map<Integer, Double> route : routes) {
-            System.out.println(route);
+        // 输出结果
+        for (List<Object> migrationPair : mergedList) {
+            System.out.println(migrationPair);
         }
     }
 
-    public static List<Map<Integer, Double>> calculateRoutes(int[][] instanceDeployOnNode, List<Integer> serviceChain, double arrivalRate) {
-        List<Map<Integer, Double>> allRoutes = new ArrayList<>();
-        Map<Integer, Double> currentRoute = new HashMap<>();
-        calculateRoutesRecursive(instanceDeployOnNode, serviceChain, arrivalRate, 0, currentRoute, allRoutes);
-        return allRoutes;
-    }
+    public static List<List<Object>> mergeMigrationList(List<List<Object>> migrationList) {
+        // 使用Map来合并具有相同起点和终点的拓扑对
+        Map<String, List<Object>> mergedMap = new HashMap<>();
 
-    private static void calculateRoutesRecursive(int[][] instanceDeployOnNode, List<Integer> serviceChain, double arrivalRate, int serviceIndex, Map<Integer, Double> currentRoute, List<Map<Integer, Double>> allRoutes) {
-        if (serviceIndex == serviceChain.size()) {
-            allRoutes.add(new HashMap<>(currentRoute));
-            return;
-        }
+        for (List<Object> migrationPair : migrationList) {
+            int startMicroservice = (int) migrationPair.get(0);
+            int startNode = (int) migrationPair.get(1);
+            int endMicroservice = (int) migrationPair.get(2);
+            int endNode = (int) migrationPair.get(3);
+            double arrivalRate = (double) migrationPair.get(4);
 
-        int serviceId = serviceChain.get(serviceIndex);
-        double totalInstances = 0;
-        for (int[] nodeInstances : instanceDeployOnNode) {
-            totalInstances += nodeInstances[serviceId];
-        }
+            String key = startMicroservice + "-" + startNode + "-" + endMicroservice + "-" + endNode;
 
-        if (totalInstances == 0) {
-            return; // 如果当前服务没有任何实例，直接返回
-        }
-
-        for (int nodeId = 0; nodeId < instanceDeployOnNode.length; nodeId++) {
-            int instances = instanceDeployOnNode[nodeId][serviceId];
-            if (instances > 0) {
-                double probability = instances / totalInstances;
-                double addedLoad = arrivalRate * probability;
-                currentRoute.put(nodeId, currentRoute.getOrDefault(nodeId, 0.0) + addedLoad);
-                calculateRoutesRecursive(instanceDeployOnNode, serviceChain, arrivalRate * probability, serviceIndex + 1, currentRoute, allRoutes);
-                currentRoute.put(nodeId, currentRoute.get(nodeId) - addedLoad);
+            if (mergedMap.containsKey(key)) {
+                List<Object> existingPair = mergedMap.get(key);
+                double existingArrivalRate = (double) existingPair.get(4);
+                existingPair.set(4, existingArrivalRate + arrivalRate);
+            } else {
+                mergedMap.put(key, new ArrayList<>(migrationPair));
             }
         }
+
+        // 将合并后的结果转换回List<List<Object>>
+        return new ArrayList<>(mergedMap.values());
     }
+
 }
