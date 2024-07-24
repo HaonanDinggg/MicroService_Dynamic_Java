@@ -304,7 +304,19 @@ public class Main_Algorithm {
                 }
             }
             int[][] Routing_decision_Y = alltimeApp.get(time).genRouting_decision_Y(); //决策变量，论文中的Y(t)，其实感觉没啥吊用
-            alltimeApp.get(time).genBandwidthResource(appParams);
+            alltimeApp.get(time).genBandwidthResourceAndArrivalmatrix(appParams);
+            double[][] BandwidthResource = alltimeApp.get(time).getBandwidthResource();
+            double[][] Arrival_matrix = alltimeApp.get(time).getArrivalRate_matrix();
+            //打印当前时隙请求率
+            double arrival_sum = 0;
+            for (int i = 0; i < alltimeApp.get(time).getAppPathInfos().size(); i++) {
+                arrival_sum += alltimeApp.get(time).getAppPathInfos().get(i).getArrivalRate();
+            }
+            System.out.println(arrival_sum);
+            System.out.println("chx");
+            for (int i = 0; i < Arrival_matrix.length; i++) {
+                System.out.println(Arrays.toString(Arrival_matrix[i]));
+            }
         }
 
 
