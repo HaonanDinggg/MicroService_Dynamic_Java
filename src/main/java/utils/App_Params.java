@@ -29,6 +29,8 @@ public class App_Params {
     private int RoundRobinParam;//轮询放置的的数量
     private double AvgPhysicalConnectionDelay;//平均通信时延
     private int AvgPhysicalConnectionBandwidth;//平均带宽
+    private double avgNetworkResourceUtilization;//平均网络资源利用率上限
+    private double equalizationCoefficient;//平均网络资源利用率上限
     // 基于微服务的应用的各个参数范围
     private int[] App_Num; // 该时段下app的数量范围
     private int[] TTL_Max_Tolerance_Latency_Range; // 应用的生命周期/最大容忍时延范围
@@ -108,6 +110,45 @@ public class App_Params {
         this.RoundRobinParam = RoundRobinParam;
         this.AvgPhysicalConnectionDelay = AvgPhysicalConnectionDelay;
         this.AvgPhysicalConnectionBandwidth = AvgPhysicalConnectionBandwidth;
+        this.App_Num = App_Num;
+        this.TTL_Max_Tolerance_Latency_Range = TTL_Max_Tolerance_Latency_Range;
+        this.Unit_Rate_Bandwidth_Range = Unit_Rate_Bandwidth_Range;
+        this.Average_Arrival_Rate_Range = Average_Arrival_Rate_Range;
+        this.Num_Node_Range = Num_Node_Range;
+        this.Num_Edge_Range = Num_Edge_Range;
+        this.DAG_Category_Range = DAG_Category_Range;
+        this.Num_Apps_Timeslot_Range = Num_Apps_Timeslot_Range;
+        this.Microservice_Type_CPU = Microservice_Type_CPU;
+        this.Microservice_Type_Memory = Microservice_Type_Memory;
+        this.Lowest_Communication_Latency = Lowest_Communication_Latency;
+        this.Highest_Communication_Latency = Highest_Communication_Latency;
+        this.Lowest_Bandwidth_Capacity = Lowest_Bandwidth_Capacity;
+        this.Highest_Bandwidth_Capacity = Highest_Bandwidth_Capacity;
+        this.Lowest_Microservice_Bandwidth_Requirement = Lowest_Microservice_Bandwidth_Requirement;
+        this.Highest_Microservice_Bandwidth_Requirement = Highest_Microservice_Bandwidth_Requirement;
+        this.Lowest_Microservice_Type_Unit_Process_Ability = Lowest_Microservice_Type_Unit_Process_Ability;
+        this.Highest_Microservice_Type_Unit_Process_Ability = Highest_Microservice_Type_Unit_Process_Ability;
+        this.PhysicalConnectionDelay = PhysicalConnectionDelay;
+        this.PhysicalConnectionBandwidth = PhysicalConnectionBandwidth;
+        this.MicroServiceConnectionDelay = MicroServiceConnectionDelay;
+    }
+
+    public App_Params(int Num_Server, int Num_Microservice, List<ServiceTypeInfo> serviceTypeInfos, List<PhysicalNodeInfo> physicalNodeInfos, int Num_Application, int Num_Time_Slot, int Num_CPU_Core, int MAX1, int AvgArrivalRateDataSize, double DataBaseCommunicationDelay, int RoundRobinParam, double AvgPhysicalConnectionDelay, int AvgPhysicalConnectionBandwidth, double avgNetworkResourceUtilization, double equalizationCoefficient, int[] App_Num, int[] TTL_Max_Tolerance_Latency_Range, double[] Unit_Rate_Bandwidth_Range, int[] Average_Arrival_Rate_Range, int[] Num_Node_Range, int[] Num_Edge_Range, int[] DAG_Category_Range, int[] Num_Apps_Timeslot_Range, int[] Microservice_Type_CPU, int[] Microservice_Type_Memory, double Lowest_Communication_Latency, double Highest_Communication_Latency, int Lowest_Bandwidth_Capacity, int Highest_Bandwidth_Capacity, int Lowest_Microservice_Bandwidth_Requirement, int Highest_Microservice_Bandwidth_Requirement, int Lowest_Microservice_Type_Unit_Process_Ability, int Highest_Microservice_Type_Unit_Process_Ability, double[][] PhysicalConnectionDelay, int[][] PhysicalConnectionBandwidth, int[][] MicroServiceConnectionDelay) {
+        this.Num_Server = Num_Server;
+        this.Num_Microservice = Num_Microservice;
+        this.serviceTypeInfos = serviceTypeInfos;
+        this.physicalNodeInfos = physicalNodeInfos;
+        this.Num_Application = Num_Application;
+        this.Num_Time_Slot = Num_Time_Slot;
+        this.Num_CPU_Core = Num_CPU_Core;
+        this.MAX1 = MAX1;
+        this.AvgArrivalRateDataSize = AvgArrivalRateDataSize;
+        this.DataBaseCommunicationDelay = DataBaseCommunicationDelay;
+        this.RoundRobinParam = RoundRobinParam;
+        this.AvgPhysicalConnectionDelay = AvgPhysicalConnectionDelay;
+        this.AvgPhysicalConnectionBandwidth = AvgPhysicalConnectionBandwidth;
+        this.avgNetworkResourceUtilization = avgNetworkResourceUtilization;
+        this.equalizationCoefficient = equalizationCoefficient;
         this.App_Num = App_Num;
         this.TTL_Max_Tolerance_Latency_Range = TTL_Max_Tolerance_Latency_Range;
         this.Unit_Rate_Bandwidth_Range = Unit_Rate_Bandwidth_Range;
@@ -811,5 +852,37 @@ public class App_Params {
      */
     public void setAvgPhysicalConnectionBandwidth(int AvgPhysicalConnectionBandwidth) {
         this.AvgPhysicalConnectionBandwidth = AvgPhysicalConnectionBandwidth;
+    }
+
+    /**
+     * 获取
+     * @return avgNetworkResourceUtilization
+     */
+    public double getAvgNetworkResourceUtilization() {
+        return avgNetworkResourceUtilization;
+    }
+
+    /**
+     * 设置
+     * @param avgNetworkResourceUtilization
+     */
+    public void setAvgNetworkResourceUtilization(double avgNetworkResourceUtilization) {
+        this.avgNetworkResourceUtilization = avgNetworkResourceUtilization;
+    }
+
+    /**
+     * 获取
+     * @return equalizationCoefficient
+     */
+    public double getEqualizationCoefficient() {
+        return equalizationCoefficient;
+    }
+
+    /**
+     * 设置
+     * @param equalizationCoefficient
+     */
+    public void setEqualizationCoefficient(double equalizationCoefficient) {
+        this.equalizationCoefficient = equalizationCoefficient;
     }
 }

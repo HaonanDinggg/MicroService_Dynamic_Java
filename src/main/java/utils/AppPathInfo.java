@@ -12,6 +12,7 @@ import java.util.Map;
 public class AppPathInfo {
 
     private Map<Integer, NodeInfo> nodeInfos; //当前DAG图所有的节点信息
+    private ArrayList<Integer> serviceInstanceNumApp;//当前app计算所有需要的实例数
     private List<PathProbability> pathProbabilities;
     //DAGPathInfo对象.pathProbabilities.get(index1第几条链).getprobability 获取当前index1路径的概率
     //DAGPathInfo对象.pathProbabilities.get(index1第几条链).get(index2第几个节点).getserviceType 获取当前index路径的第index2个节点的微服务类型 也可以获取当前节点的后继节点的信息
@@ -29,6 +30,19 @@ public class AppPathInfo {
     }
     public AppPathInfo(Map<Integer, NodeInfo> nodeInfos, List<PathProbability> pathProbabilities, int Num_Dag_Node, int Num_Dag_Edge, int Num_MicroService, int[][] adjMatrix, double ArrivalRate, double AppMaxToleranceLatency, int AppType) {
         this.nodeInfos = nodeInfos;
+        this.pathProbabilities = pathProbabilities;
+        this.Num_Dag_Node = Num_Dag_Node;
+        this.Num_Dag_Edge = Num_Dag_Edge;
+        this.Num_MicroService = Num_MicroService;
+        this.adjMatrix = adjMatrix;
+        this.ArrivalRate = ArrivalRate;
+        this.AppMaxToleranceLatency = AppMaxToleranceLatency;
+        this.AppType = AppType;
+    }
+
+    public AppPathInfo(Map<Integer, NodeInfo> nodeInfos, ArrayList<Integer> serviceInstanceNumApp, List<PathProbability> pathProbabilities, int Num_Dag_Node, int Num_Dag_Edge, int Num_MicroService, int[][] adjMatrix, double ArrivalRate, double AppMaxToleranceLatency, int AppType) {
+        this.nodeInfos = nodeInfos;
+        this.serviceInstanceNumApp = serviceInstanceNumApp;
         this.pathProbabilities = pathProbabilities;
         this.Num_Dag_Node = Num_Dag_Node;
         this.Num_Dag_Edge = Num_Dag_Edge;
@@ -186,5 +200,22 @@ public class AppPathInfo {
 
     public String toString() {
         return "AppPathInfo{nodeInfos = " + nodeInfos + ", pathProbabilities = " + pathProbabilities + ", Num_Dag_Node = " + Num_Dag_Node + ", Num_Dag_Edge = " + Num_Dag_Edge + ", Num_MicroService = " + Num_MicroService + ", adjMatrix = " + adjMatrix + ", ArrivalRate = " + ArrivalRate + ", AppMaxToleranceLatency = " + AppMaxToleranceLatency + ", AppType = " + AppType + "}";
+    }
+
+
+    /**
+     * 获取
+     * @return serviceInstanceNumApp
+     */
+    public ArrayList<Integer> getServiceInstanceNumApp() {
+        return serviceInstanceNumApp;
+    }
+
+    /**
+     * 设置
+     * @param serviceInstanceNumApp
+     */
+    public void setServiceInstanceNumApp(ArrayList<Integer> serviceInstanceNumApp) {
+        this.serviceInstanceNumApp = serviceInstanceNumApp;
     }
 }
