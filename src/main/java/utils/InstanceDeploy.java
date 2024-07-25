@@ -46,6 +46,8 @@ public class InstanceDeploy {
                 System.out.println("当前部署数量"+alltimeApp.get(time).getServiceInstanceNum());
                 //在第一个时隙初始化部署矩阵
                 int[][] InstanceDeployOnNode = deepCopy(alltimeApp.get(time-1).getInstanceDeployOnNode());
+                alltimeApp.get(time).setInstanceDeployOnNode(InstanceDeployOnNode);
+
                 double redundantFactor = calculateRedundantFactor(InstanceDeployOnNode,NowServiceInstanceNum);//当前时隙的冗余因子
                 System.out.println("打印冗余因子" + redundantFactor);
                 //将该时隙微服务数量按升序排序
@@ -194,9 +196,7 @@ public class InstanceDeploy {
                             }
                         }
                     }
-                    alltimeApp.get(time).setInstanceDeployOnNode(InstanceDeployOnNode);
                 }
-
                 System.out.println("当前第"+(time+1)+"个时隙部署结果"+Arrays.deepToString(InstanceDeployOnNode));
             }
             //计算当前时隙路由
@@ -285,8 +285,8 @@ public class InstanceDeploy {
     private static Map<Integer, Double> calculateWeightedSum(Map<Integer, Double> utilizationActive, Map<Integer, Integer> totalServiceInstances, int pastServiceInstanceNum) {
         int nodeNum = utilizationActive.size();
         Map<Integer, Double> weightedSumNode = new HashMap<>();
-        double coefficient1 = 0.5;
-        double coefficient2 =0.5;
+        double coefficient1 = 0.9;
+        double coefficient2 =0.1;
         for (int node = 0; node < nodeNum; node++) {
             Map.Entry<Integer, Double> utilizationEntry = getEntryByKeyDouble(utilizationActive, node);
             Map.Entry<Integer, Integer> serviceInstancesEntry = getEntryByKey(totalServiceInstances, node);
@@ -470,7 +470,7 @@ public class InstanceDeploy {
         //将节点剩余资源按从高到低排序
         //采用贪心的方式将该实例进行部署
         //如果无法完全部署 考虑做拆分 直接拆分 更新节点剩余资源后直接招新节点进行部署
-        freeResourceNode = sortByValueDescending(freeResourceNode);
+        freeResourceNode = sortByValueAscending(freeResourceNode);
         //此步骤之前适用于所有的时隙间需要增加部署实例的情况
         // 使用增强的 for 循环遍历 Map
         for (Map.Entry<Integer, Integer> entry : freeResourceNode.entrySet()) {

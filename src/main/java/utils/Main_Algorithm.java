@@ -28,16 +28,18 @@ public class Main_Algorithm {
 
     public static App_Params init() {
         App_Params appParams = new App_Params();
-        appParams.setNum_Server(10);
-        appParams.setNum_Microservice(50);
+        appParams.setNum_Server(40);
+        appParams.setNum_Microservice(20);
         appParams.setNum_Application(30);
-        appParams.setNum_Time_Slot(20);
+        appParams.setNum_Time_Slot(5);
         appParams.setNum_CPU_Core(50);
         appParams.setMAX1(100);
         appParams.setAvgArrivalRateDataSize(1);
         appParams.setDataBaseCommunicationDelay(0);//不知道要不要写到appParams中作为常量还是后续要详细计算 目前当常量考虑 //0.1
         appParams.setRoundRobinParam(2);
-        appParams.setApp_Num(new int[]{100,100});
+        appParams.setEqualizationCoefficient(0.9);
+        appParams.setAvgNetworkResourceUtilization(0.95);
+        appParams.setApp_Num(new int[]{30,30});
         appParams.setTTL_Max_Tolerance_Latency_Range(new int[]{8,10});
         appParams.setUnit_Rate_Bandwidth_Range(new double[]{0.11,2});
         appParams.setAverage_Arrival_Rate_Range(new int[]{4,6});
@@ -79,7 +81,7 @@ public class Main_Algorithm {
         }
         //System.out.println(appParams);
         //需要初始化所有的ServiceTypeInfo 共用一套微服务信息
-        ArrayList<CurrentTimeApps> alltimeApp = GenerateApp.CreateAlltimeApp(timeslot,appParams,r);
+        ArrayList<CurrentTimeApps> alltimeApp = GenerateApp.CreateAlltimeApp(appParams.getNum_Time_Slot(),appParams,r);
 
         //后面开始准备计算实例需求
         alltimeApp = InstanceCalculator.CalculateInstance(appParams,alltimeApp);
@@ -88,242 +90,7 @@ public class Main_Algorithm {
 
         //准备部署实例
         alltimeApp = InstanceDeploy.DeployInstance(appParams,alltimeApp);
-//        for(int time = 0; time < alltimeApp.size(); time++){
-//            double equalizationCoefficient = appParams.getEqualizationCoefficient();//公平指数下限
-//            ArrayList<Integer> NowServiceInstanceNum = alltimeApp.get(time).getServiceInstanceNum();//获取当前时隙的app情况
-//            ArrayList<Integer> PastServiceInstanceNum = new ArrayList<>(appParams.getNum_Microservice());//获取前一个时隙后的app情况
-//            if(time == 0) {
-//                System.out.println("进行第"+(time+1)+"个时隙的实例部署");
-//                //在第一个时隙初始化部署矩阵
-//                int[][] InstanceDeployOnNode = new int[appParams.getNum_Server()][appParams.getNum_Microservice()];
-//                alltimeApp.get(time).setInstanceDeployOnNode(InstanceDeployOnNode);
-//                //在第一个时隙，其不存在前一个时隙的部署,即所有均为0
-//                for (int i = 0; i < appParams.getNum_Microservice(); i++) {
-//                    PastServiceInstanceNum.add(0); // 或者任何其他默认值
-//                }
-//                //ArrayList<Integer> incrementInstances = new ArrayList<>();
-//                //将该时隙微服务数量按升序排序
-//                Map<Integer,Integer> sortedNowServiceInstanceNum = ArrayToSortedMap(NowServiceInstanceNum);
-//                Map<Integer,Integer> sortedPastServiceInstanceNum = ArrayToSortedMap(PastServiceInstanceNum);
-//                // 打印排序后的结果
-//                for (Map.Entry<Integer, Integer> nowEntry : sortedNowServiceInstanceNum.entrySet()) {
-//                    int ServiceID = nowEntry.getKey();
-//                    int nowServiceInstanceNum = nowEntry.getValue();
-//                    Map.Entry<Integer, Integer> PastEntry = getEntryByKey(sortedPastServiceInstanceNum, ServiceID);
-//                    int pastServiceInstanceNum = PastEntry.getValue();
-//                    int incrementInstanceNum = nowServiceInstanceNum - pastServiceInstanceNum;
-//                    //如果是第一个时隙 那么直接采用贪心的部署方法 部署当前时隙需要的所有微服务实例
-//                    alltimeApp.get(time).setInstanceDeployOnNode(InitDeployMsOnNode(alltimeApp.get(time).getInstanceDeployOnNode(),appParams,ServiceID,incrementInstanceNum));
-//                }
-//                System.out.println("当前"+(time+1)+"时隙部署结果"+Arrays.deepToString(InstanceDeployOnNode));
-//                System.out.println();
-//            }else {
-//                System.out.println("进行第"+(time+1)+"个时隙的实例部署");
-//                PastServiceInstanceNum = alltimeApp.get(time-1).getServiceInstanceNum();//获取前一个时隙后的app情况
-//                //在第一个时隙初始化部署矩阵
-//                int[][] InstanceDeployOnNode = deepCopy(alltimeApp.get(time-1).getInstanceDeployOnNode());
-//                double redundantFactor = calculateRedundantFactor(InstanceDeployOnNode,NowServiceInstanceNum);//当前时隙的冗余因子
-//                //将该时隙微服务数量按升序排序
-//                Map<Integer,Integer> sortedNowServiceInstanceNum = ArrayToSortedMap(NowServiceInstanceNum);
-//                Map<Integer,Integer> sortedPastServiceInstanceNum = ArrayToSortedMap(PastServiceInstanceNum);
-//                // 打印排序后的结果
-//                for (Map.Entry<Integer, Integer> nowEntry : sortedNowServiceInstanceNum.entrySet()) {
-//                    int ServiceID = nowEntry.getKey();
-//                    int nowServiceInstanceNum = nowEntry.getValue();
-//                    // 获取指定键的Entry
-//                    Map.Entry<Integer, Integer> PastEntry = getEntryByKey(sortedPastServiceInstanceNum, ServiceID);
-//                    int pastServiceInstanceNum = PastEntry.getValue();
-//
-//                    if(nowEntry.getValue() == 0){
-//                        //如果该时隙下不存在该微服务的实例 回收微服务m的所有实例
-//                        for(int node = 0; node < appParams.getNum_Server(); node++){
-//                            InstanceDeployOnNode[node][ServiceID] = 0;
-//                        }
-//                        continue;
-//                    }
-//                    if(nowServiceInstanceNum < pastServiceInstanceNum){
-//                        int pastDeployedServiceNum = 0;
-//                        Map<Integer,Integer> serviceDeloyedNum = new HashMap<>();
-//                        for(int node = 0; node < appParams.getNum_Server(); node++){
-//                            pastDeployedServiceNum += InstanceDeployOnNode[node][ServiceID];
-//                            if(InstanceDeployOnNode[node][ServiceID] > 0){
-//                                serviceDeloyedNum.put(node,InstanceDeployOnNode[node][ServiceID]);
-//                            }
-//                        }
-//                        int actualDeployedServiceNum = nowServiceInstanceNum + (int) redundantFactor*(nowServiceInstanceNum-pastDeployedServiceNum);//实际需要部署的实例
-//                        int deployedServiceNumToReduce = pastDeployedServiceNum - actualDeployedServiceNum;
-//                        sortByValueAscending(serviceDeloyedNum);
-//                        for (Map.Entry<Integer, Integer> entry : serviceDeloyedNum.entrySet()) {
-//                            //遍历所有包含m的节点 升序排序，先清除小的
-//                            int nodeID = entry.getKey();
-//                            int result1 = appParams.getNum_CPU_Core(); //存储在当前时隙该节点可用的资源数量
-//                            //计算当前节点可用资源数量
-//                            for (int service = 0; service < appParams.getNum_Server(); service++) {
-//                                result1 -= InstanceDeployOnNode[nodeID][service];
-//                            }
-//                            if(result1 > deployedServiceNumToReduce){
-//                                InstanceDeployOnNode[nodeID][ServiceID] -= deployedServiceNumToReduce;
-//                                deployedServiceNumToReduce = 0;
-//                            } else if (result1 > 0 && result1<deployedServiceNumToReduce) {
-//                                InstanceDeployOnNode[nodeID][ServiceID] = 0;
-//                                deployedServiceNumToReduce -= result1;
-//                            }
-//                        }
-//                    } else if (nowServiceInstanceNum == pastServiceInstanceNum) {
-//                        //对所有服务器节点n，保持微服务m现有的部署方案
-//                    } else if (nowServiceInstanceNum > pastServiceInstanceNum) {
-//                        //更新节点利用率
-//                        Map<Integer,Double> utilizationActive = CalUtilizationActive(InstanceDeployOnNode, appParams.getNum_CPU_Core());//这边索引对应的是节点的id
-//                        ArrayList<AppPathInfo> currentAppList = alltimeApp.get(time).getAppPathInfos();
-//                        Map<Integer,Map<Integer, Integer>> backwardServiceInstanceNum = initMap(appParams);
-//                        Map<Integer,Map<Integer, Integer>> forwardServiceInstanceNum = initMap(appParams);
-//                        for (AppPathInfo app : currentAppList) {
-//                            //循环各个app的服务路径，找到微服务m的前继微服务以及后继微服务
-//                            List<PathProbability> pathProbabilities = app.getPathProbabilities();
-//                            for (PathProbability pathProbability : pathProbabilities) {
-//                                List<NodeInfo> nodeInfos = pathProbability.getNodeInfos();
-//                                for (int index = 0; index < nodeInfos.size(); index++) {
-//                                    NodeInfo nodeInfo = nodeInfos.get(index);
-//                                    if (nodeInfo.getServiceType() == ServiceID) {
-//                                        if (index == 0) {
-//                                            //如果m是头节点
-//                                            NodeInfo forwardNode = nodeInfos.get(index + 1);
-//                                            int forwardSeviceID = forwardNode.getServiceType();//后继微服务的id
-//                                            int forwardSeviceNum = forwardNode.getInstance_To_Deploy();//后继微服务的实例数
-//                                            //还需要同步更新这些微服务部署在什么节点上以及具体数量
-//                                            for(int node = 0; node < appParams.getNum_Server(); node++){
-//                                                int forwardNodeSeviceNum = forwardNode.getDeployedNode().get(node);//后继微服务在当前物理节点部署的实例数
-//                                                Map.Entry<Integer, Map<Integer, Integer>> forwardnodeEntry = getEntryByKeyNode(forwardServiceInstanceNum, node);
-//                                                Map.Entry<Integer, Integer> forwardserviceEntry = getEntryByKey(forwardnodeEntry.getValue(), forwardSeviceID);
-//                                                forwardserviceEntry.setValue(forwardNodeSeviceNum+forwardserviceEntry.getValue());
-//                                            }
-//                                        } else if (index == nodeInfos.size() - 1) {
-//                                            //如果m是尾节点
-//                                            NodeInfo backwardNode = nodeInfos.get(index - 1);
-//                                            int backwardSeviceID = backwardNode.getServiceType();//前继微服务的id
-//                                            int backwardSeviceNum = backwardNode.getInstance_To_Deploy();//前继微服务的实例数
-//                                            for(int node = 0; node < appParams.getNum_Server(); node++){
-//                                                int backwardNodeSeviceNum = backwardNode.getDeployedNode().get(node);//后继微服务在当前物理节点部署的实例数
-//                                                Map.Entry<Integer, Map<Integer, Integer>> backwardnodeEntry = getEntryByKeyNode(backwardServiceInstanceNum, node);
-//                                                Map.Entry<Integer, Integer> backwardserviceEntry = getEntryByKey(backwardnodeEntry.getValue(), backwardSeviceID);
-//                                                backwardserviceEntry.setValue(backwardNodeSeviceNum+backwardserviceEntry.getValue());
-//                                            }
-//                                        } else {
-//                                            //如果m为dag中间节点
-//                                            NodeInfo forwardNode = nodeInfos.get(index + 1);
-//                                            NodeInfo backwardNode = nodeInfos.get(index - 1);
-//                                            int forwardSeviceID = forwardNode.getServiceType();//后继微服务的id
-//                                            int forwardSeviceNum = forwardNode.getInstance_To_Deploy();//后继微服务的实例数
-//                                            int backwardSeviceID = backwardNode.getServiceType();//后继微服务的实例数
-//                                            int backwardSeviceNum = backwardNode.getInstance_To_Deploy();//前继微服务的实例数
-//                                            for(int node = 0; node < appParams.getNum_Server(); node++){
-//                                                int forwardNodeSeviceNum = forwardNode.getDeployedNode().get(node);//后继微服务在当前物理节点部署的实例数
-//                                                int backwardNodeSeviceNum = backwardNode.getDeployedNode().get(node);//前继微服务在当前物理节点部署的实例数
-//                                                Map.Entry<Integer, Map<Integer, Integer>> forwardnodeEntry = getEntryByKeyNode(forwardServiceInstanceNum, node);
-//                                                Map.Entry<Integer, Integer> forwardserviceEntry = getEntryByKey(forwardnodeEntry.getValue(), forwardSeviceID);
-//                                                forwardserviceEntry.setValue(forwardNodeSeviceNum+forwardserviceEntry.getValue());
-//                                                Map.Entry<Integer, Map<Integer, Integer>> backwardnodeEntry = getEntryByKeyNode(backwardServiceInstanceNum, node);
-//                                                Map.Entry<Integer, Integer> backwardserviceEntry = getEntryByKey(backwardnodeEntry.getValue(), backwardSeviceID);
-//                                                backwardserviceEntry.setValue(backwardNodeSeviceNum+backwardserviceEntry.getValue());
-//                                            }
-//                                        }
-//                                    }
-//                                }
-//                            }
-//                        }
-//                        //该循环过后两个map分别存储当前处理的微服务m所有前继微服务以及后继微服务在所有物理节点的部署数量
-//                        //接着可以统计激活节点的前继和后继微服务数量
-//                        // 计算合计的微服务实例数
-//                        Map<Integer, Integer> totalServiceInstances = calculateTotalServiceInstances(backwardServiceInstanceNum, forwardServiceInstanceNum);
-//                        //计算加权和,对服务器节点集合进行降序排序
-//                        Map<Integer,Double> weightedSum = calculateWeightedSum(utilizationActive,totalServiceInstances,pastServiceInstanceNum);
-//                        int incrementInstanceNum = nowServiceInstanceNum - pastServiceInstanceNum;
-//                        while (incrementInstanceNum>0) {
-//                            int lastNode = 0;
-//                            for (Map.Entry<Integer, Double> entry : weightedSum.entrySet()) {
-//                                int nodeID = entry.getKey();
-//                                int result1 = (int) (equalizationCoefficient * appParams.getNum_CPU_Core());//存储每个节点均衡部署的实例数量
-//                                int result2 = appParams.getNum_CPU_Core();//存储每个节点可部署最多的实例数量
-//                                int result3 = appParams.getNum_CPU_Core(); //存储在当前时隙该节点可用的资源数量
-//                                int result4 = result1 - result2 + result3;
-//                                //计算当前节点可用资源数量
-//                                for (int service = 0; service < appParams.getNum_Server(); service++) {
-//                                    result3 -= InstanceDeployOnNode[nodeID][service];
-//                                }
-//                                if (result4 > incrementInstanceNum) {
-//                                    //直接分配实例资源
-//                                    InstanceDeployOnNode[nodeID][ServiceID] += incrementInstanceNum;
-//                                    incrementInstanceNum = 0;//被完全部署
-//                                } else if (result4 > 0 && result4 < incrementInstanceNum) {
-//                                    InstanceDeployOnNode[nodeID][ServiceID] += result4;
-//                                    incrementInstanceNum -= result4;//被完全部署
-//                                } else if (result4 < 0) {
-//                                    continue;
-//                                }
-//                                if (incrementInstanceNum == 0) {
-//                                    break;
-//                                }
-//                                if (incrementInstanceNum > 0) {
-//                                    lastNode = nodeID;
-//                                }
-//                            }
-//                            //现有的服务器不足够了，这个时候需要增加新的激活服务器来满足计算资源需求
-//                            if (incrementInstanceNum > 0) {
-//                                int activateNode = FindNewNodeToActivate(InstanceDeployOnNode,appParams,lastNode);
-//                                InstanceDeployOnNode[activateNode][ServiceID] += incrementInstanceNum;
-//                                incrementInstanceNum = 0;//被完全部署
-//                            }
-//                        }
-//                    }
-//                    alltimeApp.get(time).setInstanceDeployOnNode(InstanceDeployOnNode);
-//                }
-//
-//                System.out.println("当前第"+(time+1)+"个时隙部署结果"+Arrays.deepToString(InstanceDeployOnNode));
-//            }
-//            //计算当前时隙路由
-//            //打印部署结果
-//            System.out.println("当前部署情况X(t):");
-//            for (int i = 0; i < alltimeApp.get(time).getInstanceDeployOnNode().length; i++) {
-//                System.out.println(Arrays.toString(alltimeApp.get(time).getInstanceDeployOnNode()[i]));
-//            }
-//            //打印当前时隙所有请求流到达率
-//            for (int i = 0; i < alltimeApp.get(time).getAppPathInfos().size(); i++) {
-//                System.out.println("APP" + i + "的到达率为:" + alltimeApp.get(time).getAppPathInfos().get(i).getArrivalRate());
-//            }
-//            //遍历每条请求流
-//            for (int i = 0; i < alltimeApp.get(time).getAppPathInfos().size(); i++) {
-//                System.out.println("APP" + i + "=======");
-//                int[][] InstanceDeployOnNode = alltimeApp.get(time).getInstanceDeployOnNode();
-//                for (PathProbability one_mspath : alltimeApp.get(time).getAppPathInfos().get(i).getPathProbabilities()) {
-//                    System.out.print("链: ");
-//                    for (int j = 0; j < one_mspath.getNodeInfos().size(); j++) {
-//                        System.out.printf("微服务" + one_mspath.getNodeInfos().get(j).getServiceType() + " ");
-//                    }
-//                    System.out.println();
-//                    System.out.println("ArrivateRate:" + one_mspath.getArrivalRate() + "微服务路径概率:" + one_mspath.getProbability());
-//                    List<List<List<Object>>> Routing_tables_eachPath = one_mspath.genPathRouting_tables(InstanceDeployOnNode);
-//                    System.out.println(Routing_tables_eachPath);
-//                }
-//            }
-//            int[][] Routing_decision_Y = alltimeApp.get(time).genRouting_decision_Y(); //决策变量，论文中的Y(t)，其实感觉没啥吊用
-//            alltimeApp.get(time).genBandwidthResourceAndArrivalmatrix(appParams);
-//            double[][] BandwidthResource = alltimeApp.get(time).getBandwidthResource();
-//            double[][] Arrival_matrix = alltimeApp.get(time).getArrivalRate_matrix();
-//            //打印当前时隙请求率
-//            double arrival_sum = 0;
-//            for (int i = 0; i < alltimeApp.get(time).getAppPathInfos().size(); i++) {
-//                arrival_sum += alltimeApp.get(time).getAppPathInfos().get(i).getArrivalRate();
-//            }
-//            System.out.println(arrival_sum);
-//            System.out.println("chx");
-//            for (int i = 0; i < Arrival_matrix.length; i++) {
-//                System.out.println(Arrays.toString(Arrival_matrix[i]));
-//            }
-//        }
-//
 
-
-        //准备路由迁移
         for(int time = 0; time < alltimeApp.size(); time++){
             double[][] bandwidthResource = alltimeApp.get(time).getBandwidthResource();
             Map<NodePair, Double> bandwidthMap = sortBandwidthResource(bandwidthResource);
