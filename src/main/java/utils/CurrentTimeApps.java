@@ -17,6 +17,7 @@ public class CurrentTimeApps {
     private int[][] Routing_decision_Y; //路由决策变量，论文中的Y(t)
     private double[][] BandwidthResource; // 节点间剩余带宽
     private double[][] ArrivalRate_matrix; //节点上的到达率 第一维为节点数，第二维为微服务种类
+    private double[][] dataTrans_NodeToNode; //节点i到节点j的数据通信总量
 
 
     public CurrentTimeApps() {
@@ -69,9 +70,11 @@ public class CurrentTimeApps {
                             //非首节点
                             double band_cost = ArrivalRate_eachNode_asBackwardMs[forward_ms_node][forward_ms_type] * p;
                             ArrivalRate_eachNode_asBackwardMs[backward_ms_node][backward_ms_type] += band_cost;
-                            this.BandwidthResource[forward_ms_node][backward_ms_node] -= band_cost;
-                            if (forward_ms_node != backward_ms_node) this.BandwidthResource[backward_ms_node][forward_ms_node] -= band_cost;
                             this.ArrivalRate_matrix[backward_ms_node][backward_ms_type] += ArrivalRate_eachNode_asBackwardMs[forward_ms_node][forward_ms_type] * p;
+                            if (forward_ms_node == backward_ms_node) continue;
+                            this.BandwidthResource[forward_ms_node][backward_ms_node] -= band_cost;
+                            this.BandwidthResource[backward_ms_node][forward_ms_node] -= band_cost;
+                            this.dataTrans_NodeToNode[forward_ms_node][backward_ms_node] += ArrivalRate_eachNode_asBackwardMs[forward_ms_node][forward_ms_type] * p;
                         }
                     }
                 }
@@ -177,5 +180,13 @@ public class CurrentTimeApps {
 
     public void setArrivalRate_matrix(double[][] arrivalRate_matrix) {
         ArrivalRate_matrix = arrivalRate_matrix;
+    }
+
+    public double[][] getDataTrans_NodeToNode() {
+        return dataTrans_NodeToNode;
+    }
+
+    public void setDataTrans_NodeToNode(double[][] dataTrans_NodeToNode) {
+        this.dataTrans_NodeToNode = dataTrans_NodeToNode;
     }
 }

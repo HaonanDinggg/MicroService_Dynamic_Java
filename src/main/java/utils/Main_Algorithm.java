@@ -28,18 +28,16 @@ public class Main_Algorithm {
 
     public static App_Params init() {
         App_Params appParams = new App_Params();
-        appParams.setNum_Server(50);
-        appParams.setNum_Microservice(10);
-        appParams.setNum_Application(50);
-        appParams.setNum_Time_Slot(5);
+        appParams.setNum_Server(10);
+        appParams.setNum_Microservice(50);
+        appParams.setNum_Application(30);
+        appParams.setNum_Time_Slot(20);
         appParams.setNum_CPU_Core(50);
         appParams.setMAX1(100);
         appParams.setAvgArrivalRateDataSize(1);
         appParams.setDataBaseCommunicationDelay(0);//不知道要不要写到appParams中作为常量还是后续要详细计算 目前当常量考虑 //0.1
         appParams.setRoundRobinParam(2);
-        appParams.setAvgNetworkResourceUtilization(0.95);
-        appParams.setEqualizationCoefficient(0.9);
-        appParams.setApp_Num(new int[]{50,50});
+        appParams.setApp_Num(new int[]{100,100});
         appParams.setTTL_Max_Tolerance_Latency_Range(new int[]{8,10});
         appParams.setUnit_Rate_Bandwidth_Range(new double[]{0.11,2});
         appParams.setAverage_Arrival_Rate_Range(new int[]{4,6});
@@ -49,10 +47,10 @@ public class Main_Algorithm {
         appParams.setNum_Apps_Timeslot_Range(new int[]{1,100});
         appParams.setMicroservice_Type_CPU(new int[]{1,5});
         appParams.setMicroservice_Type_Memory(new int[]{1,5});
-        appParams.setLowest_Communication_Latency(0.05);
-        appParams.setHighest_Communication_Latency(0.1);
-        appParams.setLowest_Bandwidth_Capacity(50);
-        appParams.setHighest_Bandwidth_Capacity(100);
+        appParams.setLowest_Communication_Latency(0.5);
+        appParams.setHighest_Communication_Latency(1);
+        appParams.setLowest_Bandwidth_Capacity(80);
+        appParams.setHighest_Bandwidth_Capacity(150);
         appParams.setLowest_Microservice_Bandwidth_Requirement(1);
         appParams.setHighest_Microservice_Bandwidth_Requirement(2);
         appParams.setLowest_Microservice_Type_Unit_Process_Ability(3);
@@ -81,7 +79,7 @@ public class Main_Algorithm {
         }
         //System.out.println(appParams);
         //需要初始化所有的ServiceTypeInfo 共用一套微服务信息
-        ArrayList<CurrentTimeApps> alltimeApp = GenerateApp.CreateAlltimeApp(appParams.getNum_Time_Slot(),appParams,r);
+        ArrayList<CurrentTimeApps> alltimeApp = GenerateApp.CreateAlltimeApp(timeslot,appParams,r);
 
         //后面开始准备计算实例需求
         alltimeApp = InstanceCalculator.CalculateInstance(appParams,alltimeApp);
