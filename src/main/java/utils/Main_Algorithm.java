@@ -192,19 +192,13 @@ public class Main_Algorithm {
                         }
                     }
                     for (List<Integer> list : migrationList) {
-                        System.out.println("源迁移节点以及微服务"+list);
-                        System.out.println("源迁移节点上微服务数量"+instanceDeployOnNode[list.get(1)][list.get(0)]);
+                        System.out.println(list);
                     }
 
                     for (List<Integer> topologyPair : migrationList) {
                         int migrationService = (int) topologyPair.get(0);//从该微服务转出
                         int migrationNode = (int) topologyPair.get(1);//从该节点转出
                         int instanceToTighten = (int) topologyPair.get(2);//从该节点的该微服务转出的实例数量
-                        System.out.println("源迁移节点上微服务数量"+instanceDeployOnNode[topologyPair.get(1)][topologyPair.get(0)]);
-                        if(instanceDeployOnNode[migrationNode][migrationService] == 0){
-                            System.out.println("warning4444");
-                            continue;
-                        }
                         CurrentTimeApps currentTimeApps = alltimeApp.get(time);
                         ArrayList<AppPathInfo> currentAppList = alltimeApp.get(time).getAppPathInfos();
                         Map<Integer,Integer> backwardServiceInstanceNum = initMapInt(appParams);
@@ -312,7 +306,6 @@ public class Main_Algorithm {
                         Map<Integer,Double> weightedSum = calculateWeightedSumMigration(utilizationActive,totalServiceInstances,migrationNode,appParams.getPhysicalConnectionDelay());
 
                         while(instanceToTighten > 0){
-                            System.out.println("存在需要迁移的微服务");
                             //初始化每个节点的最大可迁移数量和目的服务器节点列表Migration_Destination_List
                             Map<Integer,Integer> migrationDestinationList = new HashMap<>();
                             for (Map.Entry<Integer, Double> nodeAccessibleEntry : weightedSum.entrySet()) {
@@ -370,9 +363,29 @@ public class Main_Algorithm {
                                 trans_delay = currentTimeApps.getDataTrans_NodeToNode()[migrationNode][migrationDestinationNode]/currentTimeApps.getBandwidthResource()[migrationNode][migrationDestinationNode];
                                 physical_delay = appParams.getPhysicalConnectionDelay()[migrationNode][migrationDestinationNode];
                                 total_delay = procession_delay + trans_delay + physical_delay;
-                                System.out.println(procession_delay);
-                                System.out.println(trans_delay);
-                                System.out.println(physical_delay);
+//                                System.out.println("当前部署情况X(t):");
+//                                for (int i = 0; i < alltimeApp.get(time).getInstanceDeployOnNode().length; i++) {
+//                                    System.out.println(Arrays.toString(alltimeApp.get(time).getInstanceDeployOnNode()[i]));
+//                                }
+//                                System.out.println("节点到达率:");
+//                                for (int i = 0; i < currentTimeApps.getArrivalRate_matrix().length; i++) {
+//                                    System.out.println(Arrays.toString(currentTimeApps.getArrivalRate_matrix()[i]));
+//                                }
+//                                System.out.println("时延"+calculateMicroserviceNodeAverageServiceTime(75,4,1));
+//                                System.out.println(migrationNode);
+//                                System.out.println(migrationDestinationNode);
+//                                System.out.println(currentTimeApps.getArrivalRate_matrix()[migrationNode][migrationService]);
+//                                System.out.println(currentTimeApps.getInstanceDeployOnNode()[migrationNode][migrationService]);
+//                                System.out.println(currentTimeApps.getArrivalRate_matrix()[migrationDestinationNode][migrationService]);
+//                                System.out.println(currentTimeApps.getInstanceDeployOnNode()[migrationDestinationNode][migrationService]);
+//                                System.out.println("chx");
+//                                System.out.println(calculateMicroserviceNodeAverageServiceTime(currentTimeApps.getArrivalRate_matrix()[migrationNode][migrationService],currentTimeApps.getInstanceDeployOnNode()[migrationNode][migrationService],migrationServiceProcessingRate));
+//                                System.out.println(calculateMicroserviceNodeAverageServiceTime(currentTimeApps.getArrivalRate_matrix()[migrationDestinationNode][migrationService],currentTimeApps.getInstanceDeployOnNode()[migrationDestinationNode][migrationService],migrationServiceProcessingRate));
+                                System.out.println("procession" + procession_delay);
+                                System.out.println("trans_delay" + trans_delay);
+                                System.out.println("physical_delay" + physical_delay);
+                                int e = Math.min(migrationInstanceNum, Math.min(currentTimeApps.getInstanceDeployOnNode()[migrationNode][migrationService], instanceToTighten));
+                                System.out.println("e:" + e);
                                 System.out.println("迁移前X(t)：");
                                 for (int i = 0; i < currentTimeApps.getInstanceDeployOnNode().length; i++) {
                                     System.out.println(Arrays.toString(currentTimeApps.getInstanceDeployOnNode()[i]));
@@ -433,8 +446,6 @@ public class Main_Algorithm {
                                 int migrationDestinationNode = decreaseMigrationDestinationEntry.getKey();//转入的节点id
                                 int migrationInstanceNum = (int)decreaseMigrationDestinationEntry.getValue().get(0);//转入的实例数量
                                 int migrationNum = instanceDeployOnNode[migrationNode][migrationService] > migrationInstanceNum ? migrationInstanceNum : instanceDeployOnNode[migrationNode][migrationService];
-
-                                // 具体更新 存在迁移
                                 instanceDeployOnNode[migrationDestinationNode][migrationService] += migrationNum;
                                 instanceDeployOnNode[migrationNode][migrationService] -= migrationNum;
                                 instanceToTighten -= migrationNum;
@@ -453,9 +464,6 @@ public class Main_Algorithm {
                             if(instanceToTighten > 0){
                                 //找到一个新的服务器节点
                                 int migrationDestinationNode = FindNewNodeToActivate(instanceDeployOnNode,appParams,migrationNode);
-
-                                // 具体更新 存在迁移
-
                                 instanceDeployOnNode[migrationDestinationNode][migrationService] += instanceToTighten;
                                 instanceDeployOnNode[migrationNode][migrationService] -= instanceToTighten;
                                 instanceToTighten = 0;
