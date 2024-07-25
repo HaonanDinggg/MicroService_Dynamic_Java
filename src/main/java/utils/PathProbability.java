@@ -50,7 +50,6 @@ public class PathProbability {
      * @return Routing_tables_eachPath
      */
     public List<List<List<Object>>> genPathRouting_tables(int[][] InstanceDeployOnNode){
-        System.out.println("======genPathRouting_tables======");
         List<List<List<Object>>> Routing_tables_eachPath = new ArrayList<>();
         //遍历每个微服务
         for (int i = 0; i < nodeInfos.size(); i++) {

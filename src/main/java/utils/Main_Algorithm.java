@@ -28,7 +28,7 @@ public class Main_Algorithm {
 
     public static App_Params init() {
         App_Params appParams = new App_Params();
-        appParams.setNum_Server(40);
+        appParams.setNum_Server(10);
         appParams.setNum_Microservice(20);
         appParams.setNum_Application(30);
         appParams.setNum_Time_Slot(5);
@@ -83,6 +83,10 @@ public class Main_Algorithm {
         //需要初始化所有的ServiceTypeInfo 共用一套微服务信息
         ArrayList<CurrentTimeApps> alltimeApp = GenerateApp.CreateAlltimeApp(appParams.getNum_Time_Slot(),appParams,r);
 
+        for (int i = 0; i < appParams.getNum_Microservice(); i++) {
+            int serviceProcessingRate = appParams.getServiceTypeInfos().get(i).getServiceProcessingRate();
+            System.out.println("微服务" + appParams.getServiceTypeInfos().get(i).getServiceID() + "的单位实例处理能力" + serviceProcessingRate);
+        }
         //后面开始准备计算实例需求
         alltimeApp = InstanceCalculator.CalculateInstance(appParams,alltimeApp);
         System.out.println("====ar2====");
@@ -99,10 +103,11 @@ public class Main_Algorithm {
             double avgNetworkResourceUtilization = appParams.getAvgNetworkResourceUtilization();//平均网络资源利用率上限
             double equalizationCoefficient = appParams.getEqualizationCoefficient();//公平指数下限
             for (Map.Entry<NodePair, Double> entry : bandwidthMap.entrySet()) {
-                System.out.println("处理当前连接");
+//                System.out.println("处理当前连接");
                 NodePair nodePair  = entry.getKey();
                 double accessibleBandwidth = entry.getValue();
                 if(accessibleBandwidth<0){
+                    System.out.println("ccc");
                     List<List<Object>> topologyPairs = new ArrayList<>();
                     ArrayList<AppPathInfo> appPathInfos = alltimeApp.get(time).getAppPathInfos();
                     for (AppPathInfo appPathInfo : appPathInfos) {
@@ -156,9 +161,9 @@ public class Main_Algorithm {
                     });
                     double bandwidthToTighten = 0-accessibleBandwidth;//为正，即需要迁移走的数据量
                     // 输出排序后的结果
-                    for (List<Object> list : topologyPairs) {
-                        System.out.println(list);
-                    }
+//                    for (List<Object> list : topologyPairs) {
+//                        System.out.println(list);
+//                    }
                     //初始化迁移列表
                     List<List<Integer>> migrationList = new ArrayList<>();
                     for (List<Object> topologyPair : topologyPairs) {
@@ -195,6 +200,7 @@ public class Main_Algorithm {
                         int migrationService = (int) topologyPair.get(0);//从该微服务转出
                         int migrationNode = (int) topologyPair.get(1);//从该节点转出
                         int instanceToTighten = (int) topologyPair.get(2);//从该节点的该微服务转出的实例数量
+                        CurrentTimeApps currentTimeApps = alltimeApp.get(time);
                         ArrayList<AppPathInfo> currentAppList = alltimeApp.get(time).getAppPathInfos();
                         Map<Integer,Integer> backwardServiceInstanceNum = initMapInt(appParams);
                         Map<Integer,Integer> forwardServiceInstanceNum = initMapInt(appParams);
@@ -351,7 +357,77 @@ public class Main_Algorithm {
                                 int migrationInstanceNum = migrationDestinationEntry.getValue();//转入的实例数量
                                 double gain = 0;
                                 List<Object> migrationInfo = new ArrayList<>();//该列表第一个元素为迁移实例数量，第二个为迁移增益
-                                //计算实验增益
+                                //计算时延增益
+                                int migrationServiceProcessingRate = appParams.getServiceTypeInfos().get(migrationService).getServiceProcessingRate();
+                                double procession_delay, trans_delay, physical_delay, total_delay;
+                                double procession_delay_migration, trans_delay_migration, physical_delay_migration, total_delay_migration;
+                                procession_delay = calculateMicroserviceNodeAverageServiceTime(currentTimeApps.getArrivalRate_matrix()[migrationNode][migrationService],currentTimeApps.getInstanceDeployOnNode()[migrationNode][migrationService],migrationServiceProcessingRate)
+                                        + calculateMicroserviceNodeAverageServiceTime(currentTimeApps.getArrivalRate_matrix()[migrationDestinationNode][migrationService],currentTimeApps.getInstanceDeployOnNode()[migrationDestinationNode][migrationService],migrationServiceProcessingRate);
+                                trans_delay = currentTimeApps.getDataTrans_NodeToNode()[migrationNode][migrationDestinationNode]/currentTimeApps.getBandwidthResource()[migrationNode][migrationDestinationNode];
+                                physical_delay = appParams.getPhysicalConnectionDelay()[migrationNode][migrationDestinationNode];
+                                total_delay = procession_delay + trans_delay + physical_delay;
+//                                System.out.println("当前部署情况X(t):");
+//                                for (int i = 0; i < alltimeApp.get(time).getInstanceDeployOnNode().length; i++) {
+//                                    System.out.println(Arrays.toString(alltimeApp.get(time).getInstanceDeployOnNode()[i]));
+//                                }
+//                                System.out.println("节点到达率:");
+//                                for (int i = 0; i < currentTimeApps.getArrivalRate_matrix().length; i++) {
+//                                    System.out.println(Arrays.toString(currentTimeApps.getArrivalRate_matrix()[i]));
+//                                }
+//                                System.out.println("时延"+calculateMicroserviceNodeAverageServiceTime(75,4,1));
+//                                System.out.println(migrationNode);
+//                                System.out.println(migrationDestinationNode);
+//                                System.out.println(currentTimeApps.getArrivalRate_matrix()[migrationNode][migrationService]);
+//                                System.out.println(currentTimeApps.getInstanceDeployOnNode()[migrationNode][migrationService]);
+//                                System.out.println(currentTimeApps.getArrivalRate_matrix()[migrationDestinationNode][migrationService]);
+//                                System.out.println(currentTimeApps.getInstanceDeployOnNode()[migrationDestinationNode][migrationService]);
+//                                System.out.println("chx");
+//                                System.out.println(calculateMicroserviceNodeAverageServiceTime(currentTimeApps.getArrivalRate_matrix()[migrationNode][migrationService],currentTimeApps.getInstanceDeployOnNode()[migrationNode][migrationService],migrationServiceProcessingRate));
+//                                System.out.println(calculateMicroserviceNodeAverageServiceTime(currentTimeApps.getArrivalRate_matrix()[migrationDestinationNode][migrationService],currentTimeApps.getInstanceDeployOnNode()[migrationDestinationNode][migrationService],migrationServiceProcessingRate));
+                                System.out.println(procession_delay);
+                                System.out.println(trans_delay);
+                                System.out.println(physical_delay);
+                                System.out.println("迁移前X(t)：");
+                                for (int i = 0; i < currentTimeApps.getInstanceDeployOnNode().length; i++) {
+                                    System.out.println(Arrays.toString(currentTimeApps.getInstanceDeployOnNode()[i]));
+                                }
+                                //迁移
+                                currentTimeApps.getInstanceDeployOnNode()[migrationNode][migrationService] -= migrationInstanceNum;
+                                currentTimeApps.getInstanceDeployOnNode()[migrationDestinationNode][migrationService] += migrationInstanceNum;
+                                //重定向路由
+                                for (int i = 0; i < currentTimeApps.getAppPathInfos().size(); i++) {
+                                    int[][] InstanceDeployOnNode = alltimeApp.get(time).getInstanceDeployOnNode();
+                                    for (PathProbability one_mspath : alltimeApp.get(time).getAppPathInfos().get(i).getPathProbabilities()) {
+                                        List<List<List<Object>>> Routing_tables_eachPath = one_mspath.genPathRouting_tables(InstanceDeployOnNode);
+                                    }
+                                }
+                                currentTimeApps.genBandwidthResourceAndArrivalmatrix(appParams);
+                                System.out.println("还原前X(t)：");
+                                for (int i = 0; i < currentTimeApps.getInstanceDeployOnNode().length; i++) {
+                                    System.out.println(Arrays.toString(currentTimeApps.getInstanceDeployOnNode()[i]));
+                                }
+                                procession_delay_migration = calculateMicroserviceNodeAverageServiceTime(currentTimeApps.getArrivalRate_matrix()[migrationNode][migrationService],currentTimeApps.getInstanceDeployOnNode()[migrationNode][migrationService],migrationServiceProcessingRate)
+                                        + calculateMicroserviceNodeAverageServiceTime(currentTimeApps.getArrivalRate_matrix()[migrationDestinationNode][migrationService],currentTimeApps.getInstanceDeployOnNode()[migrationDestinationNode][migrationService],migrationServiceProcessingRate);
+                                trans_delay_migration = currentTimeApps.getDataTrans_NodeToNode()[migrationNode][migrationDestinationNode]/currentTimeApps.getBandwidthResource()[migrationNode][migrationDestinationNode];
+                                physical_delay_migration = appParams.getPhysicalConnectionDelay()[migrationNode][migrationDestinationNode];
+                                total_delay_migration = procession_delay_migration + trans_delay_migration + physical_delay_migration;
+                                gain = (total_delay - total_delay_migration) / Math.min(migrationInstanceNum, Math.min(currentTimeApps.getInstanceDeployOnNode()[migrationNode][migrationService], instanceToTighten));
+                                System.out.println("gain:" + gain);
+                                //还原
+                                currentTimeApps.getInstanceDeployOnNode()[migrationNode][migrationService] += migrationInstanceNum;
+                                currentTimeApps.getInstanceDeployOnNode()[migrationDestinationNode][migrationService] -= migrationInstanceNum;
+                                //重定向路由
+                                for (int i = 0; i < currentTimeApps.getAppPathInfos().size(); i++) {
+                                    int[][] InstanceDeployOnNode = alltimeApp.get(time).getInstanceDeployOnNode();
+                                    for (PathProbability one_mspath : alltimeApp.get(time).getAppPathInfos().get(i).getPathProbabilities()) {
+                                        List<List<List<Object>>> Routing_tables_eachPath = one_mspath.genPathRouting_tables(InstanceDeployOnNode);
+                                    }
+                                }
+                                currentTimeApps.genBandwidthResourceAndArrivalmatrix(appParams);
+                                System.out.println("还原后X(t)：");
+                                for (int i = 0; i < currentTimeApps.getInstanceDeployOnNode().length; i++) {
+                                    System.out.println(Arrays.toString(currentTimeApps.getInstanceDeployOnNode()[i]));
+                                }
 
                                 migrationInfo.add(migrationInstanceNum);
                                 migrationInfo.add(gain);
@@ -368,7 +444,7 @@ public class Main_Algorithm {
                                 int migrationInstanceNum = (int)decreaseMigrationDestinationEntry.getValue().get(0);//转入的实例数量
                                 int migrationNum = instanceDeployOnNode[migrationNode][migrationService] > migrationInstanceNum ? migrationInstanceNum : instanceDeployOnNode[migrationNode][migrationService];
                                 instanceDeployOnNode[migrationDestinationNode][migrationService] += migrationNum;
-                                instanceDeployOnNode[migrationNode][migrationService] += migrationNum;
+                                instanceDeployOnNode[migrationNode][migrationService] -= migrationNum;
                                 instanceToTighten -= migrationNum;
                                 if(instanceToTighten <= 0){
                                     //遍历每条请求流
@@ -386,7 +462,7 @@ public class Main_Algorithm {
                                 //找到一个新的服务器节点
                                 int migrationDestinationNode = FindNewNodeToActivate(instanceDeployOnNode,appParams,migrationNode);
                                 instanceDeployOnNode[migrationDestinationNode][migrationService] += instanceToTighten;
-                                instanceDeployOnNode[migrationNode][migrationService] += instanceToTighten;
+                                instanceDeployOnNode[migrationNode][migrationService] -= instanceToTighten;
                                 instanceToTighten -= instanceToTighten;
                                 //遍历每条请求流
                                 for (int i = 0; i < alltimeApp.get(time).getAppPathInfos().size(); i++) {
@@ -524,7 +600,18 @@ public class Main_Algorithm {
         return new ArrayList<>(mergedMap.values());
     }
 
+    // 深拷贝方法
+    public static int[][] deepCopy(int[][] original) {
+        if (original == null) {
+            return null;
+        }
 
+        int[][] result = new int[original.length][];
+        for (int i = 0; i < original.length; i++) {
+            result[i] = original[i].clone();
+        }
+        return result;
+    }
     /**
       * @Description : 将特定类型map按照value值进行升序排序
       * @Author : Dior

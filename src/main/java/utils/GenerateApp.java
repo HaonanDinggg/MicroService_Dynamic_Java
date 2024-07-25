@@ -63,6 +63,10 @@ public class GenerateApp {
             //初始到达率矩阵
             double[][] Arrival_matrix = new double[appParams.getNum_Server()][appParams.getNum_Microservice()];
             currentTimeApps.setArrivalRate_matrix(Arrival_matrix);
+            System.out.println("===初始化到达率矩阵===");
+            for (int i = 0; i < Arrival_matrix.length; i++) {
+                System.out.println(Arrays.toString(Arrival_matrix[i]));;
+            }
             double[][] dataTrans_NodeToNode = new double[appParams.getNum_Server()][appParams.getNum_Server()];
             currentTimeApps.setDataTrans_NodeToNode(dataTrans_NodeToNode);
         }
@@ -288,9 +292,9 @@ public class GenerateApp {
         //目前卡住的原因是生成的dag图 边和节点比值不对
         int[][] adjMatrix = CorrectGraph(dagPathInfo.getNum_Dag_Node(),dagPathInfo.getNum_Dag_Edge());
         dagPathInfo.setAdjMatrix(adjMatrix);
-        for (int i = 0; i < dagPathInfo.getAdjMatrix().length; i++) {
-            System.out.println(Arrays.toString(dagPathInfo.getAdjMatrix()[i]));
-        }
+//        for (int i = 0; i < dagPathInfo.getAdjMatrix().length; i++) {
+//            System.out.println(Arrays.toString(dagPathInfo.getAdjMatrix()[i]));
+//        }
         Map<Integer, Integer> serviceTypes = assignServiceTypes(dagPathInfo.getAdjMatrix().length, dagPathInfo.getNum_MicroService(),r);
         Map<Integer, Map<Integer, Double>> transitionProbabilities = generateTransitionProbabilities(dagPathInfo.getAdjMatrix(),dagPathInfo.getAppType(),r);
         Map<Integer, NodeInfo> nodeInfos = createNodeInfos(serviceTypes,appParams.getServiceTypeInfos(), transitionProbabilities);

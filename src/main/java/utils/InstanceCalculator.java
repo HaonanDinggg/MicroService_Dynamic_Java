@@ -34,6 +34,7 @@ public class InstanceCalculator {
             for (AppPathInfo app : currentAppList) {
                 System.out.println(app.getArrivalRate());
             }
+            double[] arrivalRate_ms = new double[appParams.getNum_Microservice()]; //每个微服务的总到达率
 
             for (AppPathInfo app : currentAppList) {//该循环方式修改app的属性会对currentAppList中的app对象属性进行修改
                 System.out.println("当前APP的类型是" + app.getAppType());
@@ -75,9 +76,11 @@ public class InstanceCalculator {
                         }
                         currentNode.setDeployedNode(deployedNode);//最初实例只是计算 并未部署在某一结点上因此，全为0
                         if(app.getAppType()==0){
+                            arrivalRate_ms[serviceType] += currentArrivalRateOnNode;
                             currentNode.setInstance_To_Deploy(currentNode.getInstance_To_Deploy() + temporaryInstance);
                         }else if(app.getAppType()==1){
                             if (temporaryInstance > currentNode.getInstance_To_Deploy()){
+                                arrivalRate_ms[serviceType] += currentArrivalRateOnNode;
                                 currentNode.setInstance_To_Deploy(temporaryInstance);
                             }
                         }
@@ -171,6 +174,7 @@ public class InstanceCalculator {
                     }
                 }
             }
+            System.out.println("微服务到达率:" + Arrays.toString(arrivalRate_ms));
             alltimeApp.get(time).setAppPathInfos(currentAppList);//更新一个时隙后的app情况
             //更新一个时隙后的实例部署情况
             for (int i = 0; i < currentAppList.size(); i++) {

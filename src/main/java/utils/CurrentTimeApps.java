@@ -43,50 +43,107 @@ public class CurrentTimeApps {
     public double[][] genBandwidthResourceAndArrivalmatrix(App_Params app_params) {
         int forward_ms_type, forward_ms_node, backward_ms_type, backward_ms_node;
         double p;
+        //重置带宽和到达率初始状态
+        for (int i = 0; i < app_params.getPhysicalConnectionBandwidth().length; i++) {
+            for (int j = 0; j < app_params.getPhysicalConnectionBandwidth()[i].length; j++) {
+                this.BandwidthResource[i][j] = app_params.getPhysicalConnectionBandwidth()[i][j];
+            }
+        }
+        for (int i = 0; i < this.ArrivalRate_matrix.length; i++) {
+            Arrays.fill(this.ArrivalRate_matrix[i], 0.0);
+        }
+        for (int i = 0; i < this.dataTrans_NodeToNode.length; i++) {
+            Arrays.fill(this.dataTrans_NodeToNode[i], 0.0);
+        }
+        double arrival_ms0 = 0.0;
         //遍历当前时隙下所有app
         Iterator<AppPathInfo> it_appPathInfos = appPathInfos.iterator();
         while (it_appPathInfos.hasNext()){
             AppPathInfo appPathInfo = it_appPathInfos.next();
             Iterator<PathProbability> it_PathProbabilities = appPathInfo.getPathProbabilities().iterator();
-            while (it_PathProbabilities.hasNext()){
-                PathProbability pathProbability = it_PathProbabilities.next();
-                double ArrivalRate = pathProbability.getArrivalRate();
-                List<List<List<Object>>> Routing_tables_eachPath = pathProbability.getRouting_tables_eachPath();
-                double[][] ArrivalRate_eachNode_asBackwardMs = new double[app_params.getNum_Server()][app_params.getNum_Microservice()]; //在当前路由表策略下的每个节点作为后继节点的到达率，[节点数][微服务数]
-                for (int i = 0; i < Routing_tables_eachPath.size(); i++) {
-                    for (int j = 0; j < Routing_tables_eachPath.get(i).size(); j++) {
-                        List<Object> routing_table = Routing_tables_eachPath.get(i).get(j);
-                        forward_ms_type = (int)routing_table.get(0);
-                        forward_ms_node = (int)routing_table.get(1);
-                        backward_ms_type = (int)routing_table.get(2);
-                        backward_ms_node = (int)routing_table.get(3);
-                        p = (double)routing_table.get(4);
-                        if (forward_ms_type == -1){
-                            //首节点
-                            double band_cost = ArrivalRate * p;
-                            ArrivalRate_eachNode_asBackwardMs[backward_ms_node][backward_ms_type] = band_cost;
-                            this.ArrivalRate_matrix[backward_ms_node][backward_ms_type] += ArrivalRate * p;
-                        }else {
-                            //非首节点
-                            double band_cost = ArrivalRate_eachNode_asBackwardMs[forward_ms_node][forward_ms_type] * p;
-                            ArrivalRate_eachNode_asBackwardMs[backward_ms_node][backward_ms_type] += band_cost;
-                            this.ArrivalRate_matrix[backward_ms_node][backward_ms_type] += ArrivalRate_eachNode_asBackwardMs[forward_ms_node][forward_ms_type] * p;
-                            if (forward_ms_node == backward_ms_node) continue;
-                            this.BandwidthResource[forward_ms_node][backward_ms_node] -= band_cost;
-                            this.BandwidthResource[backward_ms_node][forward_ms_node] -= band_cost;
-                            this.dataTrans_NodeToNode[forward_ms_node][backward_ms_node] += ArrivalRate_eachNode_asBackwardMs[forward_ms_node][forward_ms_type] * p;
+            if (appPathInfo.getAppType() == 0){
+                while (it_PathProbabilities.hasNext()){
+                    PathProbability pathProbability = it_PathProbabilities.next();
+                    double ArrivalRate = pathProbability.getArrivalRate();
+                    List<List<List<Object>>> Routing_tables_eachPath = pathProbability.getRouting_tables_eachPath();
+                    double[][] ArrivalRate_eachNode_asBackwardMs = new double[app_params.getNum_Server()][app_params.getNum_Microservice()]; //在当前路由表策略下的每个节点作为后继节点的到达率，[节点数][微服务数]
+                    for (int i = 0; i < Routing_tables_eachPath.size(); i++) {
+                        for (int j = 0; j < Routing_tables_eachPath.get(i).size(); j++) {
+                            List<Object> routing_table = Routing_tables_eachPath.get(i).get(j);
+                            forward_ms_type = (int)routing_table.get(0);
+                            forward_ms_node = (int)routing_table.get(1);
+                            backward_ms_type = (int)routing_table.get(2);
+                            backward_ms_node = (int)routing_table.get(3);
+                            p = (double)routing_table.get(4);
+                            if (forward_ms_type == -1){
+                                //首节点
+                                double band_cost = ArrivalRate * p;
+                                ArrivalRate_eachNode_asBackwardMs[backward_ms_node][backward_ms_type] = band_cost;
+                                this.ArrivalRate_matrix[backward_ms_node][backward_ms_type] += ArrivalRate * p;
+                                if (backward_ms_type == 0) {
+                                    arrival_ms0 += band_cost;
+                                }
+                            }else {
+                                //非首节点
+                                double band_cost = ArrivalRate_eachNode_asBackwardMs[forward_ms_node][forward_ms_type] * p;
+                                if (backward_ms_type == 0) {
+                                    arrival_ms0 += band_cost;
+                                }
+                                ArrivalRate_eachNode_asBackwardMs[backward_ms_node][backward_ms_type] += band_cost;
+                                this.ArrivalRate_matrix[backward_ms_node][backward_ms_type] += ArrivalRate_eachNode_asBackwardMs[forward_ms_node][forward_ms_type] * p;
+                                if (forward_ms_node == backward_ms_node) continue;
+                                this.BandwidthResource[forward_ms_node][backward_ms_node] -= band_cost;
+                                this.BandwidthResource[backward_ms_node][forward_ms_node] -= band_cost;
+                                this.dataTrans_NodeToNode[forward_ms_node][backward_ms_node] += ArrivalRate_eachNode_asBackwardMs[forward_ms_node][forward_ms_type] * p;
+                                this.dataTrans_NodeToNode[backward_ms_node][forward_ms_node] += ArrivalRate_eachNode_asBackwardMs[forward_ms_node][forward_ms_type] * p;
+                            }
                         }
                     }
-                }
                 /*double s = 0;
                 for (int i = 0; i < app_params.getNum_Server(); i++) {
                     s+=ArrivalRate_eachNode_asBackwardMs[i][pathProbability.getNodeInfos().get(Routing_tables_eachPath.size()-1).getServiceType()];
                 }
                 System.out.println(ArrivalRate);
                 System.out.println(s);*/
+                }
+            } else if (appPathInfo.getAppType() == 1) {
+                double[][] ArrivalRate_eachNode_asBackwardMs_parallel = new double[app_params.getNum_Server()][app_params.getNum_Microservice()]; //在当前路由表策略下的每个节点作为后继节点的到达率，[节点数][微服务数]
+                while (it_PathProbabilities.hasNext()){
+                    PathProbability pathProbability = it_PathProbabilities.next();
+                    double ArrivalRate = pathProbability.getArrivalRate();
+                    List<List<List<Object>>> Routing_tables_eachPath = pathProbability.getRouting_tables_eachPath();
+                    for (int i = 0; i < Routing_tables_eachPath.size(); i++) {
+                        for (int j = 0; j < Routing_tables_eachPath.get(i).size(); j++) {
+                            List<Object> routing_table = Routing_tables_eachPath.get(i).get(j);
+                            forward_ms_type = (int)routing_table.get(0);
+                            forward_ms_node = (int)routing_table.get(1);
+                            backward_ms_type = (int)routing_table.get(2);
+                            backward_ms_node = (int)routing_table.get(3);
+                            p = (double)routing_table.get(4);
+                            ArrivalRate_eachNode_asBackwardMs_parallel[backward_ms_node][backward_ms_type] = ArrivalRate * p;
+                            if (forward_ms_type == -1){
+                                //首节点
+                            }else {
+                                //非首节点
+                                double band_cost = ArrivalRate_eachNode_asBackwardMs_parallel[forward_ms_node][forward_ms_type] * p;
+                                if (forward_ms_node == backward_ms_node) continue;
+                                this.BandwidthResource[forward_ms_node][backward_ms_node] -= band_cost;
+                                this.BandwidthResource[backward_ms_node][forward_ms_node] -= band_cost;
+                                this.dataTrans_NodeToNode[forward_ms_node][backward_ms_node] += ArrivalRate_eachNode_asBackwardMs_parallel[forward_ms_node][forward_ms_type] * p;
+                                this.dataTrans_NodeToNode[backward_ms_node][forward_ms_node] += ArrivalRate_eachNode_asBackwardMs_parallel[forward_ms_node][forward_ms_type] * p;
+                            }
+                        }
+                    }
+                }
+                for (int i = 0; i < ArrivalRate_eachNode_asBackwardMs_parallel.length; i++) {
+                    for (int j = 0; j < ArrivalRate_eachNode_asBackwardMs_parallel[0].length; j++) {
+                        this.ArrivalRate_matrix[i][j] += ArrivalRate_eachNode_asBackwardMs_parallel[i][j];
+                    }
+                }
             }
         }
-        System.out.println("当前节点带宽:");
+        System.out.println("arrival_ms0" + arrival_ms0);
+        System.out.println("当前时隙带宽:");
         for (int i = 0; i < BandwidthResource.length; i++) {
             System.out.println(Arrays.toString(BandwidthResource[i]));;
         }

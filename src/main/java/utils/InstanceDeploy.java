@@ -209,9 +209,9 @@ public class InstanceDeploy {
             for (int i = 0; i < alltimeApp.get(time).getAppPathInfos().size(); i++) {
                 System.out.println("APP" + i + "的到达率为:" + alltimeApp.get(time).getAppPathInfos().get(i).getArrivalRate());
             }
+            System.out.println("计算路由");
             //遍历每条请求流
             for (int i = 0; i < alltimeApp.get(time).getAppPathInfos().size(); i++) {
-                System.out.println("APP" + i + "=======");
                 int[][] InstanceDeployOnNode = alltimeApp.get(time).getInstanceDeployOnNode();
                 for (PathProbability one_mspath : alltimeApp.get(time).getAppPathInfos().get(i).getPathProbabilities()) {
                     System.out.print("链: ");
@@ -221,7 +221,7 @@ public class InstanceDeploy {
                     System.out.println();
                     System.out.println("ArrivateRate:" + one_mspath.getArrivalRate() + "微服务路径概率:" + one_mspath.getProbability());
                     List<List<List<Object>>> Routing_tables_eachPath = one_mspath.genPathRouting_tables(InstanceDeployOnNode);
-                    System.out.println(Routing_tables_eachPath);
+//                    System.out.println(Routing_tables_eachPath);
                 }
             }
             int[][] Routing_decision_Y = alltimeApp.get(time).genRouting_decision_Y(); //决策变量，论文中的Y(t)，其实感觉没啥吊用
@@ -234,7 +234,7 @@ public class InstanceDeploy {
                 arrival_sum += alltimeApp.get(time).getAppPathInfos().get(i).getArrivalRate();
             }
             System.out.println(arrival_sum);
-            System.out.println("chx");
+            System.out.println("当前时隙到达率矩阵:");
             for (int i = 0; i < Arrival_matrix.length; i++) {
                 System.out.println(Arrays.toString(Arrival_matrix[i]));
             }
