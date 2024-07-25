@@ -214,14 +214,7 @@ public class InstanceDeploy {
             for (int i = 0; i < alltimeApp.get(time).getAppPathInfos().size(); i++) {
                 int[][] InstanceDeployOnNode = alltimeApp.get(time).getInstanceDeployOnNode();
                 for (PathProbability one_mspath : alltimeApp.get(time).getAppPathInfos().get(i).getPathProbabilities()) {
-                    System.out.print("链: ");
-                    for (int j = 0; j < one_mspath.getNodeInfos().size(); j++) {
-                        System.out.printf("微服务" + one_mspath.getNodeInfos().get(j).getServiceType() + " ");
-                    }
-                    System.out.println();
-                    System.out.println("ArrivateRate:" + one_mspath.getArrivalRate() + "微服务路径概率:" + one_mspath.getProbability());
                     List<List<List<Object>>> Routing_tables_eachPath = one_mspath.genPathRouting_tables(InstanceDeployOnNode);
-//                    System.out.println(Routing_tables_eachPath);
                 }
             }
             int[][] Routing_decision_Y = alltimeApp.get(time).genRouting_decision_Y(); //决策变量，论文中的Y(t)，其实感觉没啥吊用
