@@ -28,7 +28,7 @@ public class Main_Algorithm {
 
     public static App_Params init() {
         App_Params appParams = new App_Params();
-        appParams.setNum_Server(40);
+        appParams.setNum_Server(20);
         appParams.setNum_Microservice(20);
         appParams.setNum_Application(30);
         appParams.setNum_Time_Slot(5);
@@ -51,8 +51,8 @@ public class Main_Algorithm {
         appParams.setMicroservice_Type_Memory(new int[]{1,5});
         appParams.setLowest_Communication_Latency(0.5);
         appParams.setHighest_Communication_Latency(1);
-        appParams.setLowest_Bandwidth_Capacity(80);
-        appParams.setHighest_Bandwidth_Capacity(150);
+        appParams.setLowest_Bandwidth_Capacity(60);
+        appParams.setHighest_Bandwidth_Capacity(120);
         appParams.setLowest_Microservice_Bandwidth_Requirement(1);
         appParams.setHighest_Microservice_Bandwidth_Requirement(2);
         appParams.setLowest_Microservice_Type_Unit_Process_Ability(3);
@@ -92,6 +92,7 @@ public class Main_Algorithm {
         alltimeApp = InstanceDeploy.DeployInstance(appParams,alltimeApp);
 
         for(int time = 0; time < alltimeApp.size(); time++){
+            System.out.println("准备进行第"+(time+1)+"个时隙的迁移");
             double[][] bandwidthResource = alltimeApp.get(time).getBandwidthResource();
             Map<NodePair, Double> bandwidthMap = sortBandwidthResource(bandwidthResource);
             int[][] instanceDeployOnNode = alltimeApp.get(time).getInstanceDeployOnNode();
@@ -99,7 +100,7 @@ public class Main_Algorithm {
             double avgNetworkResourceUtilization = appParams.getAvgNetworkResourceUtilization();//平均网络资源利用率上限
             double equalizationCoefficient = appParams.getEqualizationCoefficient();//公平指数下限
             for (Map.Entry<NodePair, Double> entry : bandwidthMap.entrySet()) {
-                System.out.println("处理当前连接");
+                //System.out.println("处理当前连接");
                 NodePair nodePair  = entry.getKey();
                 double accessibleBandwidth = entry.getValue();
                 if(accessibleBandwidth<0){
@@ -186,7 +187,6 @@ public class Main_Algorithm {
                             }
                         }
                     }
-                    System.out.println("打印需要迁移的实例对象");
                     for (List<Integer> list : migrationList) {
                         System.out.println(list);
                     }
@@ -308,7 +308,6 @@ public class Main_Algorithm {
                                 int instanceMigration = 0;
                                 int nodeResource = appParams.getNum_CPU_Core();
                                 while (true){
-
                                     int nodeAccessibleResource = CalNodeAccessibleResource(instanceDeployOnNode,nodeResource,nodeID,appParams.getNum_Microservice(),equalizationCoefficient);
                                     if(instanceMigration < (int) (avgNetworkResourceUtilization*nodeResource) - nodeResource + nodeAccessibleResource ){
                                         instanceMigration++;
@@ -324,7 +323,6 @@ public class Main_Algorithm {
                                     //计算数据通信量变化 即需要迁移的服务占比
                                     //需要遍历所有的节点 看是否满足约束
                                     boolean flag = false;
-
                                     for(int migratenode = 0;migratenode < appParams.getNum_Server();migratenode ++) {
                                         double arrivalRate = 0;
                                         arrivalRate += getEntryByKeyDouble(backwardServiceArrivalRate, migratenode).getValue() * instanceToTighten / instanceDeployOnNode[migrationNode][migrationService];
@@ -368,7 +366,7 @@ public class Main_Algorithm {
                                 int migrationInstanceNum = (int)decreaseMigrationDestinationEntry.getValue().get(0);//转入的实例数量
                                 int migrationNum = instanceDeployOnNode[migrationNode][migrationService] > migrationInstanceNum ? migrationInstanceNum : instanceDeployOnNode[migrationNode][migrationService];
                                 instanceDeployOnNode[migrationDestinationNode][migrationService] += migrationNum;
-                                instanceDeployOnNode[migrationNode][migrationService] += migrationNum;
+                                instanceDeployOnNode[migrationNode][migrationService] -= migrationNum;
                                 instanceToTighten -= migrationNum;
                                 if(instanceToTighten <= 0){
                                     //遍历每条请求流
@@ -386,8 +384,8 @@ public class Main_Algorithm {
                                 //找到一个新的服务器节点
                                 int migrationDestinationNode = FindNewNodeToActivate(instanceDeployOnNode,appParams,migrationNode);
                                 instanceDeployOnNode[migrationDestinationNode][migrationService] += instanceToTighten;
-                                instanceDeployOnNode[migrationNode][migrationService] += instanceToTighten;
-                                instanceToTighten -= instanceToTighten;
+                                instanceDeployOnNode[migrationNode][migrationService] -= instanceToTighten;
+                                instanceToTighten = 0;
                                 //遍历每条请求流
                                 for (int i = 0; i < alltimeApp.get(time).getAppPathInfos().size(); i++) {
                                     int[][] InstanceDeployOnNode = alltimeApp.get(time).getInstanceDeployOnNode();
@@ -399,8 +397,14 @@ public class Main_Algorithm {
                                 break;
                             }
                         }
+
                     }
                 }
+            }
+            //打印部署结果
+            System.out.println("当前部署情况X(t):");
+            for (int i = 0; i < alltimeApp.get(time).getInstanceDeployOnNode().length; i++) {
+                System.out.println(Arrays.toString(alltimeApp.get(time).getInstanceDeployOnNode()[i]));
             }
         }
     }

@@ -220,9 +220,9 @@ public class App_Params {
                     PhysicalConnectionDelay[i][j] = 0;
                 } else {
                     PhysicalConnectionDelay[i][j] = (r.nextDouble() * (highest_communication_latency - lowest_communication_latency)) + lowest_communication_latency;
-                    PhysicalConnectionDelay[j][i] = (r.nextDouble() * (highest_communication_latency - lowest_communication_latency)) + lowest_communication_latency;
+                    PhysicalConnectionDelay[j][i] = PhysicalConnectionDelay[i][j];
                     PhysicalConnectionBandwidth[i][j] = r.nextInt(highest_bandwidth_capacity - Lowest_bandwidth_capacity + 1) + Lowest_bandwidth_capacity;
-                    PhysicalConnectionBandwidth[j][i] = r.nextInt(highest_bandwidth_capacity - Lowest_bandwidth_capacity + 1) + Lowest_bandwidth_capacity;
+                    PhysicalConnectionBandwidth[j][i] = PhysicalConnectionBandwidth[i][j];
                 }
             }
         }
@@ -234,7 +234,7 @@ public class App_Params {
                     MicroServiceConnectionDelay[m][n] = 0;
                 }else {
                     MicroServiceConnectionDelay[m][n] = r.nextInt(highest_microservice_bandwidth_requirement - Lowest_microservice_bandwidth_requirement + 1) + Lowest_microservice_bandwidth_requirement;
-                    MicroServiceConnectionDelay[n][m] = r.nextInt(highest_microservice_bandwidth_requirement - Lowest_microservice_bandwidth_requirement + 1) + Lowest_microservice_bandwidth_requirement;
+                    MicroServiceConnectionDelay[n][m] = MicroServiceConnectionDelay[m][n];
                 }
             }
         }
