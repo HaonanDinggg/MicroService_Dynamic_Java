@@ -55,7 +55,6 @@ public class CurrentTimeApps {
         for (int i = 0; i < this.dataTrans_NodeToNode.length; i++) {
             Arrays.fill(this.dataTrans_NodeToNode[i], 0.0);
         }
-        double arrival_ms0 = 0.0;
         //遍历当前时隙下所有app
         Iterator<AppPathInfo> it_appPathInfos = appPathInfos.iterator();
         while (it_appPathInfos.hasNext()){
@@ -80,15 +79,9 @@ public class CurrentTimeApps {
                                 double band_cost = ArrivalRate * p;
                                 ArrivalRate_eachNode_asBackwardMs[backward_ms_node][backward_ms_type] = band_cost;
                                 this.ArrivalRate_matrix[backward_ms_node][backward_ms_type] += ArrivalRate * p;
-                                if (backward_ms_type == 0) {
-                                    arrival_ms0 += band_cost;
-                                }
                             }else {
                                 //非首节点
                                 double band_cost = ArrivalRate_eachNode_asBackwardMs[forward_ms_node][forward_ms_type] * p;
-                                if (backward_ms_type == 0) {
-                                    arrival_ms0 += band_cost;
-                                }
                                 ArrivalRate_eachNode_asBackwardMs[backward_ms_node][backward_ms_type] += band_cost;
                                 this.ArrivalRate_matrix[backward_ms_node][backward_ms_type] += ArrivalRate_eachNode_asBackwardMs[forward_ms_node][forward_ms_type] * p;
                                 if (forward_ms_node == backward_ms_node) continue;
@@ -142,7 +135,6 @@ public class CurrentTimeApps {
                 }
             }
         }
-        System.out.println("arrival_ms0" + arrival_ms0);
         System.out.println("当前时隙带宽:");
         for (int i = 0; i < BandwidthResource.length; i++) {
             System.out.println(Arrays.toString(BandwidthResource[i]));;
