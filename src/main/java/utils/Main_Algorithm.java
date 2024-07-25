@@ -29,15 +29,15 @@ public class Main_Algorithm {
     public static App_Params init() {
         App_Params appParams = new App_Params();
         appParams.setNum_Server(10);
-        appParams.setNum_Microservice(50);
-        appParams.setNum_Application(30);
+        appParams.setNum_Microservice(10);
+        appParams.setNum_Application(50);
         appParams.setNum_Time_Slot(20);
         appParams.setNum_CPU_Core(50);
         appParams.setMAX1(100);
         appParams.setAvgArrivalRateDataSize(1);
         appParams.setDataBaseCommunicationDelay(0);//不知道要不要写到appParams中作为常量还是后续要详细计算 目前当常量考虑 //0.1
         appParams.setRoundRobinParam(2);
-        appParams.setApp_Num(new int[]{100,100});
+        appParams.setApp_Num(new int[]{10,10});
         appParams.setTTL_Max_Tolerance_Latency_Range(new int[]{8,10});
         appParams.setUnit_Rate_Bandwidth_Range(new double[]{0.11,2});
         appParams.setAverage_Arrival_Rate_Range(new int[]{4,6});
@@ -313,7 +313,7 @@ public class Main_Algorithm {
                 arrival_sum += alltimeApp.get(time).getAppPathInfos().get(i).getArrivalRate();
             }
             System.out.println(arrival_sum);
-            System.out.println("chx");
+            System.out.println("节点到达率:");
             for (int i = 0; i < Arrival_matrix.length; i++) {
                 System.out.println(Arrays.toString(Arrival_matrix[i]));
             }
@@ -426,7 +426,8 @@ public class Main_Algorithm {
                         int migrationService = (int) topologyPair.get(0);//从该微服务转出
                         int migrationNode = (int) topologyPair.get(1);//从该节点转出
                         int instanceToTighten = (int) topologyPair.get(2);//从该节点的该微服务转出的实例数量
-                        ArrayList<AppPathInfo> currentAppList = alltimeApp.get(time).getAppPathInfos();
+                        CurrentTimeApps currentTimeApps = alltimeApp.get(time);
+                        ArrayList<AppPathInfo> currentAppList = currentTimeApps.getAppPathInfos();
                         Map<Integer,Integer> backwardServiceInstanceNum = initMapInt(appParams);
                         Map<Integer,Integer> forwardServiceInstanceNum = initMapInt(appParams);
                         Map<Integer,Double> backwardServiceArrivalRate = initMapDouble(appParams);
@@ -567,7 +568,34 @@ public class Main_Algorithm {
                                 int migrationInstanceNum = migrationDestinationEntry.getValue();//转入的实例数量
                                 double gain = 0;
                                 List<Object> migrationInfo = new ArrayList<>();//该列表第一个元素为迁移实例数量，第二个为迁移增益
-                                //计算实验增益
+                                //计算时延增益
+                                int migrationServiceProcessingRate = appParams.getServiceTypeInfos().get(migrationService).getServiceProcessingRate();
+                                double procession_delay, trans_delay, physical_delay;
+                                procession_delay = calculateMicroserviceNodeAverageServiceTime(currentTimeApps.getArrivalRate_matrix()[migrationNode][migrationService],currentTimeApps.getInstanceDeployOnNode()[migrationNode][migrationService],migrationServiceProcessingRate)
+                                        + calculateMicroserviceNodeAverageServiceTime(currentTimeApps.getArrivalRate_matrix()[migrationDestinationNode][migrationService],currentTimeApps.getInstanceDeployOnNode()[migrationDestinationNode][migrationService],migrationServiceProcessingRate);
+                                trans_delay = currentTimeApps.getDataTrans_NodeToNode()[migrationNode][migrationDestinationNode]/currentTimeApps.getBandwidthResource()[migrationNode][migrationDestinationNode];
+                                physical_delay = appParams.getPhysicalConnectionDelay()[migrationNode][migrationDestinationNode];
+//                                System.out.println("当前部署情况X(t):");
+//                                for (int i = 0; i < alltimeApp.get(time).getInstanceDeployOnNode().length; i++) {
+//                                    System.out.println(Arrays.toString(alltimeApp.get(time).getInstanceDeployOnNode()[i]));
+//                                }
+//                                System.out.println("节点到达率:");
+//                                for (int i = 0; i < currentTimeApps.getArrivalRate_matrix().length; i++) {
+//                                    System.out.println(Arrays.toString(currentTimeApps.getArrivalRate_matrix()[i]));
+//                                }
+//                                System.out.println("时延"+calculateMicroserviceNodeAverageServiceTime(75,4,1));
+//                                System.out.println(migrationNode);
+//                                System.out.println(migrationDestinationNode);
+//                                System.out.println(currentTimeApps.getArrivalRate_matrix()[migrationNode][migrationService]);
+//                                System.out.println(currentTimeApps.getInstanceDeployOnNode()[migrationNode][migrationService]);
+//                                System.out.println(currentTimeApps.getArrivalRate_matrix()[migrationDestinationNode][migrationService]);
+//                                System.out.println(currentTimeApps.getInstanceDeployOnNode()[migrationDestinationNode][migrationService]);
+//                                System.out.println("chx");
+//                                System.out.println(calculateMicroserviceNodeAverageServiceTime(currentTimeApps.getArrivalRate_matrix()[migrationNode][migrationService],currentTimeApps.getInstanceDeployOnNode()[migrationNode][migrationService],migrationServiceProcessingRate));
+//                                System.out.println(calculateMicroserviceNodeAverageServiceTime(currentTimeApps.getArrivalRate_matrix()[migrationDestinationNode][migrationService],currentTimeApps.getInstanceDeployOnNode()[migrationDestinationNode][migrationService],migrationServiceProcessingRate));
+                                System.out.println(procession_delay);
+                                System.out.println(trans_delay);
+                                System.out.println(physical_delay);
 
                                 migrationInfo.add(migrationInstanceNum);
                                 migrationInfo.add(gain);

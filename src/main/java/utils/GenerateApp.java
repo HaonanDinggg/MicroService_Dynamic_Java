@@ -63,6 +63,8 @@ public class GenerateApp {
             //初始到达率矩阵
             double[][] Arrival_matrix = new double[appParams.getNum_Server()][appParams.getNum_Microservice()];
             currentTimeApps.setArrivalRate_matrix(Arrival_matrix);
+            double[][] dataTrans_NodeToNode = new double[appParams.getNum_Server()][appParams.getNum_Server()];
+            currentTimeApps.setDataTrans_NodeToNode(dataTrans_NodeToNode);
         }
         return alltimeApp;
     }

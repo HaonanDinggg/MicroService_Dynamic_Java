@@ -66,46 +66,20 @@ public class InstanceCalculator {
                         int serviceType = pathProbability.getNodeInfos().get(currentNodeInfo).getServiceType();
                         int currentServiceProcessingRate = appParams.getServiceTypeInfos().get(serviceType).getServiceProcessingRate();
                         double currentArrivalRateOnNode = arrivalRatePath;
-                        pathProbability.getNodeInfos().get(currentNodeInfo).setArrivalRate_On_Node(currentArrivalRateOnNode);//该服务链当前节点的请求到达率即该请求链的到达率 他可以被拆分到不同的服务器节点
+                        NodeInfo currentNode = pathProbability.getNodeInfos().get(currentNodeInfo);
+                        currentNode.setArrivalRate_On_Node(currentArrivalRateOnNode);//该服务链当前节点的请求到达率即该请求链的到达率 他可以被拆分到不同的服务器节点
                         int temporaryInstance = (int)(currentArrivalRateOnNode/currentServiceProcessingRate) + 1;//粗略计算暂时的实例数量
-                        pathProbability.getNodeInfos().get(currentNodeInfo).setInstance_To_Deploy(temporaryInstance);
                         ArrayList<Integer> deployedNode = new ArrayList<>();
                         for(int node = 0 ; node < appParams.getNum_Server() ; node++ ){
                             deployedNode.add(0);
                         }
-                        pathProbability.getNodeInfos().get(currentNodeInfo).setDeployedNode(deployedNode);//最初实例只是计算 并未部署在某一结点上因此，全为0
+                        currentNode.setDeployedNode(deployedNode);//最初实例只是计算 并未部署在某一结点上因此，全为0
                         if(app.getAppType()==0){
-                            //更新app的Map<Integer, NodeInfo> nodeInfos当前DAG图所有的节点信息，更新该app每个微服务需要部署的实例数
-                            Map<Integer, NodeInfo> updateNodeInfos = app.getNodeInfos();
-                            // 循环遍历 Map 并获取每个 NodeInfo 值
-                            for (Map.Entry<Integer, NodeInfo> entry : updateNodeInfos.entrySet()) {
-                                NodeInfo value = entry.getValue();
-                                if(value.getServiceType() == serviceType){
-                                    int backInstance = value.getInstance_To_Deploy();
-                                    value.setInstance_To_Deploy(temporaryInstance + backInstance);
-                                    serviceInstanceNum.set(serviceType,temporaryInstance + backInstance);
-                                    updateNodeInfos.replace(entry.getKey(),value);
-                                    break;
-                                }
-                            }
-                            app.setNodeInfos(updateNodeInfos);
+                            currentNode.setInstance_To_Deploy(currentNode.getInstance_To_Deploy() + temporaryInstance);
                         }else if(app.getAppType()==1){
-                            //更新app的Map<Integer, NodeInfo> nodeInfos当前DAG图所有的节点信息，更新该app每个微服务需要部署的实例数
-                            Map<Integer, NodeInfo> updateNodeInfos = app.getNodeInfos();
-                            // 循环遍历 Map 并获取每个 NodeInfo 值
-                            for (Map.Entry<Integer, NodeInfo> entry : updateNodeInfos.entrySet()) {
-                                NodeInfo value = entry.getValue();
-                                if(value.getServiceType() == serviceType){
-                                    int backInstance = value.getInstance_To_Deploy();
-                                    if(temporaryInstance > backInstance) {
-                                        value.setInstance_To_Deploy(temporaryInstance);
-                                        serviceInstanceNum.set(serviceType,temporaryInstance);
-                                        updateNodeInfos.replace(entry.getKey(), value);
-                                        break;
-                                    }
-                                }
+                            if (temporaryInstance > currentNode.getInstance_To_Deploy()){
+                                currentNode.setInstance_To_Deploy(temporaryInstance);
                             }
-                            app.setNodeInfos(updateNodeInfos);
                         }
                         if(appParams.getServiceTypeInfos().get(serviceType).getServiceState() == 1){
                             //这边需要减去有状态的微服务与数据库交互的时延
@@ -176,42 +150,13 @@ public class InstanceCalculator {
                             }
                         }
                         int currentNodeInfoGainServiceInstance = pathProbability.getNodeInfos().get(targetServiceIndex).getInstance_To_Deploy();//重新获取微服务实例数量
-                        pathProbability.getNodeInfos().get(targetServiceIndex).setInstance_To_Deploy(currentNodeInfoGainServiceInstance+1);//更新需要部署的实例数量
-                        int targetAppServiceIndex = 0;
+                        System.out.println(currentNodeInfoGainServiceInstance);
 
                         if(app.getAppType()==0){
-                            //更新app的Map<Integer, NodeInfo> nodeInfos当前DAG图所有的节点信息，更新该app每个微服务需要部署的实例数
-                            Map<Integer, NodeInfo> updateNodeInfos = app.getNodeInfos();//这边的integer的key是dag图map中的排序 和微服务id序号无关
-                            // 循环遍历 Map 并获取每个 NodeInfo 值
-                            for (Map.Entry<Integer, NodeInfo> entry : updateNodeInfos.entrySet()) {
-                                //找到需要修改的dag节点以及其上的微服务
-                                NodeInfo value = entry.getValue();
-                                if(value.getServiceType() == nodeServiceToIncrease.getKey()){//这边在寻找对应的微服务id
-                                    int backInstance = value.getInstance_To_Deploy();
-                                    value.setInstance_To_Deploy(backInstance+1);
-                                    serviceInstanceNum.set(nodeServiceToIncrease.getKey(),backInstance+1);
-                                    updateNodeInfos.replace(entry.getKey(),value);
-                                    break;
-                                }
-                            }
-                            app.setNodeInfos(updateNodeInfos);
+                            pathProbability.getNodeInfos().get(targetServiceIndex).setInstance_To_Deploy(currentNodeInfoGainServiceInstance+1);//更新需要部署的实例数量
                         }else if(app.getAppType()==1){
-                            //更新app的Map<Integer, NodeInfo> nodeInfos当前DAG图所有的节点信息，更新该app每个微服务需要部署的实例数
-                            Map<Integer, NodeInfo> updateNodeInfos = app.getNodeInfos();
-                            // 循环遍历 Map 并获取每个 NodeInfo 值
-                            for (Map.Entry<Integer, NodeInfo> entry : updateNodeInfos.entrySet()) {
-                                NodeInfo value = entry.getValue();
-                                if(value.getServiceType() == nodeServiceToIncrease.getKey()){
-                                    int backInstance = value.getInstance_To_Deploy();
-                                    if(currentNodeInfoGainServiceInstance+1 > backInstance) {
-                                        value.setInstance_To_Deploy(currentNodeInfoGainServiceInstance+1);
-                                        serviceInstanceNum.set(nodeServiceToIncrease.getKey(),currentNodeInfoGainServiceInstance+1);
-                                        updateNodeInfos.replace(entry.getKey(), value);
-                                        break;
-                                    }
-                                }
-                            }
-                            app.setNodeInfos(updateNodeInfos);
+                            if (currentNodeInfoGainServiceInstance+1 > pathProbability.getNodeInfos().get(targetServiceIndex).getInstance_To_Deploy())
+                                pathProbability.getNodeInfos().get(targetServiceIndex).setInstance_To_Deploy(currentNodeInfoGainServiceInstance+1);//更新需要部署的实例数量
                         }
                         idealLatency = 0;//更新计算新的ideallatency
                         for(int currentNodeInfo = 0; currentNodeInfo < pathProbability.getNodeInfos().size(); currentNodeInfo++){
@@ -227,7 +172,15 @@ public class InstanceCalculator {
                 }
             }
             alltimeApp.get(time).setAppPathInfos(currentAppList);//更新一个时隙后的app情况
-            alltimeApp.get(time).setServiceInstanceNum(serviceInstanceNum);//更新一个时隙后的实例部署情况
+            //更新一个时隙后的实例部署情况
+            for (int i = 0; i < currentAppList.size(); i++) {
+                Map<Integer, NodeInfo> nodeInfos = currentAppList.get(i).getNodeInfos();
+                for (NodeInfo value : nodeInfos.values()) {
+                    serviceInstanceNum.set(value.getServiceType(), serviceInstanceNum.get(value.getServiceType()) + value.getInstance_To_Deploy());
+                }
+            }
+            alltimeApp.get(time).setServiceInstanceNum(serviceInstanceNum);
+            System.out.println("serviceInstancNum:" + serviceInstanceNum);
         }
         return alltimeApp;
     }
