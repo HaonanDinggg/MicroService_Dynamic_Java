@@ -138,7 +138,7 @@ public class WaitingTime {
       * @Version : 1.0
       * @Copyright : © 2024 All Rights Reserved.
       **/
-    public static Double calculateMicroserviceNodeAverageServiceTime(double averageArrivalRate, int correspondingMicroserviceInstanceNum, int microserviceTypeUnitProcessAbility) {
+    public static double calculateMicroserviceNodeAverageServiceTime(double averageArrivalRate, int correspondingMicroserviceInstanceNum, int microserviceTypeUnitProcessAbility) {
         if (averageArrivalRate == 0 || correspondingMicroserviceInstanceNum ==0) return 0.0;
         Double resultMicroserviceNodeAverageServiceTime = null;
         double serviceIntensity1 = averageArrivalRate / microserviceTypeUnitProcessAbility;

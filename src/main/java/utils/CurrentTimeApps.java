@@ -18,6 +18,7 @@ public class CurrentTimeApps {
     private double[][] BandwidthResource; // 节点间剩余带宽
     private double[][] ArrivalRate_matrix; //节点上的到达率 第一维为节点数，第二维为微服务种类
     private double[][] dataTrans_NodeToNode; //节点i到节点j的数据通信总量
+    private List<Double> migrationCost;//时隙迁移成本
 
 
     public CurrentTimeApps() {
@@ -34,6 +35,17 @@ public class CurrentTimeApps {
         this.ServiceInstanceNum = ServiceInstanceNum;
         this.InstanceDeployOnNode = InstanceDeployOnNode;
         this.BandwidthResource = BandwidthResource;
+    }
+
+    public CurrentTimeApps(ArrayList<AppPathInfo> appPathInfos, ArrayList<Integer> ServiceInstanceNum, int[][] InstanceDeployOnNode, int[][] Routing_decision_Y, double[][] BandwidthResource, double[][] ArrivalRate_matrix, double[][] dataTrans_NodeToNode, List<Double> migrationCost) {
+        this.appPathInfos = appPathInfos;
+        this.ServiceInstanceNum = ServiceInstanceNum;
+        this.InstanceDeployOnNode = InstanceDeployOnNode;
+        this.Routing_decision_Y = Routing_decision_Y;
+        this.BandwidthResource = BandwidthResource;
+        this.ArrivalRate_matrix = ArrivalRate_matrix;
+        this.dataTrans_NodeToNode = dataTrans_NodeToNode;
+        this.migrationCost = migrationCost;
     }
 
     /**
@@ -235,5 +247,37 @@ public class CurrentTimeApps {
 
     public void setDataTrans_NodeToNode(double[][] dataTrans_NodeToNode) {
         this.dataTrans_NodeToNode = dataTrans_NodeToNode;
+    }
+
+    /**
+     * 获取
+     * @return Routing_decision_Y
+     */
+    public int[][] getRouting_decision_Y() {
+        return Routing_decision_Y;
+    }
+
+    /**
+     * 设置
+     * @param Routing_decision_Y
+     */
+    public void setRouting_decision_Y(int[][] Routing_decision_Y) {
+        this.Routing_decision_Y = Routing_decision_Y;
+    }
+
+    /**
+     * 获取
+     * @return migrationCost
+     */
+    public List<Double> getMigrationCost() {
+        return migrationCost;
+    }
+
+    /**
+     * 设置
+     * @param migrationCost
+     */
+    public void setMigrationCost(List<Double> migrationCost) {
+        this.migrationCost = migrationCost;
     }
 }

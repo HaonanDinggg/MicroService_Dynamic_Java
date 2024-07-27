@@ -36,7 +36,7 @@ public class InstanceDeploy {
                     int pastServiceInstanceNum = PastEntry.getValue();
                     int incrementInstanceNum = nowServiceInstanceNum - pastServiceInstanceNum;
                     //如果是第一个时隙 那么直接采用贪心的部署方法 部署当前时隙需要的所有微服务实例
-                    InitDeployMsOnNode(alltimeApp.get(time).getInstanceDeployOnNode(),appParams,ServiceID,incrementInstanceNum);
+                    InitDeployMsOnNode(alltimeApp.get(time).getInstanceDeployOnNode(),appParams,ServiceID,incrementInstanceNum,equalizationCoefficient);
                 }
                 System.out.println("当前"+(time+1)+"时隙部署结果"+ Arrays.deepToString(InstanceDeployOnNode));
                 System.out.println();
@@ -191,8 +191,21 @@ public class InstanceDeploy {
                             //现有的服务器不足够了，这个时候需要增加新的激活服务器来满足计算资源需求
                             if (incrementInstanceNum > 0) {
                                 int activateNode = FindNewNodeToActivate(InstanceDeployOnNode,appParams,lastNode);
-                                InstanceDeployOnNode[activateNode][ServiceID] += incrementInstanceNum;
-                                incrementInstanceNum = 0;//被完全部署
+                                int result1 = (int) (equalizationCoefficient * appParams.getNum_CPU_Core());//存储每个节点均衡部署的实例数量
+                                int result2 = appParams.getNum_CPU_Core();//存储每个节点可部署最多的实例数量
+                                int result3 = appParams.getNum_CPU_Core(); //存储在当前时隙该节点可用的资源数量
+                                for (int service = 0; service < appParams.getNum_Microservice(); service++) {
+                                    result3 -= InstanceDeployOnNode[activateNode][service];
+                                }
+                                int result4 = result1 - result2 + result3;
+                                if (result4 > incrementInstanceNum) {
+                                    //直接分配实例资源
+                                    InstanceDeployOnNode[activateNode][ServiceID] += incrementInstanceNum;
+                                    incrementInstanceNum = 0;//被完全部署
+                                } else if (result4 > 0 && result4 < incrementInstanceNum) {
+                                    InstanceDeployOnNode[activateNode][ServiceID] += result4;
+                                    incrementInstanceNum -= result4;//被完全部署
+                                }
                             }
                         }
                     }
@@ -445,7 +458,7 @@ public class InstanceDeploy {
      * @Version : 1.0
      * @Copyright : © 2024 All Rights Reserved.
      **/
-    public static int[][] InitDeployMsOnNode(int[][] initDeployMsOnNode,App_Params appParams,int deployServiceID,int deployInstanceNum) {
+    public static int[][] InitDeployMsOnNode(int[][] initDeployMsOnNode,App_Params appParams,int deployServiceID,int deployInstanceNum,double equalizationCoefficient ) {
         Map<Integer,Integer> freeResourceNode = new HashMap<>();
         for (int node = 0; node < appParams.getNum_Server(); node++) {
             freeResourceNode.put(node,appParams.getNum_CPU_Core());
@@ -469,16 +482,25 @@ public class InstanceDeploy {
         for (Map.Entry<Integer, Integer> entry : freeResourceNode.entrySet()) {
             Integer nodeID = entry.getKey();
             Integer instanceNum = entry.getValue();
-            if( instanceNum >= deployInstanceNum){
+            int result1 = (int) (equalizationCoefficient * appParams.getNum_CPU_Core());//存储每个节点均衡部署的实例数量
+            int result2 = appParams.getNum_CPU_Core();//存储每个节点可部署最多的实例数量
+            int result3 = appParams.getNum_CPU_Core(); //存储在当前时隙该节点可用的资源数量
+            //计算当前节点可用资源数量
+            for (int service = 0; service < appParams.getNum_Microservice(); service++) {
+                result3 -= initDeployMsOnNode[nodeID][service];
+            }
+            int result4 = result1 - result2 + result3;
+            if( deployInstanceNum <= result4 ){
                 //如果节点资源满足微服务部署要求
-                initDeployMsOnNode[nodeID][deployServiceID] = deployInstanceNum;
-                freeResourceNode.replace(nodeID,instanceNum-deployInstanceNum);
-                break;
-            }else {
-                int instanceDeployOnCurrentNode = instanceNum;
-                initDeployMsOnNode[nodeID][deployServiceID] = instanceNum;
-                deployInstanceNum -= instanceDeployOnCurrentNode;
+                initDeployMsOnNode[nodeID][deployServiceID] += deployInstanceNum;
+                deployInstanceNum = 0;
                 freeResourceNode.replace(nodeID,0);
+
+                break;
+            }else if (result4 > 0 && result4 < deployInstanceNum) {
+                initDeployMsOnNode[nodeID][deployServiceID] += result4;
+                deployInstanceNum -= result4;
+                freeResourceNode.replace(nodeID,instanceNum-deployInstanceNum);
             }
         }
         return initDeployMsOnNode;

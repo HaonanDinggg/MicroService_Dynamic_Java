@@ -42,6 +42,12 @@ public class App_Params {
     private int[] Num_Apps_Timeslot_Range; // 每个时隙内待编排的微服务应用的数量
     private int[] Microservice_Type_CPU; // 每种微服务的一个实例需要消耗的CPU数量
     private int[] Microservice_Type_Memory; // 每种微服务的一个实例需要消耗的内存大小
+    private double[] Microservice_Type_Migration_Cost; // 每种微服务的一个到达率的迁移成本
+    private int[] Microservice_Type_ServiceScalingCost; // 每种微服务的一个实例的迁移成本
+
+    private List<Double> microService_Type_Migration_Cost; //所有微服务单位到达率迁移成本的信息
+    private List<Integer> microService_Type_ServiceScalingCost; //所有微服务伸缩成本的信息
+    private int ServerScalingCost; // 每个服务器的迁移成本
 
     private double Lowest_Communication_Latency; // 服务期间通信时延的最低值1
     private double Highest_Communication_Latency; // 服务器间通信时延的最高值1
@@ -172,6 +178,92 @@ public class App_Params {
         this.MicroServiceConnectionDelay = MicroServiceConnectionDelay;
     }
 
+    public App_Params(int Num_Server, int Num_Microservice, List<ServiceTypeInfo> serviceTypeInfos, List<PhysicalNodeInfo> physicalNodeInfos, int Num_Application, int Num_Time_Slot, int Num_CPU_Core, int MAX1, int AvgArrivalRateDataSize, double DataBaseCommunicationDelay, int RoundRobinParam, double AvgPhysicalConnectionDelay, int AvgPhysicalConnectionBandwidth, double avgNetworkResourceUtilization, double equalizationCoefficient, int[] App_Num, int[] TTL_Max_Tolerance_Latency_Range, double[] Unit_Rate_Bandwidth_Range, int[] Average_Arrival_Rate_Range, int[] Num_Node_Range, int[] Num_Edge_Range, int[] DAG_Category_Range, int[] Num_Apps_Timeslot_Range, int[] Microservice_Type_CPU, int[] Microservice_Type_Memory, double[] Microservice_Type_Migration_Cost, int[] Microservice_Type_ServiceScalingCost, int ServerScalingCost, double Lowest_Communication_Latency, double Highest_Communication_Latency, int Lowest_Bandwidth_Capacity, int Highest_Bandwidth_Capacity, int Lowest_Microservice_Bandwidth_Requirement, int Highest_Microservice_Bandwidth_Requirement, int Lowest_Microservice_Type_Unit_Process_Ability, int Highest_Microservice_Type_Unit_Process_Ability, double[][] PhysicalConnectionDelay, int[][] PhysicalConnectionBandwidth, int[][] MicroServiceConnectionDelay) {
+        this.Num_Server = Num_Server;
+        this.Num_Microservice = Num_Microservice;
+        this.serviceTypeInfos = serviceTypeInfos;
+        this.physicalNodeInfos = physicalNodeInfos;
+        this.Num_Application = Num_Application;
+        this.Num_Time_Slot = Num_Time_Slot;
+        this.Num_CPU_Core = Num_CPU_Core;
+        this.MAX1 = MAX1;
+        this.AvgArrivalRateDataSize = AvgArrivalRateDataSize;
+        this.DataBaseCommunicationDelay = DataBaseCommunicationDelay;
+        this.RoundRobinParam = RoundRobinParam;
+        this.AvgPhysicalConnectionDelay = AvgPhysicalConnectionDelay;
+        this.AvgPhysicalConnectionBandwidth = AvgPhysicalConnectionBandwidth;
+        this.avgNetworkResourceUtilization = avgNetworkResourceUtilization;
+        this.equalizationCoefficient = equalizationCoefficient;
+        this.App_Num = App_Num;
+        this.TTL_Max_Tolerance_Latency_Range = TTL_Max_Tolerance_Latency_Range;
+        this.Unit_Rate_Bandwidth_Range = Unit_Rate_Bandwidth_Range;
+        this.Average_Arrival_Rate_Range = Average_Arrival_Rate_Range;
+        this.Num_Node_Range = Num_Node_Range;
+        this.Num_Edge_Range = Num_Edge_Range;
+        this.DAG_Category_Range = DAG_Category_Range;
+        this.Num_Apps_Timeslot_Range = Num_Apps_Timeslot_Range;
+        this.Microservice_Type_CPU = Microservice_Type_CPU;
+        this.Microservice_Type_Memory = Microservice_Type_Memory;
+        this.Microservice_Type_Migration_Cost = Microservice_Type_Migration_Cost;
+        this.Microservice_Type_ServiceScalingCost = Microservice_Type_ServiceScalingCost;
+        this.ServerScalingCost = ServerScalingCost;
+        this.Lowest_Communication_Latency = Lowest_Communication_Latency;
+        this.Highest_Communication_Latency = Highest_Communication_Latency;
+        this.Lowest_Bandwidth_Capacity = Lowest_Bandwidth_Capacity;
+        this.Highest_Bandwidth_Capacity = Highest_Bandwidth_Capacity;
+        this.Lowest_Microservice_Bandwidth_Requirement = Lowest_Microservice_Bandwidth_Requirement;
+        this.Highest_Microservice_Bandwidth_Requirement = Highest_Microservice_Bandwidth_Requirement;
+        this.Lowest_Microservice_Type_Unit_Process_Ability = Lowest_Microservice_Type_Unit_Process_Ability;
+        this.Highest_Microservice_Type_Unit_Process_Ability = Highest_Microservice_Type_Unit_Process_Ability;
+        this.PhysicalConnectionDelay = PhysicalConnectionDelay;
+        this.PhysicalConnectionBandwidth = PhysicalConnectionBandwidth;
+        this.MicroServiceConnectionDelay = MicroServiceConnectionDelay;
+    }
+
+    public App_Params(int Num_Server, int Num_Microservice, List<ServiceTypeInfo> serviceTypeInfos, List<PhysicalNodeInfo> physicalNodeInfos, int Num_Application, int Num_Time_Slot, int Num_CPU_Core, int MAX1, int AvgArrivalRateDataSize, double DataBaseCommunicationDelay, int RoundRobinParam, double AvgPhysicalConnectionDelay, int AvgPhysicalConnectionBandwidth, double avgNetworkResourceUtilization, double equalizationCoefficient, int[] App_Num, int[] TTL_Max_Tolerance_Latency_Range, double[] Unit_Rate_Bandwidth_Range, int[] Average_Arrival_Rate_Range, int[] Num_Node_Range, int[] Num_Edge_Range, int[] DAG_Category_Range, int[] Num_Apps_Timeslot_Range, int[] Microservice_Type_CPU, int[] Microservice_Type_Memory, double[] Microservice_Type_Migration_Cost, int[] Microservice_Type_ServiceScalingCost, List<Double> microService_Type_Migration_Cost, List<Integer> microService_Type_ServiceScalingCost, int ServerScalingCost, double Lowest_Communication_Latency, double Highest_Communication_Latency, int Lowest_Bandwidth_Capacity, int Highest_Bandwidth_Capacity, int Lowest_Microservice_Bandwidth_Requirement, int Highest_Microservice_Bandwidth_Requirement, int Lowest_Microservice_Type_Unit_Process_Ability, int Highest_Microservice_Type_Unit_Process_Ability, double[][] PhysicalConnectionDelay, int[][] PhysicalConnectionBandwidth, int[][] MicroServiceConnectionDelay) {
+        this.Num_Server = Num_Server;
+        this.Num_Microservice = Num_Microservice;
+        this.serviceTypeInfos = serviceTypeInfos;
+        this.physicalNodeInfos = physicalNodeInfos;
+        this.Num_Application = Num_Application;
+        this.Num_Time_Slot = Num_Time_Slot;
+        this.Num_CPU_Core = Num_CPU_Core;
+        this.MAX1 = MAX1;
+        this.AvgArrivalRateDataSize = AvgArrivalRateDataSize;
+        this.DataBaseCommunicationDelay = DataBaseCommunicationDelay;
+        this.RoundRobinParam = RoundRobinParam;
+        this.AvgPhysicalConnectionDelay = AvgPhysicalConnectionDelay;
+        this.AvgPhysicalConnectionBandwidth = AvgPhysicalConnectionBandwidth;
+        this.avgNetworkResourceUtilization = avgNetworkResourceUtilization;
+        this.equalizationCoefficient = equalizationCoefficient;
+        this.App_Num = App_Num;
+        this.TTL_Max_Tolerance_Latency_Range = TTL_Max_Tolerance_Latency_Range;
+        this.Unit_Rate_Bandwidth_Range = Unit_Rate_Bandwidth_Range;
+        this.Average_Arrival_Rate_Range = Average_Arrival_Rate_Range;
+        this.Num_Node_Range = Num_Node_Range;
+        this.Num_Edge_Range = Num_Edge_Range;
+        this.DAG_Category_Range = DAG_Category_Range;
+        this.Num_Apps_Timeslot_Range = Num_Apps_Timeslot_Range;
+        this.Microservice_Type_CPU = Microservice_Type_CPU;
+        this.Microservice_Type_Memory = Microservice_Type_Memory;
+        this.Microservice_Type_Migration_Cost = Microservice_Type_Migration_Cost;
+        this.Microservice_Type_ServiceScalingCost = Microservice_Type_ServiceScalingCost;
+        this.microService_Type_Migration_Cost = microService_Type_Migration_Cost;
+        this.microService_Type_ServiceScalingCost = microService_Type_ServiceScalingCost;
+        this.ServerScalingCost = ServerScalingCost;
+        this.Lowest_Communication_Latency = Lowest_Communication_Latency;
+        this.Highest_Communication_Latency = Highest_Communication_Latency;
+        this.Lowest_Bandwidth_Capacity = Lowest_Bandwidth_Capacity;
+        this.Highest_Bandwidth_Capacity = Highest_Bandwidth_Capacity;
+        this.Lowest_Microservice_Bandwidth_Requirement = Lowest_Microservice_Bandwidth_Requirement;
+        this.Highest_Microservice_Bandwidth_Requirement = Highest_Microservice_Bandwidth_Requirement;
+        this.Lowest_Microservice_Type_Unit_Process_Ability = Lowest_Microservice_Type_Unit_Process_Ability;
+        this.Highest_Microservice_Type_Unit_Process_Ability = Highest_Microservice_Type_Unit_Process_Ability;
+        this.PhysicalConnectionDelay = PhysicalConnectionDelay;
+        this.PhysicalConnectionBandwidth = PhysicalConnectionBandwidth;
+        this.MicroServiceConnectionDelay = MicroServiceConnectionDelay;
+    }
+
 
     public void CreateServiceList() {
         List<ServiceTypeInfo> serviceTypeInfoList = new ArrayList<>();
@@ -207,7 +299,15 @@ public class App_Params {
         int[][] MicroServiceConnectionDelay  = new int[this.getNum_Microservice()][this.getNum_Microservice()];
         int max = 10000;
         List<PhysicalNodeInfo> physicalNodeInfosList = new ArrayList<>();
+        List<Integer> Microservice_Type_ServiceScalingCost = new ArrayList<>();
+        List<Double> Microservice_Type_Migration_Cost = new ArrayList<>();
         Random r = new Random(214);//处理率的随机种子固定
+        for (int i = 0; i < this.getNum_Microservice(); i++) {
+            Microservice_Type_ServiceScalingCost.add(r.nextInt(this.getMicroservice_Type_ServiceScalingCost()[1] - this.getMicroservice_Type_ServiceScalingCost()[0] + 1) + this.getMicroservice_Type_ServiceScalingCost()[0]);
+            Microservice_Type_Migration_Cost.add(r.nextDouble() * (this.getMicroservice_Type_Migration_Cost()[1] - this.getMicroservice_Type_Migration_Cost()[0]) + this.getMicroservice_Type_Migration_Cost()[0]);
+        }
+        this.setmicroService_Type_ServiceScalingCost(Microservice_Type_ServiceScalingCost);
+        this.setmicroService_Type_Migration_Cost(Microservice_Type_Migration_Cost);
         for (int i = 0; i < this.getNum_Server(); i++) {
             PhysicalNodeInfo physicalNodeInfo = new PhysicalNodeInfo();
             physicalNodeInfo.setNodeID(i);
@@ -884,5 +984,86 @@ public class App_Params {
      */
     public void setEqualizationCoefficient(double equalizationCoefficient) {
         this.equalizationCoefficient = equalizationCoefficient;
+    }
+
+    /**
+     * 获取
+     * @return Microservice_Type_Migration_Cost
+     */
+    public double[] getMicroservice_Type_Migration_Cost() {
+        return Microservice_Type_Migration_Cost;
+    }
+
+    /**
+     * 设置
+     * @param Microservice_Type_Migration_Cost
+     */
+    public void setMicroservice_Type_Migration_Cost(double[] Microservice_Type_Migration_Cost) {
+        this.Microservice_Type_Migration_Cost = Microservice_Type_Migration_Cost;
+    }
+
+    /**
+     * 获取
+     * @return Microservice_Type_ServiceScalingCost
+     */
+    public int[] getMicroservice_Type_ServiceScalingCost() {
+        return Microservice_Type_ServiceScalingCost;
+    }
+
+    /**
+     * 设置
+     * @param Microservice_Type_ServiceScalingCost
+     */
+    public void setMicroservice_Type_ServiceScalingCost(int[] Microservice_Type_ServiceScalingCost) {
+        this.Microservice_Type_ServiceScalingCost = Microservice_Type_ServiceScalingCost;
+    }
+
+
+    /**
+     * 获取
+     * @return ServerScalingCost
+     */
+    public int getServerScalingCost() {
+        return ServerScalingCost;
+    }
+
+    /**
+     * 设置
+     * @param ServerScalingCost
+     */
+    public void setServerScalingCost(int ServerScalingCost) {
+        this.ServerScalingCost = ServerScalingCost;
+    }
+
+    /**
+     * 获取
+     * @return microService_Type_Migration_Cost
+     */
+    public List<Double> getmicroService_Type_Migration_Cost() {
+        return microService_Type_Migration_Cost;
+    }
+
+    /**
+     * 设置
+     * @param microService_Type_Migration_Cost
+     */
+    public void setmicroService_Type_Migration_Cost(List<Double> microService_Type_Migration_Cost) {
+        this.microService_Type_Migration_Cost = microService_Type_Migration_Cost;
+    }
+
+    /**
+     * 获取
+     * @return microService_Type_ServiceScalingCost
+     */
+    public List<Integer> getmicroService_Type_ServiceScalingCost() {
+        return microService_Type_ServiceScalingCost;
+    }
+
+    /**
+     * 设置
+     * @param microService_Type_ServiceScalingCost
+     */
+    public void setmicroService_Type_ServiceScalingCost(List<Integer> microService_Type_ServiceScalingCost) {
+        this.microService_Type_ServiceScalingCost = microService_Type_ServiceScalingCost;
     }
 }
