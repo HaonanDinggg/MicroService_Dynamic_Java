@@ -291,10 +291,10 @@ public class Migration {
                                 System.out.println("physical_delay" + physical_delay);
                                 int e = Math.min(migrationInstanceNum, Math.min(currentTimeApps.getInstanceDeployOnNode()[migrationNode][migrationService], instanceToTighten));
                                 System.out.println("e:" + e);
-                                System.out.println("迁移前X(t)：");
-                                for (int i = 0; i < currentTimeApps.getInstanceDeployOnNode().length; i++) {
-                                    System.out.println(Arrays.toString(currentTimeApps.getInstanceDeployOnNode()[i]));
-                                }
+//                                System.out.println("迁移前X(t)：");
+//                                for (int i = 0; i < currentTimeApps.getInstanceDeployOnNode().length; i++) {
+//                                    System.out.println(Arrays.toString(currentTimeApps.getInstanceDeployOnNode()[i]));
+//                                }
                                 //迁移
                                 currentTimeApps.getInstanceDeployOnNode()[migrationNode][migrationService] -= e;
                                 currentTimeApps.getInstanceDeployOnNode()[migrationDestinationNode][migrationService] += e;
@@ -306,10 +306,10 @@ public class Migration {
                                     }
                                 }
                                 currentTimeApps.genBandwidthResourceAndArrivalmatrix(appParams);
-                                System.out.println("还原前X(t)：");
-                                for (int i = 0; i < currentTimeApps.getInstanceDeployOnNode().length; i++) {
-                                    System.out.println(Arrays.toString(currentTimeApps.getInstanceDeployOnNode()[i]));
-                                }
+//                                System.out.println("还原前X(t)：");
+//                                for (int i = 0; i < currentTimeApps.getInstanceDeployOnNode().length; i++) {
+//                                    System.out.println(Arrays.toString(currentTimeApps.getInstanceDeployOnNode()[i]));
+//                                }
                                 procession_delay_migration = calculateMicroserviceNodeAverageServiceTime(currentTimeApps.getArrivalRate_matrix()[migrationNode][migrationService],currentTimeApps.getInstanceDeployOnNode()[migrationNode][migrationService],migrationServiceProcessingRate)
                                         + calculateMicroserviceNodeAverageServiceTime(currentTimeApps.getArrivalRate_matrix()[migrationDestinationNode][migrationService],currentTimeApps.getInstanceDeployOnNode()[migrationDestinationNode][migrationService],migrationServiceProcessingRate);
                                 trans_delay_migration = currentTimeApps.getDataTrans_NodeToNode()[migrationNode][migrationDestinationNode]/currentTimeApps.getBandwidthResource()[migrationNode][migrationDestinationNode];
@@ -327,10 +327,10 @@ public class Migration {
                                     }
                                 }
                                 currentTimeApps.genBandwidthResourceAndArrivalmatrix(appParams);
-                                System.out.println("还原后X(t)：");
-                                for (int i = 0; i < currentTimeApps.getInstanceDeployOnNode().length; i++) {
-                                    System.out.println(Arrays.toString(currentTimeApps.getInstanceDeployOnNode()[i]));
-                                }
+//                                System.out.println("还原后X(t)：");
+//                                for (int i = 0; i < currentTimeApps.getInstanceDeployOnNode().length; i++) {
+//                                    System.out.println(Arrays.toString(currentTimeApps.getInstanceDeployOnNode()[i]));
+//                                }
                                 gain = (total_delay - total_delay_migration) / e;
                                 System.out.println("gain:" + gain);
                                 migrationInfo.add(migrationInstanceNum);
@@ -348,11 +348,11 @@ public class Migration {
                                 int migrationDestinationNode = decreaseMigrationDestinationEntry.getKey();//转入的节点id
                                 int migrationInstanceNum = (int)decreaseMigrationDestinationEntry.getValue().get(0);//转入的实例数量
                                 int migrationNum = instanceDeployOnNode[migrationNode][migrationService] > migrationInstanceNum ? migrationInstanceNum : instanceDeployOnNode[migrationNode][migrationService];
-                                double pastMigrationCost = migrationCost.get(migrationService);
-                                migrationCost.set(migrationService, (double) (migrationNum/instanceDeployOnNode[migrationNode][migrationService])*alltimeApp.get(time).getArrivalRate_matrix()[migrationNode][migrationService]+pastMigrationCost);
+                                migrationCost.set(migrationService, (double) (migrationNum/instanceDeployOnNode[migrationNode][migrationService])*alltimeApp.get(time).getArrivalRate_matrix()[migrationNode][migrationService]);
                                 instanceDeployOnNode[migrationDestinationNode][migrationService] += migrationNum;
                                 instanceDeployOnNode[migrationNode][migrationService] -= migrationNum;
                                 instanceToTighten -= migrationNum;
+                                double pastMigrationCost = migrationCost.get(migrationService);
 
                                 if(instanceToTighten <= 0){
                                     //遍历每条请求流
@@ -370,8 +370,7 @@ public class Migration {
                                 //找到一个新的服务器节点
                                 int migrationDestinationNode = FindNewNodeToActivate(instanceDeployOnNode,appParams,migrationNode);
                                 //直接分配实例资源
-                                double pastMigrationCost = migrationCost.get(migrationService);
-                                migrationCost.set(migrationService, (double) (instanceToTighten/instanceDeployOnNode[migrationNode][migrationService])*alltimeApp.get(time).getArrivalRate_matrix()[migrationNode][migrationService] + pastMigrationCost);
+                                migrationCost.set(migrationService, (double) (instanceToTighten/instanceDeployOnNode[migrationNode][migrationService])*alltimeApp.get(time).getArrivalRate_matrix()[migrationNode][migrationService]);
                                 instanceDeployOnNode[migrationDestinationNode][migrationService] += instanceToTighten;
                                 instanceDeployOnNode[migrationNode][migrationService] -= instanceToTighten;
 

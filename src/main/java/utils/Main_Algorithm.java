@@ -28,10 +28,10 @@ public class Main_Algorithm {
 
     public static App_Params init() {
         App_Params appParams = new App_Params();
-        appParams.setNum_Server(200);
+        appParams.setNum_Server(400);
         appParams.setNum_Microservice(10);
         appParams.setNum_Application(30);
-        appParams.setNum_Time_Slot(5);
+        appParams.setNum_Time_Slot(120);
         appParams.setNum_CPU_Core(50);
         appParams.setMAX1(100);
         appParams.setAvgArrivalRateDataSize(1);
@@ -39,10 +39,14 @@ public class Main_Algorithm {
         appParams.setRoundRobinParam(2);
         appParams.setEqualizationCoefficient(0.8);
         appParams.setAvgNetworkResourceUtilization(0.9);
-        appParams.setApp_Num(new int[]{600,600});
-        appParams.setTTL_Max_Tolerance_Latency_Range(new int[]{5,5});
+        appParams.setApp_Num(new int[]{300,300});
+
+        appParams.setTTL_Max_Tolerance_Latency_Range(new int[]{6,8});
+
         appParams.setUnit_Rate_Bandwidth_Range(new double[]{0.11,2});
-        appParams.setAverage_Arrival_Rate_Range(new int[]{4,6});
+
+        appParams.setAverage_Arrival_Rate_Range(new int[]{1,9});
+
         appParams.setNum_Node_Range(new int[]{2,6});
         appParams.setNum_Edge_Range(new int[]{1,6});
         appParams.setDAG_Category_Range(new int[]{0,1});
@@ -55,12 +59,13 @@ public class Main_Algorithm {
         appParams.setServerScalingCost(100);
         appParams.setMicroservice_Type_ServiceScalingCost(new int[]{6,14});
         appParams.setMicroservice_Type_Migration_Cost(new double[]{2,4});
+        appParams.setServerOperatingCost(50);
 
         appParams.setLowest_Bandwidth_Capacity(10);
         appParams.setHighest_Bandwidth_Capacity(30);
         appParams.setLowest_Microservice_Bandwidth_Requirement(1);
         appParams.setHighest_Microservice_Bandwidth_Requirement(2);
-        appParams.setLowest_Microservice_Type_Unit_Process_Ability(3);
+        appParams.setLowest_Microservice_Type_Unit_Process_Ability(8);
         appParams.setHighest_Microservice_Type_Unit_Process_Ability(8);
         appParams.setAvgPhysicalConnectionDelay((appParams.getHighest_Communication_Latency() + appParams.getLowest_Communication_Latency())/2);
         appParams.setAvgPhysicalConnectionBandwidth((appParams.getHighest_Bandwidth_Capacity() + appParams.getLowest_Bandwidth_Capacity())/2);
@@ -74,19 +79,52 @@ public class Main_Algorithm {
 
         Random r = new Random(214);
         App_Params appParams = init();
-        String filePathParams = String.format("D:\\华科工作\\实验室工作\\胡毅学长动态\\Dynamic_Java\\appParams\\app_params.json");
-        File fileParams = new File(filePathParams);
-        fileParams.getParentFile().mkdirs();
-        // 确保目录存在
-        try {
-            saveToJsonFile(appParams, filePathParams);
-            //System.out.println("对象已成功保存到 app_params.json 文件中。");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+//        String filePathParams = String.format("D:\\华科工作\\实验室工作\\胡毅学长动态\\Dynamic_Java\\appParams\\app_params.json");
+//        File fileParams = new File(filePathParams);
+//        fileParams.getParentFile().mkdirs();
+//        // 确保目录存在
+//        try {
+//            saveToJsonFile(appParams, filePathParams);
+//            //System.out.println("对象已成功保存到 app_params.json 文件中。");
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
         //System.out.println(appParams);
         //需要初始化所有的ServiceTypeInfo 共用一套微服务信息
-        ArrayList<CurrentTimeApps> alltimeApp = GenerateApp.CreateAlltimeApp(appParams.getNum_Time_Slot(),appParams,r);
+
+        List<Integer> appNum = new ArrayList<>(Arrays.asList(   200, 300, 400, 590,
+                                                                600, 100, 150, 300,
+                                                                250, 250, 150, 630,
+                                                                 50, 240, 400, 810,
+                                                                500, 440, 300, 200,
+                                                                160, 200, 320, 460,
+                                                                260, 320, 410, 590,
+                                                                660, 100, 160, 300,
+                                                                250, 270, 150, 730,
+                                                                290, 850, 990, 820,
+                                                                440, 350, 400, 500,
+                                                                670, 110, 150, 300,
+                                                                250, 200, 150, 777,
+                                                                150, 280, 400, 666,
+                                                                590, 400, 300, 222,
+                                                                100, 290, 300, 444,
+                                                                220, 730, 400, 555,
+                                                                660, 100, 150, 100,
+                                                                230, 200, 150, 770,
+                                                                250, 200, 150, 640,
+                                                                210, 380, 400, 500,
+                                                                610, 100, 150, 300,
+                                                                250, 230, 150, 760,
+                                                                 80, 200, 400, 600,
+                                                                570, 410, 300, 200,
+                                                                140, 280, 350, 400,
+                                                                290, 330, 400, 500,
+                                                                610, 100, 150, 300,
+                                                                250, 200, 550, 1000,
+                                                                450, 210, 150, 800));
+
+        //ArrayList<CurrentTimeApps> alltimeApp = GenerateApp.CreateAlltimeApp(appParams.getNum_Time_Slot(),appParams,r);
+        ArrayList<CurrentTimeApps> alltimeApp = GenerateAppSP.CreateAlltimeApp(appParams.getNum_Time_Slot(),appParams,r,appNum);
 
         for (int i = 0; i < appParams.getNum_Microservice(); i++) {
             int serviceProcessingRate = appParams.getServiceTypeInfos().get(i).getServiceProcessingRate();
@@ -103,7 +141,7 @@ public class Main_Algorithm {
         //准备进行迁移
         alltimeApp = Migration.Migration(appParams,alltimeApp);
 
-        //时延以及成功率计算
+        //时延以及成功率以及成本计算
         for(int time = 0; time < alltimeApp.size(); time++){
             ArrayList<AppPathInfo> currentAppList = alltimeApp.get(time).getAppPathInfos();
             double[][] Arrival_matrix = alltimeApp.get(time).getArrivalRate_matrix();
@@ -177,9 +215,19 @@ public class Main_Algorithm {
                     successNum--;
                 }
             }
-
-            System.out.println("当前时隙app平均时延为 "+avgLatency/currentAppList.size());
-            System.out.println("当前时隙app服务成功率为 "+successNum/currentAppList.size());
+            int nodeCoreNum = appParams.getNum_CPU_Core();
+            int[][] currentInstanceDeployOnNode = alltimeApp.get(time).getInstanceDeployOnNode();
+            double[][] bandwidthResource = alltimeApp.get(time).getBandwidthResource();
+            int[][] physicalConnectionBandwidth = appParams.getPhysicalConnectionBandwidth();
+            double serverNetworkFairnessIndex = calServerNetworkFairnessIndex(currentInstanceDeployOnNode,nodeCoreNum);
+            double bandNetworkFairnessIndex = calBandNetworkFairnessIndex(physicalConnectionBandwidth,bandwidthResource);
+            //System.out.println("当前时隙"+(time+1)+"的服务器公平指数"+serverNetworkFairnessIndex);
+            //System.out.println("当前时隙"+(time+1)+"的带宽公平指数"+bandNetworkFairnessIndex);
+            System.out.println("当前时隙"+(time+1)+"app平均时延为 "+avgLatency/currentAppList.size());
+            System.out.println("当前时隙"+(time+1)+"app服务成功率为 "+successNum/currentAppList.size());
+            System.out.println("当前时隙"+(time+1)+"的公平指数"+(0.5*serverNetworkFairnessIndex+0.5*bandNetworkFairnessIndex));
+            System.out.println("当前时隙"+(time+1)+"节点利用率的公平指数"+serverNetworkFairnessIndex);
+            System.out.println("当前时隙"+(time+1)+"带宽利用率的公平指数"+bandNetworkFairnessIndex);
         }
         //
         //迁移成本计算
@@ -198,28 +246,13 @@ public class Main_Algorithm {
             for (int i = 0; i < migrationCost.size(); i++) {
                 migrationCostSum += appParams.getmicroService_Type_Migration_Cost().get(i)*migrationCost.get(i);
             }
-            double costSum = migrationCostSum + serverCost + serviceCostSum;
+            double operatingCost = countActivatedNodes(currentInstanceDeployOnNode)* appParams.getServerOperatingCost();
+            double costSum = migrationCostSum + serverCost + serviceCostSum + operatingCost;
 //            System.out.println("当前时隙"+(time+1)+"与时隙 "+(time+2)+"的服务器伸缩成本为"+serverCost);
-//            System.out.println("当前时隙"+(time+1)+"与时隙 "+(time+2)+"的微服务伸缩成本为"+serviceCost);
 //            System.out.println("当前时隙"+(time+1)+"与时隙 "+(time+2)+"的微服务伸缩总成本为"+serviceCostSum);
-//            System.out.println("当前时隙"+(time+1)+"与时隙 "+(time+2)+"的迁移成本为"+migrationCost);
 //            System.out.println("当前时隙"+(time+1)+"与时隙 "+(time+2)+"的迁移总成本为"+migrationCostSum);
+//            System.out.println("当前时隙"+(time+1)+"与时隙 "+(time+2)+"的服务器运行成本为"+operatingCost);
             System.out.println("当前时隙"+(time+1)+"与时隙 "+(time+2)+"的总成本为"+costSum);
-        }
-        //网络公平指数
-        for(int time = 0; time < alltimeApp.size(); time++){
-            int nodeCoreNum = appParams.getNum_CPU_Core();
-            int[][] currentInstanceDeployOnNode = alltimeApp.get(time).getInstanceDeployOnNode();
-            double[][] bandwidthResource = alltimeApp.get(time).getBandwidthResource();
-            int[][] physicalConnectionBandwidth = appParams.getPhysicalConnectionBandwidth();
-            double serverNetworkFairnessIndex = calServerNetworkFairnessIndex(currentInstanceDeployOnNode,nodeCoreNum);
-            double bandNetworkFairnessIndex = calBandNetworkFairnessIndex(physicalConnectionBandwidth,bandwidthResource);
-            //System.out.println("当前时隙"+(time+1)+"的服务器公平指数"+serverNetworkFairnessIndex);
-            //System.out.println("当前时隙"+(time+1)+"的带宽公平指数"+bandNetworkFairnessIndex);
-            System.out.println("当前时隙"+(time+1)+"的公平指数"+(0.5*serverNetworkFairnessIndex+0.5*bandNetworkFairnessIndex));
-
-            System.out.println("当前时隙"+(time+1)+"节点利用率的公平指数"+serverNetworkFairnessIndex);
-            System.out.println("当前时隙"+(time+1)+"带宽利用率的公平指数"+bandNetworkFairnessIndex);
         }
     }
 
@@ -266,6 +299,24 @@ public class Main_Algorithm {
         return serverNetworkFairnessIndex;
     }
 
+
+    public static int countActivatedNodes(int[][] coming) {
+        int activatedNodes = 0;
+        int numNodes = coming.length;
+        int numServices = coming[0].length;
+
+        for (int j = 0; j < numNodes; j++) {
+            for (int i = 0; i < numServices; i++) {
+                if (coming[j][i] > 0) {
+                    activatedNodes ++;
+                    break;
+                }
+            }
+
+        }
+
+        return activatedNodes;
+    }
 
 
     // 统计从未有任何服务部署到有服务部署的节点数量

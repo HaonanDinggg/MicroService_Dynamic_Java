@@ -93,6 +93,7 @@ public class InstanceDeploy {
                     } else if (nowServiceInstanceNum == pastDeployedServiceNum) {
                         //对所有服务器节点n，保持微服务m现有的部署方案
                     } else if (nowServiceInstanceNum > pastDeployedServiceNum) {
+
                         //更新节点利用率
                         Map<Integer,Double> utilizationActive = CalUtilizationActive(InstanceDeployOnNode, appParams.getNum_CPU_Core());//这边索引对应的是节点的id
                         ArrayList<AppPathInfo> currentAppList = alltimeApp.get(time).getAppPathInfos();
@@ -159,7 +160,7 @@ public class InstanceDeploy {
                         //计算加权和,对服务器节点集合进行降序排序
                         Map<Integer,Double> weightedSum = calculateWeightedSum(utilizationActive,totalServiceInstances,pastDeployedServiceNum);
                         int incrementInstanceNum = nowServiceInstanceNum - pastDeployedServiceNum;
-                        while (incrementInstanceNum>0) {
+                        while (incrementInstanceNum > 0) {
                             int lastNode = 0;
                             for (Map.Entry<Integer, Double> entry : weightedSum.entrySet()) {
                                 int nodeID = entry.getKey();
@@ -202,7 +203,7 @@ public class InstanceDeploy {
                                     //直接分配实例资源
                                     InstanceDeployOnNode[activateNode][ServiceID] += incrementInstanceNum;
                                     incrementInstanceNum = 0;//被完全部署
-                                } else if (result4 > 0 && result4 < incrementInstanceNum) {
+                                } else {
                                     InstanceDeployOnNode[activateNode][ServiceID] += result4;
                                     incrementInstanceNum -= result4;//被完全部署
                                 }
