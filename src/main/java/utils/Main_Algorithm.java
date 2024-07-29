@@ -231,6 +231,7 @@ public class Main_Algorithm {
         }
         //
         //迁移成本计算
+        double avg= 0.0;
         for(int time = 0; time < alltimeApp.size()-1; time++){
             int[][] currentInstanceDeployOnNode = alltimeApp.get(time).getInstanceDeployOnNode();
             int[][] comingInstanceDeployOnNode = alltimeApp.get(time+1).getInstanceDeployOnNode();
@@ -253,6 +254,24 @@ public class Main_Algorithm {
 //            System.out.println("当前时隙"+(time+1)+"与时隙 "+(time+2)+"的迁移总成本为"+migrationCostSum);
 //            System.out.println("当前时隙"+(time+1)+"与时隙 "+(time+2)+"的服务器运行成本为"+operatingCost);
             System.out.println("当前时隙"+(time+1)+"与时隙 "+(time+2)+"的总成本为"+costSum);
+            avg+=costSum;
+        }
+        avg/=alltimeApp.size()-1;
+        System.out.println("平均" + avg);
+        //网络公平指数
+        for(int time = 0; time < alltimeApp.size(); time++){
+            int nodeCoreNum = appParams.getNum_CPU_Core();
+            int[][] currentInstanceDeployOnNode = alltimeApp.get(time).getInstanceDeployOnNode();
+            double[][] bandwidthResource = alltimeApp.get(time).getBandwidthResource();
+            int[][] physicalConnectionBandwidth = appParams.getPhysicalConnectionBandwidth();
+            double serverNetworkFairnessIndex = calServerNetworkFairnessIndex(currentInstanceDeployOnNode,nodeCoreNum);
+            double bandNetworkFairnessIndex = calBandNetworkFairnessIndex(physicalConnectionBandwidth,bandwidthResource);
+            //System.out.println("当前时隙"+(time+1)+"的服务器公平指数"+serverNetworkFairnessIndex);
+            //System.out.println("当前时隙"+(time+1)+"的带宽公平指数"+bandNetworkFairnessIndex);
+            System.out.println("当前时隙"+(time+1)+"的公平指数"+(0.5*serverNetworkFairnessIndex+0.5*bandNetworkFairnessIndex));
+
+            System.out.println("当前时隙"+(time+1)+"节点利用率的公平指数"+serverNetworkFairnessIndex);
+            System.out.println("当前时隙"+(time+1)+"带宽利用率的公平指数"+bandNetworkFairnessIndex);
         }
     }
 
