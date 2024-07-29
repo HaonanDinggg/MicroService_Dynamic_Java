@@ -22,14 +22,10 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="33958379-72a9-4e0c-a9bb-14492c4743a8" name="Changes" comment="更新当前时隙内每个节点的总到达率">
+    <list default="true" id="33958379-72a9-4e0c-a9bb-14492c4743a8" name="Changes" comment="修改时延gain的bug-">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/utils/CurrentTimeApps.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/utils/CurrentTimeApps.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/utils/GenerateApp.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/utils/GenerateApp.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/utils/InstanceCalculator.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/utils/InstanceCalculator.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/utils/Main_Algorithm.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/utils/Main_Algorithm.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/utils/WaitingTime.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/utils/WaitingTime.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/utils/WaitingTime.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/utils/WaitingTime.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/utils/App_Params.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/utils/App_Params.class" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -39,26 +35,28 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="master" />
+        <entry key="$PROJECT_DIR$" value="main" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="RESET_MODE" value="HARD" />
   </component>
-  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
-  "lastFilter": {
-    "state": "OPEN",
-    "assignee": "CrankyDog"
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;CrankyDog&quot;
   }
-}]]></component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/HaonanDinggg/MicroService_Dynamic_Java.git",
-    "accountId": "02eed263-2780-4571-a5c3-341f141cf134"
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/HaonanDinggg/MicroService_Dynamic_Java.git&quot;,
+    &quot;accountId&quot;: &quot;02eed263-2780-4571-a5c3-341f141cf134&quot;
   }
-}]]></component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 3
-}]]></component>
+}</component>
+  <component name="ProjectColorInfo">{
+  &quot;customColor&quot;: &quot;&quot;,
+  &quot;associatedIndex&quot;: 3
+}</component>
   <component name="ProjectId" id="2jd8stCopLpMPQUGnQLD3ScSpKK" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true">
     <ConfirmationsSetting value="2" id="Add" />
@@ -67,19 +65,19 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Application.Main_Algorithm.executor": "Run",
-    "git-widget-placeholder": "master",
-    "kotlin-language-version-configured": "true",
-    "node.js.detected.package.eslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "Console",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Application.Main_Algorithm.executor&quot;: &quot;Run&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.lookFeel&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RunManager">
     <configuration name="Main_Algorithm" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="utils.Main_Algorithm" />
@@ -96,6 +94,10 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Application.Main_Algorithm" />
+        <item itemvalue="Application.Main_Algorithm" />
+        <item itemvalue="Application.Main_Algorithm" />
+        <item itemvalue="Application.Main_Algorithm" />
         <item itemvalue="Application.Main_Algorithm" />
       </list>
     </recent_temporary>
@@ -135,8 +137,10 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1721705802855</updated>
-      <workItem from="1721734355096" duration="32557000" />
-      <workItem from="1721881194810" duration="5738000" />
+      <workItem from="1721734355096" duration="26699000" />
+      <workItem from="1721895833456" duration="24482000" />
+      <workItem from="1721924235139" duration="12781000" />
+      <workItem from="1722158518422" duration="5024000" />
     </task>
     <task id="LOCAL-00003" summary="更新当前时隙内每个节点的总到达率">
       <option name="closed" value="true" />
@@ -146,7 +150,55 @@
       <option name="project" value="LOCAL" />
       <updated>1721739570756</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="修改到达率计算时的bug，平行请求分类讨论">
+      <option name="closed" value="true" />
+      <created>1721918913193</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1721918913193</updated>
+    </task>
+    <task id="LOCAL-00005" summary="修改到达率计算时的bug，平行请求分类讨论">
+      <option name="closed" value="true" />
+      <created>1721918957399</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1721918957399</updated>
+    </task>
+    <task id="LOCAL-00006" summary="修改时延gain的bug">
+      <option name="closed" value="true" />
+      <created>1721923450882</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1721923450882</updated>
+    </task>
+    <task id="LOCAL-00007" summary="修改时延gain的bug-">
+      <option name="closed" value="true" />
+      <created>1721924675138</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1721924675138</updated>
+    </task>
+    <task id="LOCAL-00008" summary="修改时延gain的bug-">
+      <option name="closed" value="true" />
+      <created>1721924818284</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1721924818284</updated>
+    </task>
+    <task id="LOCAL-00009" summary="修改时延gain的bug-">
+      <option name="closed" value="true" />
+      <created>1721925031676</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1721925031676</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -167,6 +219,9 @@
     <MESSAGE value="添加剩余带宽更新" />
     <MESSAGE value="添加剩余带宽更新，添加注释" />
     <MESSAGE value="更新当前时隙内每个节点的总到达率" />
-    <option name="LAST_COMMIT_MESSAGE" value="更新当前时隙内每个节点的总到达率" />
+    <MESSAGE value="修改到达率计算时的bug，平行请求分类讨论" />
+    <MESSAGE value="修改时延gain的bug" />
+    <MESSAGE value="修改时延gain的bug-" />
+    <option name="LAST_COMMIT_MESSAGE" value="修改时延gain的bug-" />
   </component>
 </project>

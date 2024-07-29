@@ -178,8 +178,8 @@ public class Main_Algorithm {
                 }
             }
 
-            System.out.println("当前时隙app平均时延为 "+avgLatency/currentAppList.size());
-            System.out.println("当前时隙app服务成功率为 "+successNum/currentAppList.size());
+            System.out.println("当前时隙" + time+1 + "app平均时延为 "+avgLatency/currentAppList.size());
+            System.out.println("当前时隙" + time+1 + "app服务成功率为 "+successNum/currentAppList.size());
         }
         //
         //迁移成本计算
