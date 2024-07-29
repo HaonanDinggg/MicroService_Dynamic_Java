@@ -28,10 +28,10 @@ public class Main_Algorithm {
 
     public static App_Params init() {
         App_Params appParams = new App_Params();
-        appParams.setNum_Server(400);
+        appParams.setNum_Server(600);
         appParams.setNum_Microservice(10);
         appParams.setNum_Application(30);
-        appParams.setNum_Time_Slot(120);
+        appParams.setNum_Time_Slot(5);
         appParams.setNum_CPU_Core(50);
         appParams.setMAX1(100);
         appParams.setAvgArrivalRateDataSize(1);
@@ -39,13 +39,13 @@ public class Main_Algorithm {
         appParams.setRoundRobinParam(2);
         appParams.setEqualizationCoefficient(0.8);
         appParams.setAvgNetworkResourceUtilization(0.9);
-        appParams.setApp_Num(new int[]{300,300});
+        appParams.setApp_Num(new int[]{800,800});
 
         appParams.setTTL_Max_Tolerance_Latency_Range(new int[]{6,8});
 
         appParams.setUnit_Rate_Bandwidth_Range(new double[]{0.11,2});
 
-        appParams.setAverage_Arrival_Rate_Range(new int[]{1,9});
+        appParams.setAverage_Arrival_Rate_Range(new int[]{8,8});
 
         appParams.setNum_Node_Range(new int[]{2,6});
         appParams.setNum_Edge_Range(new int[]{1,6});
@@ -123,8 +123,8 @@ public class Main_Algorithm {
                                                                 250, 200, 550, 1000,
                                                                 450, 210, 150, 800));
 
-        //ArrayList<CurrentTimeApps> alltimeApp = GenerateApp.CreateAlltimeApp(appParams.getNum_Time_Slot(),appParams,r);
-        ArrayList<CurrentTimeApps> alltimeApp = GenerateAppSP.CreateAlltimeApp(appParams.getNum_Time_Slot(),appParams,r,appNum);
+        ArrayList<CurrentTimeApps> alltimeApp = GenerateApp.CreateAlltimeApp(appParams.getNum_Time_Slot(),appParams,r);
+        //ArrayList<CurrentTimeApps> alltimeApp = GenerateAppSP.CreateAlltimeApp(appParams.getNum_Time_Slot(),appParams,r,appNum);
 
         for (int i = 0; i < appParams.getNum_Microservice(); i++) {
             int serviceProcessingRate = appParams.getServiceTypeInfos().get(i).getServiceProcessingRate();
