@@ -28,7 +28,7 @@ public class Main_Algorithm {
 
     public static App_Params init() {
         App_Params appParams = new App_Params();
-        appParams.setNum_Server(200);
+        appParams.setNum_Server(600);
         appParams.setNum_Microservice(10);
         appParams.setNum_Application(30);
         appParams.setNum_Time_Slot(5);
@@ -39,10 +39,10 @@ public class Main_Algorithm {
         appParams.setRoundRobinParam(2);
         appParams.setEqualizationCoefficient(0.8);
         appParams.setAvgNetworkResourceUtilization(0.9);
-        appParams.setApp_Num(new int[]{600,600});
+        appParams.setApp_Num(new int[]{800,800});
         appParams.setTTL_Max_Tolerance_Latency_Range(new int[]{5,5});
         appParams.setUnit_Rate_Bandwidth_Range(new double[]{0.11,2});
-        appParams.setAverage_Arrival_Rate_Range(new int[]{4,6});
+        appParams.setAverage_Arrival_Rate_Range(new int[]{8,8});
         appParams.setNum_Node_Range(new int[]{2,6});
         appParams.setNum_Edge_Range(new int[]{1,6});
         appParams.setDAG_Category_Range(new int[]{0,1});
@@ -183,6 +183,7 @@ public class Main_Algorithm {
         }
         //
         //迁移成本计算
+        double avg= 0.0;
         for(int time = 0; time < alltimeApp.size()-1; time++){
             int[][] currentInstanceDeployOnNode = alltimeApp.get(time).getInstanceDeployOnNode();
             int[][] comingInstanceDeployOnNode = alltimeApp.get(time+1).getInstanceDeployOnNode();
@@ -205,7 +206,10 @@ public class Main_Algorithm {
 //            System.out.println("当前时隙"+(time+1)+"与时隙 "+(time+2)+"的迁移成本为"+migrationCost);
 //            System.out.println("当前时隙"+(time+1)+"与时隙 "+(time+2)+"的迁移总成本为"+migrationCostSum);
             System.out.println("当前时隙"+(time+1)+"与时隙 "+(time+2)+"的总成本为"+costSum);
+            avg+=costSum;
         }
+        avg/=alltimeApp.size()-1;
+        System.out.println("平均" + avg);
         //网络公平指数
         for(int time = 0; time < alltimeApp.size(); time++){
             int nodeCoreNum = appParams.getNum_CPU_Core();

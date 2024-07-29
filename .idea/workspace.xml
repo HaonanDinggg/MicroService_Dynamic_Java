@@ -22,10 +22,9 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="33958379-72a9-4e0c-a9bb-14492c4743a8" name="Changes" comment="修改时延gain的bug-">
+    <list default="true" id="33958379-72a9-4e0c-a9bb-14492c4743a8" name="Changes" comment="终测版，改了点注释">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/utils/Main_Algorithm.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/utils/Main_Algorithm.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/utils/App_Params.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/utils/App_Params.class" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -140,7 +139,7 @@
       <workItem from="1721734355096" duration="26699000" />
       <workItem from="1721895833456" duration="24482000" />
       <workItem from="1721924235139" duration="12781000" />
-      <workItem from="1722158518422" duration="5024000" />
+      <workItem from="1722158518422" duration="11944000" />
     </task>
     <task id="LOCAL-00003" summary="更新当前时隙内每个节点的总到达率">
       <option name="closed" value="true" />
@@ -198,7 +197,15 @@
       <option name="project" value="LOCAL" />
       <updated>1721925031676</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL-00010" summary="终测版，改了点注释">
+      <option name="closed" value="true" />
+      <created>1722237686781</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1722237686781</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -222,6 +229,7 @@
     <MESSAGE value="修改到达率计算时的bug，平行请求分类讨论" />
     <MESSAGE value="修改时延gain的bug" />
     <MESSAGE value="修改时延gain的bug-" />
-    <option name="LAST_COMMIT_MESSAGE" value="修改时延gain的bug-" />
+    <MESSAGE value="终测版，改了点注释" />
+    <option name="LAST_COMMIT_MESSAGE" value="终测版，改了点注释" />
   </component>
 </project>
